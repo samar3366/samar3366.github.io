@@ -1,6 +1,10 @@
 body {
   margin: 0;
+  font-family: consolas;
 }
+
+/* Color Combinations */
+/* #fae5df #f5cac2 #ed7966 #303179 #141850 */
 
 header {
   display: flex;
@@ -17,7 +21,7 @@ header .title {
   display: flex;
   justify-content: center;
   font-size: 40px;
-  padding: 10px;
+  padding: 20px;
   font-family: consolas;
 }
 
@@ -34,12 +38,49 @@ header .title .last-name {
   margin-top: 150px;
 }
 
+.body .container-about {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.body .container-about .about-section {
+  flex: 50%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  height: 400px;
+  color: #ed7966;
+  background-color: #303179;
+}
+
+.body .container-about .about-section .title {
+  padding: 25px;
+  font-size: 30px;
+}
+
+.body .container-about .contact-section {
+  flex: 50%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  height: 400px;
+  color: #141850;
+  background-color: #f5cac2;
+}
+
+.body .container-about .contact-section code {
+  padding: 25px;
+  font-size: 30px;
+}
+
 footer {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-flow: column;
   height: 150px;
+  width: 100%;
   background-color: #141850;
 }
 
@@ -58,4 +99,38 @@ footer .connect-with {
   flex-flow: row;
   height: 40px;
   width: 50px;
+}
+
+/* common styles */
+
+a {
+    color: #141850;
+}
+
+/* Responsive view styles */
+
+@media only screen and (max-width: 600px) {
+  header .title {
+    font-size: 25px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .body {
+    margin-top: 100px;
+  }
+
+  .body .container-about {
+    flex-flow: column;
+  }
+
+  .body .container-about .about-section .title {
+    padding: 15px;
+    font-size: 17px;
+  }
+
+  .body .container-about .contact-section code {
+    padding: 15px;
+    font-size: 17px;
+  }
 }
