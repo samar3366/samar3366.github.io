@@ -97,14 +97,18 @@ footer .connect-with {
   display: flex;
   justify-content: center;
   flex-flow: row;
+}
+
+footer .connect-with a {
   height: 40px;
-  width: 50px;
+  width: 40px;
+  padding: 10px;
 }
 
 /* common styles */
 
 a {
-    color: #141850;
+  color: #141850;
 }
 
 /* Responsive view styles */
