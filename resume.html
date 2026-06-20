@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sumanth Reddy Pathi — Resume</title>
+    <style>
+      :root {
+        --ink: #1c2330;
+        --muted: #4a5568;
+        --accent: #1f3b57;
+        --rule: #c9d2dd;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #e9edf2;
+        color: var(--ink);
+        font-family: "Calibri", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        font-size: 11pt;
+        line-height: 1.34;
+      }
+
+      /* Print / save-as-PDF helper bar (screen only) */
+      .toolbar {
+        position: sticky;
+        top: 0;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px;
+        background: #1f3b57;
+        color: #fff;
+        font-size: 10pt;
+      }
+      .toolbar button {
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        border: 0;
+        border-radius: 6px;
+        padding: 8px 18px;
+        background: #fff;
+        color: #1f3b57;
+      }
+      .toolbar span {
+        align-self: center;
+        opacity: 0.9;
+      }
+
+      .page {
+        max-width: 210mm;
+        margin: 18px auto;
+        padding: 16mm 16mm 14mm;
+        background: #fff;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+      }
+
+      /* Header */
+      header {
+        border-bottom: 2px solid var(--accent);
+        padding-bottom: 8px;
+        margin-bottom: 10px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 23pt;
+        letter-spacing: 0.5px;
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .role {
+        margin-top: 2px;
+        font-size: 12pt;
+        font-weight: 600;
+        color: var(--ink);
+      }
+      .contact {
+        margin-top: 8px;
+        font-size: 9.7pt;
+        color: var(--muted);
+      }
+      .contact a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+      .contact a:hover {
+        text-decoration: underline;
+      }
+      .contact .sep {
+        margin: 0 7px;
+        color: var(--rule);
+      }
+
+      /* Sections */
+      section {
+        margin-top: 9px;
+      }
+      h2 {
+        margin: 0 0 6px;
+        font-size: 11.5pt;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--accent);
+        border-bottom: 1px solid var(--rule);
+        padding-bottom: 3px;
+      }
+
+      p {
+        margin: 0;
+      }
+      .summary {
+        color: var(--ink);
+      }
+      .competencies {
+        color: var(--ink);
+        font-weight: 600;
+        line-height: 1.6;
+      }
+
+      /* Skills as label / value rows */
+      .skills {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        row-gap: 3px;
+        column-gap: 12px;
+      }
+      .skills dt {
+        font-weight: 700;
+        color: var(--accent);
+      }
+      .skills dd {
+        margin: 0;
+        color: var(--ink);
+      }
+
+      /* Experience */
+      .job {
+        margin-bottom: 9px;
+      }
+      .job:last-child {
+        margin-bottom: 0;
+      }
+      .job-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 16px;
+      }
+      .job-title {
+        font-weight: 700;
+        font-size: 11pt;
+      }
+      .job-org {
+        font-weight: 600;
+        color: var(--accent);
+      }
+      .job-meta {
+        white-space: nowrap;
+        font-size: 9.7pt;
+        color: var(--muted);
+      }
+      .job ul {
+        margin: 5px 0 0;
+        padding-left: 18px;
+      }
+      .job li {
+        margin-bottom: 3px;
+      }
+      .role-line {
+        margin-top: 4px;
+        font-size: 10pt;
+        color: var(--muted);
+      }
+
+      .two-col {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 16px;
+      }
+      .edu-school {
+        font-weight: 700;
+      }
+
+      .proj b {
+        color: var(--accent);
+      }
+      .proj li {
+        margin-bottom: 3px;
+      }
+      .proj ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      @media print {
+        html,
+        body {
+          background: #fff;
+          font-size: 10pt;
+        }
+        .toolbar {
+          display: none;
+        }
+        .page {
+          margin: 0;
+          padding: 0;
+          max-width: none;
+          box-shadow: none;
+        }
+        @page {
+          size: A4;
+          margin: 9mm 14mm;
+        }
+        a {
+          color: var(--ink);
+        }
+        .job {
+          page-break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar">
+      <button onclick="window.print()">⬇ Save as PDF / Print</button>
+      <span>Tip: in the print dialog choose “Save as PDF”, margins “Default”.</span>
+    </div>
+
+    <div class="page">
+      <header>
+        <h1>Sumanth Reddy Pathi</h1>
+        <div class="role">Engineering Team Lead — AI &amp; Full-Stack</div>
+        <div class="contact">
+          Hyderabad, India
+          <span class="sep">|</span>
+          <a href="tel:+918008089900">+91 80080 89900</a>
+          <span class="sep">|</span>
+          <a href="mailto:sumanthreddypathi3366@gmail.com">sumanthreddypathi3366@gmail.com</a>
+          <br />
+          <a href="https://samar3366.github.io/">samar3366.github.io</a>
+          <span class="sep">|</span>
+          <a href="https://www.linkedin.com/in/sum-123">linkedin.com/in/sum-123</a>
+          <span class="sep">|</span>
+          <a href="https://github.com/samar3366">github.com/samar3366</a>
+        </div>
+      </header>
+
+      <section>
+        <h2>Summary</h2>
+        <p class="summary">
+          Engineering team lead with 7+ years of experience across full-stack development,
+          Generative AI, and solution architecture. Leads cross-functional teams and owns
+          initiatives end to end — embedding LLM, RAG, and agentic-AI capabilities into
+          enterprise compliance platforms, from requirements and architecture through
+          development, deployment, and customer delivery.
+        </p>
+      </section>
+
+      <section>
+        <h2>Core Competencies</h2>
+        <p class="competencies">
+          Solution Architecture &nbsp;&middot;&nbsp; Technical Leadership &amp; Mentoring
+          &nbsp;&middot;&nbsp; End-to-End Ownership &nbsp;&middot;&nbsp; AI Strategy &amp;
+          Enterprise Adoption &nbsp;&middot;&nbsp; Product Thinking &nbsp;&middot;&nbsp;
+          Stakeholder &amp; Customer Engagement &nbsp;&middot;&nbsp; Proof-of-Concept Development
+          &nbsp;&middot;&nbsp; Cross-functional Collaboration
+        </p>
+      </section>
+
+      <section>
+        <h2>Technical Skills</h2>
+        <dl class="skills">
+          <dt>Languages</dt>
+          <dd>Python, JavaScript, TypeScript, SQL</dd>
+
+          <dt>AI &amp; GenAI</dt>
+          <dd>
+            LLMs, Retrieval-Augmented Generation (RAG), Agentic AI, Prompt Engineering,
+            Fine-tuning, Vector Search, Embeddings
+          </dd>
+
+          <dt>AI Infrastructure</dt>
+          <dd>Azure OpenAI, vLLM, GPU Optimization, Model Deployment, Vector Indexing</dd>
+
+          <dt>Backend</dt>
+          <dd>Node.js, Flask, Express.js, REST API Design, Microservices, Background Jobs</dd>
+
+          <dt>Frontend</dt>
+          <dd>React, TypeScript, React Bootstrap, CKEditor, Monaco Editor</dd>
+
+          <dt>Data &amp; Databases</dt>
+          <dd>MSSQL, Neo4j, Redis, ChromaDB, Vector Databases, Data Modeling, ETL</dd>
+
+          <dt>Cloud &amp; DevOps</dt>
+          <dd>Microsoft Azure (Blob Storage, VMs, AKS), Docker, CI/CD</dd>
+
+          <dt>Domain</dt>
+          <dd>QMS, DMS, TMS, Compliance (ISO 42001), Document Lifecycle, Audit &amp; Validation</dd>
+        </dl>
+      </section>
+
+      <section>
+        <h2>Professional Experience</h2>
+
+        <div class="job">
+          <div class="job-head">
+            <div>
+              <span class="job-title">Team Lead</span>,
+              <span class="job-org">Compliance Group Inc</span>
+            </div>
+            <div class="job-meta">Mar 2020 – Present &middot; Hyderabad, India (Hybrid)</div>
+          </div>
+          <div class="role-line">
+            Team Lead (Feb 2024 – Present) &middot; Senior Software Engineer (Aug 2022 – Jan 2024)
+            &middot; Software Engineer (Mar 2020 – Aug 2022)
+          </div>
+          <ul>
+            <li>
+              Lead a cross-functional engineering team, owning solution architecture, technical
+              direction, code quality, and mentoring across the product suite.
+            </li>
+            <li>
+              Built and modernized enterprise Quality (QMS), Document (DMS), and Training (TMS)
+              Management platforms for regulated, compliance-driven industries.
+            </li>
+            <li>
+              Led adoption of Generative AI across the product suite — delivered RAG-based
+              knowledge systems, AI copilots, and agentic workflows using Azure OpenAI, vLLM,
+              and vector databases.
+            </li>
+            <li>
+              Engineered solutions across the full stack — React/TypeScript front ends and
+              Node.js/Python services — and owned deployment on Azure (Blob Storage, AKS,
+              Docker).
+            </li>
+            <li>
+              Designed data models and integrations across MSSQL, Neo4j, Redis, and ChromaDB,
+              plus third-party services such as Azure Blob Storage and OnlyOffice; drove
+              proofs-of-concept and presented solutions directly to customers.
+            </li>
+          </ul>
+        </div>
+
+        <div class="job">
+          <div class="job-head">
+            <div>
+              <span class="job-title">Associate Software Engineer</span>,
+              <span class="job-org">Yellow Messenger</span>
+            </div>
+            <div class="job-meta">Oct 2019 – Feb 2020 &middot; Bengaluru, India</div>
+          </div>
+          <div class="role-line">
+            Associate Software Engineer (Oct 2019 – Feb 2020) &middot; Intern (Mar 2019 – Sep 2019)
+          </div>
+          <ul>
+            <li>
+              Partnered with the customer success team to deliver conversational AI solutions
+              for business clients.
+            </li>
+            <li>
+              Built cloud-function APIs integrating Elasticsearch, NLP services, and third-party
+              client APIs. Tech: Python, JavaScript, Node.js, Elasticsearch, MongoDB.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Education</h2>
+        <div class="two-col">
+          <div>
+            <span class="edu-school">B.Tech, Computer Science &amp; Engineering</span><br />
+            Vignan Institute of Technology and Science
+          </div>
+          <div class="job-meta">2015 – 2019</div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
