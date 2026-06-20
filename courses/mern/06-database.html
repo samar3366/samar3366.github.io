@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Database (MSSQL) — Store Your Data | DevLaunch Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/styles.css" />
+<style>
+  .db-table { font-family: var(--mono); font-size: 0.85rem; }
+  .db-table caption { font-family: var(--sans); color: var(--text-dim); font-size: 0.8rem; padding-bottom: 6px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .pk { color: var(--accent-sql); font-weight: 700; }
+  .fk { color: var(--brand); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand"><span class="logo">⚡</span> DevLaunch Academy</a>
+    <nav class="topnav">
+      <a href="index.html">Home</a>
+      <a href="01-foundations.html">Foundations</a>
+      <a href="02-javascript.html">JavaScript</a>
+      <a href="03-react.html">React</a>
+      <a href="04-node.html">Node</a>
+      <a href="05-rest-apis.html">REST</a>
+      <a href="06-database.html" class="active">MSSQL</a>
+      <a href="07-capstone.html">Capstone</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <button class="menu-toggle" style="margin:18px 0;">☰ Sections</button>
+  <div class="layout">
+    <aside class="sidebar">
+      <h4>On this page</h4>
+      <a href="#why">Why a database?</a>
+      <a href="#tables">① Tables, rows, columns</a>
+      <a href="#datatypes">② Data types in depth</a>
+      <a href="#setup">③ Installing MSSQL</a>
+      <a href="#create">④ CREATE TABLE</a>
+      <a href="#constraints">⑤ Constraints in depth</a>
+      <a href="#alter">⑥ ALTER TABLE</a>
+      <a href="#crud">⑦ SQL CRUD</a>
+      <a href="#select-deep">⑧ SELECT in depth</a>
+      <a href="#nulls">⑨ Working with NULL</a>
+      <a href="#playground">⑩ Try SQL live</a>
+      <a href="#aggregates">⑪ Aggregates &amp; GROUP BY</a>
+      <a href="#relations">⑫ Relationships &amp; JOINs</a>
+      <a href="#manytomany">⑬ Many-to-many</a>
+      <a href="#subqueries">⑭ Subqueries</a>
+      <a href="#indexes">⑮ Indexes</a>
+      <a href="#transactions">⑯ Transactions &amp; ACID</a>
+      <a href="#views-procs">⑰ Views &amp; procedures</a>
+      <a href="#node">⑱ MSSQL from Node</a>
+      <a href="#safety">⑲ Safety: injection</a>
+      <a href="#orms">⑳ ORMs &amp; modeling tips</a>
+      <a href="#quiz">Quiz</a>
+      <a href="#takeaways">Key takeaways</a>
+    </aside>
+
+    <div class="content">
+      <p class="muted" style="margin:0;">Module 5 · <span class="chip inter">Intermediate</span> <span class="chip adv">Advanced</span></p>
+      <h1 style="margin-top:6px;">🗄️ Database: MSSQL</h1>
+      <p class="lead" style="color:var(--text-soft);font-size:1.12rem;">
+        Servers forget everything when they restart. A <strong>database</strong> stores your data permanently and lets you
+        query it fast. You'll learn <strong>SQL</strong> — the language of data — and connect <strong>Microsoft SQL Server</strong> to your Node API.
+      </p>
+
+      <section id="why" class="section">
+        <h2>Why do we need a database?</h2>
+        <p>So far our task list lived in a JavaScript array on the server. The problem: restart the server and it's gone. Real apps need data that <strong>persists</strong> (survives restarts and crashes), can be <strong>searched</strong> quickly even with millions of rows, handles <strong>many users at once</strong> without corrupting each other's work, and stays <strong>consistent</strong> (no half-finished updates). Doing all of that by hand with files would be a nightmare — a database gives it to you for free.</p>
+        <p><strong>MSSQL</strong> (Microsoft SQL Server) is a <strong>relational</strong> database: data lives in <strong>tables</strong> (like spreadsheets) that can be <em>linked</em> together. You talk to it using <strong>SQL</strong> (Structured Query Language) — a small, English-like language that has barely changed in 40 years. Learn it once and it transfers to PostgreSQL, MySQL, SQLite, and more.</p>
+
+        <h3>Why "relational"? The big idea</h3>
+        <p>The word <strong>relational</strong> means tables can <em>relate</em> to one another. Instead of repeating the same facts over and over, you store each fact <strong>once</strong> and point to it. Imagine storing tasks in a single flat spreadsheet where every row also repeats the owner's full name, email, and team:</p>
+        <table class="db-table">
+          <caption>The "everything in one table" trap</caption>
+          <thead><tr><th class="pk">Id</th><th>Title</th><th>OwnerName</th><th>OwnerEmail</th></tr></thead>
+          <tbody>
+            <tr><td class="pk">1</td><td>Learn SQL</td><td>Aisha Khan</td><td>aisha@x.com</td></tr>
+            <tr><td class="pk">2</td><td>Build API</td><td>Aisha Khan</td><td>aisha@x.com</td></tr>
+            <tr><td class="pk">3</td><td>Ship app</td><td>Aisha Kahn ⚠️</td><td>aisha@x.com</td></tr>
+          </tbody>
+        </table>
+        <p>Aisha's name is duplicated three times — and row 3 has a typo, so now the database "thinks" there are two different people. If she changes her email, you must hunt down <em>every</em> row. This is called an <strong>update anomaly</strong>, and it's exactly what relational design prevents: store Aisha once in a <code>Users</code> table, and have each task simply reference her <code>Id</code>.</p>
+
+        <div class="callout key"><span class="ci">🔑</span><p><strong>The golden rule of database design:</strong> <em>each fact should live in exactly one place.</em> If you ever find yourself copy-pasting the same value into many rows, that's a hint a second table is hiding in there.</p></div>
+
+        <h3>A gentle intro to normalization (1NF · 2NF · 3NF)</h3>
+        <p><strong>Normalization</strong> sounds scary but it's just a set of common-sense guidelines for splitting data into well-organised tables. You don't need to memorise them — just absorb the spirit. Here they are in plain English:</p>
+        <table>
+          <thead><tr><th>Rule</th><th>In plain English</th><th>Example fix</th></tr></thead>
+          <tbody>
+            <tr><td><strong>1NF</strong> — First Normal Form</td><td>One value per cell. No comma-separated lists stuffed into a single column.</td><td>Instead of <code>Tags = "urgent,home"</code> in one cell, give each tag its own row.</td></tr>
+            <tr><td><strong>2NF</strong> — Second Normal Form</td><td>Every column depends on the <em>whole</em> primary key, not just part of it.</td><td>Don't store a product's name in an <em>order-line</em> table; the name depends on the product, not the order.</td></tr>
+            <tr><td><strong>3NF</strong> — Third Normal Form</td><td>Columns depend only on the key — not on <em>other non-key columns</em>.</td><td>Don't store <code>OwnerEmail</code> in Tasks; it depends on the owner, not the task. Put it in Users.</td></tr>
+          </tbody>
+        </table>
+        <p>Most well-designed apps aim for 3NF: <em>"every column describes the key, the whole key, and nothing but the key."</em> Get to roughly here and your data will be clean and easy to change. We'll see the practical version of all this when we build relationships and JOINs later.</p>
+        <div class="callout tip"><span class="ci">💡</span><p>Normalization keeps data <em>clean</em>, but JOINs cost a little speed. Real systems sometimes <strong>denormalize</strong> (deliberately duplicate) for performance. As a beginner: <strong>normalize first</strong>, optimise later only if you measure a real problem.</p></div>
+        <figure class="diagram">
+          <svg viewBox="0 0 780 170" role="img" aria-label="Where the database sits">
+            <rect x="20" y="60" width="150" height="55" rx="10" fill="#1b2030" stroke="#61dafb" stroke-width="2"/><text x="95" y="92" text-anchor="middle" fill="#fff" font-size="13">React</text>
+            <rect x="250" y="60" width="170" height="55" rx="10" fill="#1b2030" stroke="#3c873a" stroke-width="2"/><text x="335" y="86" text-anchor="middle" fill="#fff" font-size="13">Node + Express</text><text x="335" y="104" text-anchor="middle" fill="#aab2c5" font-size="11">REST API</text>
+            <rect x="500" y="50" width="170" height="75" rx="10" fill="#1b2030" stroke="#cc2927" stroke-width="2"/><text x="585" y="80" text-anchor="middle" fill="#fff" font-size="13">MSSQL</text><text x="585" y="100" text-anchor="middle" fill="#ff8a88" font-size="11">tables of data 🗄️</text>
+            <path d="M172,87 L248,87" stroke="#6c8cff" stroke-width="2" marker-end="url(#d1)"/>
+            <path d="M422,87 L498,87" stroke="#6c8cff" stroke-width="2" marker-end="url(#d1)"/>
+            <text x="335" y="145" text-anchor="middle" fill="#707a92" font-size="11">Only the back-end talks to the database — never the browser directly (security!).</text>
+            <defs><marker id="d1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6c8cff"/></marker></defs>
+          </svg>
+          <figcaption>The database sits behind your API. React asks the API; the API queries MSSQL and returns the result.</figcaption>
+        </figure>
+      </section>
+
+      <section id="tables" class="section">
+        <h2>① Tables, rows &amp; columns</h2>
+        <p>A relational database is organised like a set of spreadsheets. Four words cover almost everything:</p>
+        <ul>
+          <li>A <strong>table</strong> holds one kind of thing (e.g. all <code>Tasks</code>). Think of it as one spreadsheet tab.</li>
+          <li>A <strong>column</strong> (also called a <em>field</em> or <em>attribute</em>) is a property every item has (e.g. <code>Title</code>, <code>IsDone</code>). Each column has a fixed <strong>data type</strong> — it can only ever hold that kind of value.</li>
+          <li>A <strong>row</strong> (also called a <em>record</em>) is one item — one task. Every row has a value for every column.</li>
+          <li>A <strong>primary key</strong> (usually <code>Id</code>) is the column whose value uniquely identifies each row, like a serial number. No two rows share it.</li>
+        </ul>
+        <p>Here is a real Tasks table. Notice the <span class="pk">Id</span> column is highlighted because it's the primary key:</p>
+        <table class="db-table">
+          <caption>Tasks table</caption>
+          <thead><tr><th class="pk">Id (PK)</th><th>Title</th><th>IsDone</th><th>CreatedAt</th></tr></thead>
+          <tbody>
+            <tr><td class="pk">1</td><td>Learn SQL</td><td>1</td><td>2026-06-18</td></tr>
+            <tr><td class="pk">2</td><td>Build the API</td><td>0</td><td>2026-06-19</td></tr>
+            <tr><td class="pk">3</td><td>Ship the app</td><td>0</td><td>2026-06-20</td></tr>
+          </tbody>
+        </table>
+        <p>The whole table is sometimes called a <strong>schema</strong> when we talk about its <em>shape</em> (which columns exist and their types), separate from the <em>data</em> (the rows inside it). Designing good schemas is most of the skill in databases — and that's what the next few sections build up.</p>
+        <div class="callout info"><span class="ci">📛</span><p><strong>Naming tip:</strong> pick a convention and stick to it. This course uses <code>PascalCase</code> table names (<code>Tasks</code>, <code>Users</code>) and singular column names. Plural table / singular id (<code>UserId</code>) is a common, readable choice. Consistency matters more than which style you pick.</p></div>
+      </section>
+
+      <section id="datatypes" class="section">
+        <h2>② Data types in depth <span class="chip basic">Basic</span></h2>
+        <p>Every column must declare what kind of value it stores. Choosing well keeps your data correct (you can't accidentally put text in a number column) and your storage small. Here are the types you'll actually use, grouped by purpose:</p>
+
+        <table>
+          <thead><tr><th>Type</th><th>Holds</th><th>When to use it</th></tr></thead>
+          <tbody>
+            <tr><td><code>INT</code></td><td>Whole numbers, about ±2.1 billion</td><td>Default for ids, counts, ages. The everyday integer.</td></tr>
+            <tr><td><code>BIGINT</code></td><td>Huge whole numbers (±9 quintillion)</td><td>Ids in tables that may exceed 2 billion rows; large counters.</td></tr>
+            <tr><td><code>NVARCHAR(n)</code></td><td>Variable-length <strong>Unicode</strong> text</td><td><strong>Your default for text.</strong> The <code>N</code> = supports any language/emoji. Use a real length like <code>NVARCHAR(200)</code>, or <code>NVARCHAR(MAX)</code> for long blobs.</td></tr>
+            <tr><td><code>VARCHAR(n)</code></td><td>Variable text, <strong>non-Unicode</strong> (1 byte/char)</td><td>Only for data you know is plain ASCII (some codes). Saves space but can't store é, 日本語, or 🎉.</td></tr>
+            <tr><td><code>CHAR(n)</code></td><td>Fixed-length text, always <code>n</code> chars</td><td>Fixed codes like a 2-letter country code <code>CHAR(2)</code>. Pads shorter values with spaces.</td></tr>
+            <tr><td><code>BIT</code></td><td>0 or 1 (and NULL)</td><td>Booleans / flags: <code>IsDone</code>, <code>IsActive</code>.</td></tr>
+            <tr><td><code>DATE</code></td><td>A date only (no time)</td><td>Birthdays, due dates — when the clock time doesn't matter.</td></tr>
+            <tr><td><code>TIME</code></td><td>A time of day only</td><td>Opening hours, alarm times.</td></tr>
+            <tr><td><code>DATETIME2</code></td><td>Date <em>and</em> time, high precision</td><td><strong>Preferred</strong> for timestamps (<code>CreatedAt</code>). Use it instead of the older <code>DATETIME</code>.</td></tr>
+            <tr><td><code>DECIMAL(p,s)</code></td><td>Exact decimals: <code>p</code> total digits, <code>s</code> after the point</td><td><strong>Money &amp; anything that must be exact.</strong> <code>DECIMAL(10,2)</code> = up to 99,999,999.99.</td></tr>
+            <tr><td><code>MONEY</code></td><td>A currency-flavoured number</td><td>Exists, but most teams prefer <code>DECIMAL</code> for clarity and portability.</td></tr>
+            <tr><td><code>FLOAT</code></td><td>Approximate decimals</td><td>Scientific / measurement values where tiny rounding is OK. <strong>Never</strong> for money.</td></tr>
+            <tr><td><code>UNIQUEIDENTIFIER</code></td><td>A GUID, e.g. <code>6F9619FF-8B86-...</code></td><td>Globally unique ids you can generate anywhere (even on the client) without asking the DB for the next number.</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout warn"><span class="ci">💸</span><p><strong>Money gotcha:</strong> never store money as <code>FLOAT</code>. Floats are approximate, so <code>0.1 + 0.2</code> isn't exactly <code>0.3</code> — and a one-cent error in finance is a bug. Always use <code>DECIMAL(p,s)</code>.</p></div>
+        <div class="callout tip"><span class="ci">🌍</span><p><strong>Text gotcha:</strong> prefer <code>NVARCHAR</code> over <code>VARCHAR</code> unless you have a specific reason. The "N" makes it Unicode, so names, accents, and emoji all just work. Bugs from non-Unicode columns mangling characters are common and annoying.</p></div>
+      </section>
+
+      <section id="setup" class="section">
+        <h2>③ Installing MSSQL (Windows)</h2>
+        <p>You only need to do this once. The goal: a running SQL Server you can connect to, plus a tool to type SQL into. Don't worry if a step looks unfamiliar — just follow along.</p>
+        <ol class="steps">
+          <li><strong>SQL Server Express.</strong> Download the free <em>Express</em> edition from Microsoft's SQL Server page. During setup, choose the "Basic" installation. Note the <strong>server name</strong> it gives you (often <code>localhost\SQLEXPRESS</code>).</li>
+          <li><strong>SSMS (SQL Server Management Studio).</strong> A free graphical tool to browse your database and run SQL. Install it separately, then connect to your server name.</li>
+          <li><strong>Enable SQL login (for Node).</strong> So your app can connect with a username/password, enable "SQL Server Authentication" and create a login. Many tutorials use the <code>sa</code> account plus a strong password for local dev.</li>
+          <li><strong>Create a database.</strong> In SSMS, right-click <em>Databases → New Database</em>, name it <code>devlaunch</code>, and you're ready to create tables.</li>
+        </ol>
+        <div class="callout info"><span class="ci">🍎</span><p>On Mac/Linux? SQL Server runs great in <strong>Docker</strong>: <code>docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Your_strong_Pass1" -p 1433:1433 mcr.microsoft.com/mssql/server</code>. Then connect with the free <strong>Azure Data Studio</strong> tool.</p></div>
+      </section>
+
+      <section id="create" class="section">
+        <h2>④ Creating a table with SQL</h2>
+        <p>You design a table once with <code>CREATE TABLE</code>. You list each column, its data type, and any rules it must follow. SQL keywords are traditionally written in UPPERCASE — it's a convention for readability, not a requirement. This creates our Tasks table:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">create-table.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">CREATE TABLE Tasks (
+  Id        INT IDENTITY(1,1) PRIMARY KEY,  -- auto-numbered id
+  Title     NVARCHAR(200) NOT NULL,         -- required text
+  IsDone    BIT NOT NULL DEFAULT 0,         -- defaults to "false"
+  CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+);</code></pre>
+        </div>
+        <table>
+          <thead><tr><th>Clause</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>IDENTITY(1,1)</code></td><td>Auto-increment: each new row gets the next number automatically</td></tr>
+            <tr><td><code>PRIMARY KEY</code></td><td>This column uniquely identifies each row</td></tr>
+            <tr><td><code>NOT NULL</code></td><td>This field is required — can't be empty</td></tr>
+            <tr><td><code>DEFAULT 0</code></td><td>If no value is given, use this</td></tr>
+            <tr><td><code>SYSDATETIME()</code></td><td>A built-in function returning the current date &amp; time</td></tr>
+          </tbody>
+        </table>
+        <p>Once this runs, the table's shape is locked in: every row will have exactly these four columns. The next two sections dig into the <em>rules</em> you can attach to columns (constraints) and how to change a table after it already exists.</p>
+      </section>
+
+      <section id="constraints" class="section">
+        <h2>⑤ Constraints — rules that protect your data <span class="chip inter">Intermediate</span></h2>
+        <p>A <strong>constraint</strong> is a rule the database enforces for you, automatically, on every insert and update. This is huge: instead of <em>hoping</em> your app code always validates correctly, the database <em>guarantees</em> the rule can never be broken — even if a bug, a different app, or a person typing SQL by hand tries to. Constraints are your data's last line of defence.</p>
+        <table>
+          <thead><tr><th>Constraint</th><th>Guarantees</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td><code>PRIMARY KEY</code></td><td>Each row is uniquely identifiable; the column is unique <em>and</em> not null. One per table.</td><td><code>Id INT PRIMARY KEY</code></td></tr>
+            <tr><td><code>FOREIGN KEY</code></td><td>A value must match an existing row in another table — you can't point at a user who doesn't exist.</td><td><code>FOREIGN KEY (UserId) REFERENCES Users(Id)</code></td></tr>
+            <tr><td><code>NOT NULL</code></td><td>A value is required; the cell can never be empty.</td><td><code>Title NVARCHAR(200) NOT NULL</code></td></tr>
+            <tr><td><code>UNIQUE</code></td><td>No two rows can share this value (but it may be null once).</td><td><code>Email NVARCHAR(255) UNIQUE</code></td></tr>
+            <tr><td><code>DEFAULT</code></td><td>Supplies a value when none is given on insert.</td><td><code>IsDone BIT DEFAULT 0</code></td></tr>
+            <tr><td><code>CHECK</code></td><td>A custom condition every value must satisfy.</td><td><code>CHECK (Priority BETWEEN 1 AND 5)</code></td></tr>
+          </tbody>
+        </table>
+        <p>Here's a richer table that uses several constraints together. Read the comments — each line is a promise the database will keep forever:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">users-with-constraints.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">CREATE TABLE Users (
+  Id        INT IDENTITY(1,1) PRIMARY KEY,        -- unique &amp; required, auto-numbered
+  Email     NVARCHAR(255) NOT NULL UNIQUE,        -- required, no duplicates
+  Name      NVARCHAR(120) NOT NULL,               -- required
+  Age       INT NULL CHECK (Age &gt;= 0),            -- optional, but never negative
+  Role      NVARCHAR(20) NOT NULL DEFAULT 'member',
+  CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+  CHECK (Role IN ('member', 'admin'))             -- only these two values allowed
+);</code></pre>
+        </div>
+        <p>Now if anyone tries to insert a user with a duplicate email, a negative age, or a role of <code>'wizard'</code>, the database <strong>rejects it</strong> with an error. Your data stays valid no matter what.</p>
+        <div class="callout key"><span class="ci">🔑</span><p><strong>The <code>FOREIGN KEY</code> is the heart of "relational".</strong> It says <em>"this column must point at a real row over there."</em> It blocks orphaned data (a task whose owner was deleted) and is what makes JOINs trustworthy. We'll use it heavily in the Relationships section.</p></div>
+      </section>
+
+      <section id="alter" class="section">
+        <h2>⑥ Changing a table with ALTER TABLE</h2>
+        <p>Real apps evolve — you'll need to add a column to an existing table without throwing away the data. <code>ALTER TABLE</code> modifies a table's shape in place:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">alter.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">-- Add a new column (existing rows get NULL or the default)
+ALTER TABLE Tasks ADD Priority INT NOT NULL DEFAULT 3;
+
+-- Add a foreign-key column linking tasks to users
+ALTER TABLE Tasks ADD UserId INT NULL;
+ALTER TABLE Tasks
+  ADD CONSTRAINT FK_Tasks_Users
+  FOREIGN KEY (UserId) REFERENCES Users(Id);
+
+-- Add a CHECK constraint to an existing table
+ALTER TABLE Tasks
+  ADD CONSTRAINT CK_Priority CHECK (Priority BETWEEN 1 AND 5);
+
+-- Remove a column you no longer need
+ALTER TABLE Tasks DROP COLUMN Priority;
+
+-- Remove a named constraint
+ALTER TABLE Tasks DROP CONSTRAINT CK_Priority;</code></pre>
+        </div>
+        <div class="callout tip"><span class="ci">💡</span><p><strong>Name your constraints</strong> (e.g. <code>FK_Tasks_Users</code>) when you add them. Auto-generated names are random and ugly, which makes them painful to drop later. A clear name pays off the day you need to change it.</p></div>
+        <div class="callout warn"><span class="ci">🚨</span><p>Adding a <code>NOT NULL</code> column to a table that already has rows will fail <em>unless</em> you give it a <code>DEFAULT</code> — otherwise the existing rows would have no value, which the rule forbids. The default fills them in.</p></div>
+      </section>
+
+      <section id="crud" class="section">
+        <h2>⑦ The four SQL commands = CRUD</h2>
+        <p>Just like REST has four methods, SQL has four core commands — and they line up perfectly. If you remember CRUD from the REST module, you already know the shape of SQL:</p>
+        <table>
+          <thead><tr><th>SQL</th><th>Does</th><th>CRUD</th><th>REST method</th></tr></thead>
+          <tbody>
+            <tr><td><code>SELECT</code></td><td>Read rows</td><td>Read</td><td>GET</td></tr>
+            <tr><td><code>INSERT</code></td><td>Add a row</td><td>Create</td><td>POST</td></tr>
+            <tr><td><code>UPDATE</code></td><td>Change rows</td><td>Update</td><td>PUT</td></tr>
+            <tr><td><code>DELETE</code></td><td>Remove rows</td><td>Delete</td><td>DELETE</td></tr>
+          </tbody>
+        </table>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">crud.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">-- READ: get all tasks
+SELECT * FROM Tasks;
+
+-- READ with a filter & sort
+SELECT Title, IsDone
+FROM Tasks
+WHERE IsDone = 0
+ORDER BY CreatedAt DESC;
+
+-- CREATE: add a task
+INSERT INTO Tasks (Title) VALUES ('Learn JOINs');
+
+-- UPDATE: mark task 2 as done
+UPDATE Tasks SET IsDone = 1 WHERE Id = 2;
+
+-- DELETE: remove task 3
+DELETE FROM Tasks WHERE Id = 3;</code></pre>
+        </div>
+        <div class="callout warn"><span class="ci">🚨</span><p><strong>Never forget the <code>WHERE</code> clause</strong> on UPDATE or DELETE. <code>DELETE FROM Tasks;</code> with no WHERE deletes <em>every row</em>. This is the most famous beginner (and senior!) mistake. A safe habit: write the <code>WHERE</code> <em>first</em>, then go back and type <code>DELETE</code> / <code>UPDATE</code>. Many people even run a <code>SELECT</code> with the same WHERE to preview which rows will be hit before changing them.</p></div>
+        <div class="callout info"><span class="ci">🆔</span><p><code>INSERT</code> doesn't set <code>Id</code> — the <code>IDENTITY(1,1)</code> column auto-numbers it. To get the id of the row you just inserted, add <code>OUTPUT INSERTED.Id</code> to the statement (you'll see this used from Node later).</p></div>
+      </section>
+
+      <section id="select-deep" class="section">
+        <h2>⑧ SELECT in depth — the workhorse <span class="chip inter">Intermediate</span></h2>
+        <p>You'll write <code>SELECT</code> far more than any other command — reading data is most of what apps do. Let's unpack every part of it, one small idea at a time. All examples run against our familiar Tasks table.</p>
+
+        <h3>Choosing &amp; renaming columns: aliases with <code>AS</code></h3>
+        <p>List the columns you want instead of <code>*</code>, and rename them in the output with <code>AS</code>. (Selecting only what you need is also faster.)</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">aliases.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">SELECT Title AS TaskName, IsDone AS Completed
+FROM Tasks;
+-- Output columns are now labelled "TaskName" and "Completed"</code></pre>
+        </div>
+
+        <h3><code>DISTINCT</code> — drop duplicate rows</h3>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">distinct.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">-- List each distinct completion status (returns just 0 and 1)
+SELECT DISTINCT IsDone FROM Tasks;</code></pre>
+        </div>
+
+        <h3><code>TOP (N)</code> — limit how many rows come back</h3>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">top.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">-- The 3 most recently created tasks
+SELECT TOP (3) * FROM Tasks ORDER BY CreatedAt DESC;</code></pre>
+        </div>
+        <div class="callout info"><span class="ci">📄</span><p><code>TOP</code> is SQL Server's way to limit rows (other databases use <code>LIMIT</code>). Combined with <code>ORDER BY ... OFFSET ... FETCH</code>, it powers "page 2 of results" in real apps.</p></div>
+
+        <h3>Filtering with <code>WHERE</code> — all the operators</h3>
+        <p>The <code>WHERE</code> clause keeps only the rows that match a condition. Here is the full toolkit:</p>
+        <table>
+          <thead><tr><th>Operator</th><th>Meaning</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td><code>=</code></td><td>Equals</td><td><code>WHERE IsDone = 1</code></td></tr>
+            <tr><td><code>&lt;&gt;</code></td><td>Not equal to</td><td><code>WHERE IsDone &lt;&gt; 1</code></td></tr>
+            <tr><td><code>&gt; &lt; &gt;= &lt;=</code></td><td>Greater / less than (or equal)</td><td><code>WHERE Id &gt;= 2</code></td></tr>
+            <tr><td><code>BETWEEN a AND b</code></td><td>In a range, inclusive</td><td><code>WHERE Id BETWEEN 2 AND 4</code></td></tr>
+            <tr><td><code>IN (...)</code></td><td>Matches any value in a list</td><td><code>WHERE Id IN (1, 3, 5)</code></td></tr>
+            <tr><td><code>LIKE</code></td><td>Text pattern match</td><td><code>WHERE Title LIKE 'Learn%'</code></td></tr>
+            <tr><td><code>IS NULL</code></td><td>Has no value</td><td><code>WHERE UserId IS NULL</code></td></tr>
+          </tbody>
+        </table>
+        <p>For <code>LIKE</code>, the wildcards are <code>%</code> (any number of characters, including none) and <code>_</code> (exactly one character):</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">like.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">SELECT * FROM Tasks WHERE Title LIKE 'Learn%';   -- starts with "Learn"
+SELECT * FROM Tasks WHERE Title LIKE '%app%';    -- contains "app"
+SELECT * FROM Tasks WHERE Title LIKE '%SQL';     -- ends with "SQL"</code></pre>
+        </div>
+
+        <h3>Combining conditions: <code>AND</code>, <code>OR</code>, <code>NOT</code></h3>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">and-or.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">-- Unfinished tasks created on or after a date
+SELECT * FROM Tasks
+WHERE IsDone = 0 AND CreatedAt &gt;= '2026-06-19';
+
+-- Task is either id 1, OR is already done
+SELECT * FROM Tasks
+WHERE Id = 1 OR IsDone = 1;
+
+-- Use parentheses to control grouping, just like maths
+SELECT * FROM Tasks
+WHERE (IsDone = 0 OR Id = 1) AND Title LIKE '%a%';</code></pre>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>AND binds tighter than OR.</strong> <code>A OR B AND C</code> means <code>A OR (B AND C)</code> — probably not what you meant. When mixing them, <em>always add parentheses</em> so your intent is unmistakable.</p></div>
+
+        <h3>Sorting with <code>ORDER BY</code></h3>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">order-by.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">SELECT * FROM Tasks ORDER BY Title ASC;            -- A→Z (ASC is the default)
+SELECT * FROM Tasks ORDER BY CreatedAt DESC;       -- newest first
+SELECT * FROM Tasks ORDER BY IsDone, CreatedAt DESC; -- group by done, then newest</code></pre>
+        </div>
+        <div class="callout tip"><span class="ci">🧪</span><p>Several of these run in the <strong>live playground</strong> just below (anything that's a single-table <code>SELECT</code> on Tasks with <code>WHERE</code> using <code>= &lt; &gt; &gt;= &lt;= &lt;&gt;</code> and <code>ORDER BY</code>). Patterns like <code>LIKE</code>, <code>IN</code>, and <code>BETWEEN</code> aren't supported by the tiny demo engine — run those in SSMS.</p></div>
+      </section>
+
+      <section id="nulls" class="section">
+        <h2>⑨ Working with NULL — the "unknown" value <span class="chip inter">Intermediate</span></h2>
+        <p><code>NULL</code> is special and trips up almost every beginner, so let's be crystal clear. <strong>NULL means "no value / unknown"</strong> — it is <em>not</em> zero, and <em>not</em> an empty string <code>''</code>. It's the database saying "I don't know what goes here."</p>
+        <p>Because NULL is "unknown," you can't compare it with <code>=</code>. Ask <em>"is this column equal to NULL?"</em> and the answer is itself unknown — never true. So <code>WHERE UserId = NULL</code> returns <strong>nothing</strong>, even for rows that are null! You must use the special <code>IS NULL</code> / <code>IS NOT NULL</code> tests:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">null-checks.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">SELECT * FROM Tasks WHERE UserId IS NULL;      -- unassigned tasks ✅
+SELECT * FROM Tasks WHERE UserId IS NOT NULL;  -- assigned tasks ✅
+SELECT * FROM Tasks WHERE UserId = NULL;       -- ❌ ALWAYS returns 0 rows!</code></pre>
+        </div>
+
+        <h3>Supplying a fallback: <code>ISNULL</code> &amp; <code>COALESCE</code></h3>
+        <p>Often you want "use the real value, but if it's NULL show this instead." Two functions do that:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">coalesce.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">-- If UserId is NULL, show 0 instead
+SELECT Title, ISNULL(UserId, 0) AS Owner FROM Tasks;
+
+-- COALESCE returns the first non-NULL of several options
+SELECT COALESCE(Nickname, FullName, 'Anonymous') AS DisplayName
+FROM Users;</code></pre>
+        </div>
+        <p><code>ISNULL(a, b)</code> takes exactly two arguments; <code>COALESCE(a, b, c, ...)</code> takes many and is standard SQL, so it's the more flexible choice.</p>
+        <div class="callout warn"><span class="ci">🧠</span><p><strong>Three-valued logic gotcha:</strong> SQL conditions can be <em>true</em>, <em>false</em>, or <em>unknown</em>. A NULL involved in a comparison makes the result "unknown," and <code>WHERE</code> only keeps rows that are <em>true</em>. So a row can be silently excluded by <em>both</em> <code>WHERE x = 5</code> and <code>WHERE x &lt;&gt; 5</code> when <code>x</code> is NULL. When NULLs are possible, handle them explicitly.</p></div>
+      </section>
+
+      <section id="playground" class="section">
+        <h2>⑩ Try SQL live 🧪</h2>
+        <p>A tiny <strong>SQL engine running in your browser</strong>, pre-loaded with the Tasks table. Type a <code>SELECT</code> query and run it. Supports <code>SELECT</code>, <code>WHERE</code> (with <code>=</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>, <code>&lt;&gt;</code>), and <code>ORDER BY</code> on this one table — enough to get the feel. (Press <kbd>Ctrl/⌘ + Enter</kbd> to run.)</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">query.sql</span><span class="actions"><button id="sql-reset" style="background:var(--bg-elev);color:var(--text-soft);border:1px solid var(--border);padding:4px 12px;border-radius:7px;font-size:.78rem;font-weight:700;cursor:pointer;">Reset</button><button id="sql-run" class="run" style="background:var(--accent-sql);color:#fff;border:none;padding:4px 14px;border-radius:7px;font-size:.78rem;font-weight:700;cursor:pointer;">▶ Run</button></span></div>
+          <textarea id="sql-input" class="editor" spellcheck="false" style="min-height:90px;">SELECT * FROM Tasks WHERE IsDone = 0 ORDER BY Title</textarea>
+          <div class="console"><div class="console-head">Result</div><div class="console-body" id="sql-out" style="font-size:0.84rem;"></div></div>
+        </div>
+        <p class="muted" style="font-size:0.88rem;">Try: <code>SELECT Title FROM Tasks</code> · <code>SELECT * FROM Tasks WHERE Id &gt; 2</code> · <code>SELECT * FROM Tasks ORDER BY CreatedAt</code></p>
+        <p class="muted" style="font-size:0.88rem;">More: <code>SELECT Title, IsDone FROM Tasks WHERE IsDone = 1</code> · <code>SELECT * FROM Tasks WHERE Id &lt;&gt; 2 ORDER BY Title DESC</code> · <code>SELECT * FROM Tasks WHERE CreatedAt &gt;= '2026-06-19'</code></p>
+        <div class="callout tip"><span class="ci">🧪</span><p>Experiment! Change the operator, swap the column, flip <code>ASC</code>/<code>DESC</code>. Breaking the query and reading the error message is one of the fastest ways to learn. The <strong>Reset</strong> button restores the starting query anytime.</p></div>
+      </section>
+
+      <section id="aggregates" class="section">
+        <h2>⑪ Aggregates &amp; GROUP BY — summarising data <span class="chip inter">Intermediate</span></h2>
+        <p>So far we've read individual rows. Often you instead want a <strong>summary</strong>: "how many tasks?", "what's the total?", "the average price per category?". <strong>Aggregate functions</strong> crunch many rows into a single answer:</p>
+        <table>
+          <thead><tr><th>Function</th><th>Answers</th></tr></thead>
+          <tbody>
+            <tr><td><code>COUNT(*)</code></td><td>How many rows?</td></tr>
+            <tr><td><code>SUM(col)</code></td><td>Total of a numeric column</td></tr>
+            <tr><td><code>AVG(col)</code></td><td>Average value</td></tr>
+            <tr><td><code>MIN(col)</code> / <code>MAX(col)</code></td><td>Smallest / largest value</td></tr>
+          </tbody>
+        </table>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">aggregate.sql — run in SSMS</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">SELECT COUNT(*) AS TotalTasks FROM Tasks;            -- e.g. 4
+SELECT COUNT(*) AS Done FROM Tasks WHERE IsDone = 1; -- e.g. 2
+SELECT MIN(CreatedAt) AS Earliest FROM Tasks;        -- oldest task date</code></pre>
+        </div>
+
+        <h3><code>GROUP BY</code> — one summary <em>per group</em></h3>
+        <p>The real power comes when you split rows into groups and summarise each one. "How many tasks are done vs not done?" groups by <code>IsDone</code>, then counts within each group:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">group-by.sql — run in SSMS</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">SELECT IsDone, COUNT(*) AS HowMany
+FROM Tasks
+GROUP BY IsDone;</code></pre>
+        </div>
+        <p>That query returns one row <em>per distinct</em> <code>IsDone</code> value:</p>
+        <table class="db-table">
+          <caption>Result of the GROUP BY</caption>
+          <thead><tr><th>IsDone</th><th>HowMany</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>2</td></tr>
+            <tr><td>1</td><td>2</td></tr>
+          </tbody>
+        </table>
+
+        <h3><code>HAVING</code> vs <code>WHERE</code></h3>
+        <p>This is a classic exam question. <strong><code>WHERE</code> filters individual rows <em>before</em> grouping; <code>HAVING</code> filters the groups <em>after</em> aggregating.</strong> Use <code>HAVING</code> when your condition involves an aggregate like <code>COUNT()</code>:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">having.sql — run in SSMS</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">-- "Which owners have more than 2 tasks?"
+SELECT UserId, COUNT(*) AS TaskCount
+FROM Tasks
+WHERE IsDone = 0          -- 1) keep only unfinished rows (per-row filter)
+GROUP BY UserId           -- 2) group what remains by owner
+HAVING COUNT(*) &gt; 2;      -- 3) keep only groups with &gt; 2 tasks (per-group filter)</code></pre>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>Order of operations to memorise: <strong>WHERE → GROUP BY → HAVING → SELECT → ORDER BY</strong>. The database filters rows, groups them, filters groups, picks columns, then sorts. You can't use <code>HAVING</code> without aggregating, and you can't put an aggregate in <code>WHERE</code>.</p></div>
+      </section>
+
+      <section id="relations" class="section">
+        <h2>⑫ Relationships &amp; JOINs <span class="chip adv">Advanced</span></h2>
+        <p>The "relational" superpower: link tables together. Say each task belongs to a user. We store the user's id in the task as a <strong>foreign key</strong>, instead of duplicating the user's name everywhere. This is a <strong>one-to-many</strong> relationship: one user has many tasks, but each task has exactly one user.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 760 230" role="img" aria-label="One-to-many relationship between Users and Tasks">
+            <rect x="40" y="80" width="150" height="70" rx="10" fill="#1b2030" stroke="#6c8cff" stroke-width="2"/>
+            <text x="115" y="108" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Users</text>
+            <text x="115" y="130" text-anchor="middle" fill="#aab2c5" font-size="11">Id (PK), Name</text>
+            <rect x="560" y="40" width="160" height="55" rx="10" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="640" y="64" text-anchor="middle" fill="#fff" font-size="13">Task: Learn SQL</text><text x="640" y="82" text-anchor="middle" fill="#aab2c5" font-size="10">UserId = 1</text>
+            <rect x="560" y="105" width="160" height="55" rx="10" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="640" y="129" text-anchor="middle" fill="#fff" font-size="13">Task: Build API</text><text x="640" y="147" text-anchor="middle" fill="#aab2c5" font-size="10">UserId = 1</text>
+            <rect x="560" y="170" width="160" height="55" rx="10" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="640" y="194" text-anchor="middle" fill="#fff" font-size="13">Task: Ship app</text><text x="640" y="212" text-anchor="middle" fill="#aab2c5" font-size="10">UserId = 1</text>
+            <path d="M190,110 L558,67" stroke="#ff7eb6" stroke-width="2" marker-end="url(#r1)"/>
+            <path d="M190,115 L558,132" stroke="#ff7eb6" stroke-width="2" marker-end="url(#r1)"/>
+            <path d="M190,120 L558,197" stroke="#ff7eb6" stroke-width="2" marker-end="url(#r1)"/>
+            <text x="360" y="30" text-anchor="middle" fill="#ffce5c" font-size="13" font-weight="700">ONE user → MANY tasks</text>
+            <text x="375" y="210" text-anchor="middle" fill="#707a92" font-size="11">Each task stores the owner's Id as a foreign key.</text>
+            <defs><marker id="r1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#ff7eb6"/></marker></defs>
+          </svg>
+          <figcaption>One-to-many: the "many" side (Tasks) holds the foreign key pointing back to the "one" side (Users).</figcaption>
+        </figure>
+        <div class="grid grid-2">
+          <table class="db-table"><caption>Users</caption><thead><tr><th class="pk">Id</th><th>Name</th></tr></thead><tbody><tr><td class="pk">1</td><td>Aisha</td></tr><tr><td class="pk">2</td><td>Ravi</td></tr></tbody></table>
+          <table class="db-table"><caption>Tasks</caption><thead><tr><th class="pk">Id</th><th>Title</th><th class="fk">UserId</th></tr></thead><tbody><tr><td class="pk">1</td><td>Learn SQL</td><td class="fk">1</td></tr><tr><td class="pk">2</td><td>Build API</td><td class="fk">2</td></tr><tr><td class="pk">3</td><td>Ship app</td><td class="fk">1</td></tr></tbody></table>
+        </div>
+        <p>A <strong>JOIN</strong> stitches rows from two tables together by matching the foreign key to the primary key — "give me each task <em>with</em> its owner's name":</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">join.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">SELECT Tasks.Title, Users.Name AS Owner
+FROM Tasks
+INNER JOIN Users ON Tasks.UserId = Users.Id;
+
+-- Result:
+-- Title       | Owner
+-- ------------+-------
+-- Learn SQL   | Aisha
+-- Build API   | Ravi
+-- Ship app    | Aisha</code></pre>
+        </div>
+        <p>The <code>ON</code> clause is the matching rule: <em>"line up rows where the task's UserId equals the user's Id."</em> A handy shortcut is to <strong>alias the tables</strong> with short letters so you type less:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">join-alias.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">SELECT t.Title, u.Name AS Owner
+FROM Tasks AS t
+INNER JOIN Users AS u ON t.UserId = u.Id;</code></pre>
+        </div>
+
+        <h3>The four kinds of JOIN</h3>
+        <p>JOINs differ in what they do with rows that have <em>no match</em> on the other side. Picture two overlapping circles (Tasks and Users); each JOIN keeps a different region:</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 200" role="img" aria-label="Venn diagrams of the four JOIN types">
+            <!-- INNER -->
+            <g><circle cx="55" cy="80" r="34" fill="#6c8cff" fill-opacity="0.25" stroke="#6c8cff"/><circle cx="95" cy="80" r="34" fill="#38d39f" fill-opacity="0.25" stroke="#38d39f"/><path d="M75 52 A34 34 0 0 1 75 108 A34 34 0 0 1 75 52" fill="#ffce5c" fill-opacity="0.85"/><text x="75" y="150" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">INNER</text><text x="75" y="168" text-anchor="middle" fill="#aab2c5" font-size="10">only matches</text></g>
+            <!-- LEFT -->
+            <g><circle cx="245" cy="80" r="34" fill="#ffce5c" fill-opacity="0.85" stroke="#6c8cff"/><circle cx="285" cy="80" r="34" fill="#38d39f" fill-opacity="0.25" stroke="#38d39f"/><text x="265" y="150" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">LEFT</text><text x="265" y="168" text-anchor="middle" fill="#aab2c5" font-size="10">all left + matches</text></g>
+            <!-- RIGHT -->
+            <g><circle cx="435" cy="80" r="34" fill="#6c8cff" fill-opacity="0.25" stroke="#6c8cff"/><circle cx="475" cy="80" r="34" fill="#ffce5c" fill-opacity="0.85" stroke="#38d39f"/><text x="455" y="150" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">RIGHT</text><text x="455" y="168" text-anchor="middle" fill="#aab2c5" font-size="10">all right + matches</text></g>
+            <!-- FULL -->
+            <g><circle cx="625" cy="80" r="34" fill="#ffce5c" fill-opacity="0.85" stroke="#6c8cff"/><circle cx="665" cy="80" r="34" fill="#ffce5c" fill-opacity="0.85" stroke="#38d39f"/><text x="645" y="150" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">FULL OUTER</text><text x="645" y="168" text-anchor="middle" fill="#aab2c5" font-size="10">everything</text></g>
+          </svg>
+          <figcaption>Yellow = rows kept. INNER keeps only matched pairs; LEFT keeps every left row; RIGHT every right row; FULL keeps everything from both.</figcaption>
+        </figure>
+        <table>
+          <thead><tr><th>JOIN type</th><th>Keeps</th><th>Use when…</th></tr></thead>
+          <tbody>
+            <tr><td><code>INNER JOIN</code></td><td>Only rows that match on <em>both</em> sides.</td><td>You want pairs only — tasks that <em>have</em> an owner.</td></tr>
+            <tr><td><code>LEFT JOIN</code></td><td>Every row from the left table; matched data from the right, else <code>NULL</code>.</td><td><strong>Most common outer join.</strong> "All tasks, plus owner name <em>if</em> one exists." Unassigned tasks still appear.</td></tr>
+            <tr><td><code>RIGHT JOIN</code></td><td>Every row from the right table; left side may be <code>NULL</code>.</td><td>Rare — usually you just flip the tables and use LEFT.</td></tr>
+            <tr><td><code>FULL OUTER JOIN</code></td><td>Every row from both; unmatched cells are <code>NULL</code>.</td><td>Reconciling two lists — show users with no tasks <em>and</em> tasks with no user.</td></tr>
+          </tbody>
+        </table>
+        <p>Here's why <code>LEFT JOIN</code> matters. Suppose task <em>"Ship app"</em> has no owner yet (<code>UserId IS NULL</code>). An <code>INNER JOIN</code> would silently <strong>drop it</strong>; a <code>LEFT JOIN</code> keeps it, with a NULL owner:</p>
+        <div class="grid grid-2">
+          <table class="db-table"><caption>INNER JOIN result</caption><thead><tr><th>Title</th><th>Owner</th></tr></thead><tbody><tr><td>Learn SQL</td><td>Aisha</td></tr><tr><td>Build API</td><td>Ravi</td></tr></tbody></table>
+          <table class="db-table"><caption>LEFT JOIN result</caption><thead><tr><th>Title</th><th>Owner</th></tr></thead><tbody><tr><td>Learn SQL</td><td>Aisha</td></tr><tr><td>Build API</td><td>Ravi</td></tr><tr><td>Ship app</td><td><em>NULL</em></td></tr></tbody></table>
+        </div>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">left-join.sql — run in SSMS</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">SELECT t.Title, u.Name AS Owner
+FROM Tasks AS t
+LEFT JOIN Users AS u ON t.UserId = u.Id;
+-- "Ship app" appears with Owner = NULL instead of vanishing</code></pre>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>Foreign keys + JOINs are how databases model the real world: orders belong to customers, comments belong to posts, tasks belong to users. No data duplication, no inconsistency. <strong>Reach for <code>LEFT JOIN</code> by default when you don't want to accidentally hide rows that lack a match.</strong></p></div>
+      </section>
+
+      <section id="manytomany" class="section">
+        <h2>⑬ Many-to-many: the junction table <span class="chip adv">Advanced</span></h2>
+        <p>One-to-many is easy: put the foreign key on the "many" side. But what about <strong>many-to-many</strong>? A task can have many tags, and a tag can apply to many tasks. There's no single column that can hold "many" ids — so we introduce a third table that sits in the middle, called a <strong>junction</strong> (or <em>bridge</em> / <em>link</em>) table.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 200" role="img" aria-label="Many-to-many between Tasks and Tags via a junction table">
+            <rect x="40" y="70" width="150" height="60" rx="10" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="115" y="95" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Tasks</text><text x="115" y="115" text-anchor="middle" fill="#aab2c5" font-size="11">Id (PK)</text>
+            <rect x="285" y="55" width="150" height="90" rx="10" fill="#1b2030" stroke="#ffce5c" stroke-width="2"/>
+            <text x="360" y="82" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">TaskTags</text><text x="360" y="103" text-anchor="middle" fill="#6c8cff" font-size="11">TaskId (FK)</text><text x="360" y="122" text-anchor="middle" fill="#6c8cff" font-size="11">TagId (FK)</text>
+            <rect x="530" y="70" width="150" height="60" rx="10" fill="#1b2030" stroke="#ff7eb6" stroke-width="2"/>
+            <text x="605" y="95" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Tags</text><text x="605" y="115" text-anchor="middle" fill="#aab2c5" font-size="11">Id (PK)</text>
+            <path d="M190,100 L283,100" stroke="#6c8cff" stroke-width="2" marker-end="url(#m1)"/>
+            <path d="M435,100 L528,100" stroke="#6c8cff" stroke-width="2" marker-end="url(#m1)"/>
+            <text x="360" y="175" text-anchor="middle" fill="#707a92" font-size="11">The junction table holds one row per (task, tag) pairing.</text>
+            <defs><marker id="m1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6c8cff"/></marker></defs>
+          </svg>
+          <figcaption>Many-to-many = two one-to-many relationships joined through a junction table in the middle.</figcaption>
+        </figure>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">junction.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">CREATE TABLE Tags (
+  Id   INT IDENTITY(1,1) PRIMARY KEY,
+  Name NVARCHAR(50) NOT NULL UNIQUE
+);
+
+-- The junction table: each row is one (task, tag) pairing
+CREATE TABLE TaskTags (
+  TaskId INT NOT NULL FOREIGN KEY REFERENCES Tasks(Id),
+  TagId  INT NOT NULL FOREIGN KEY REFERENCES Tags(Id),
+  PRIMARY KEY (TaskId, TagId)     -- composite key: no duplicate pairings
+);</code></pre>
+        </div>
+        <p>To list each task with its tags, JOIN across all three tables:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">tags-join.sql — run in SSMS</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">SELECT t.Title, tag.Name AS Tag
+FROM Tasks AS t
+JOIN TaskTags AS tt ON tt.TaskId = t.Id
+JOIN Tags     AS tag ON tag.Id    = tt.TagId;</code></pre>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>Whenever you hear <em>"each X can have many Y, and each Y can have many X,"</em> reach for a junction table. Students↔Courses, Posts↔Tags, Users↔Roles — all the same pattern.</p></div>
+      </section>
+
+      <section id="subqueries" class="section">
+        <h2>⑭ Subqueries — a query inside a query <span class="chip adv">Advanced</span></h2>
+        <p>Sometimes the value you want to filter by is itself the result of a query. A <strong>subquery</strong> is a <code>SELECT</code> nested inside another statement, usually in parentheses. The inner query runs first; its result feeds the outer one.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">subquery.sql — run in SSMS</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">-- "Tasks owned by users named Aisha"
+SELECT * FROM Tasks
+WHERE UserId IN (SELECT Id FROM Users WHERE Name = 'Aisha');
+
+-- The inner query finds Aisha's id(s); the outer keeps tasks with those UserIds.
+
+-- A subquery can also compute a single value:
+SELECT * FROM Tasks
+WHERE CreatedAt = (SELECT MAX(CreatedAt) FROM Tasks);  -- the newest task</code></pre>
+        </div>
+        <div class="callout tip"><span class="ci">💡</span><p>Many subqueries can be rewritten as JOINs, and JOINs are often faster. But subqueries can be clearer to read for "filter by a list" style questions. Learn both; reach for whichever makes the query easier to understand.</p></div>
+      </section>
+
+      <section id="indexes" class="section">
+        <h2>⑮ Indexes — making reads fast <span class="chip adv">Advanced</span></h2>
+        <p>Imagine finding a word in a 900-page textbook. Without an index you'd read every page (a <strong>full table scan</strong>). With the index at the back, you jump straight to the right page. A database <strong>index</strong> works exactly the same way: it's a sorted lookup structure that lets the engine find rows without scanning the whole table.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 210" role="img" aria-label="Index lookup versus full table scan">
+            <text x="180" y="28" text-anchor="middle" fill="#ff7eb6" font-size="13" font-weight="700">Full scan — check every row 🐌</text>
+            <g fill="#1b2030" stroke="#cc2927" stroke-width="1.5">
+              <rect x="60" y="45" width="240" height="22" rx="4"/><rect x="60" y="72" width="240" height="22" rx="4"/><rect x="60" y="99" width="240" height="22" rx="4"/><rect x="60" y="126" width="240" height="22" rx="4"/><rect x="60" y="153" width="240" height="22" rx="4"/>
+            </g>
+            <text x="180" y="60" text-anchor="middle" fill="#aab2c5" font-size="10">read…</text><text x="180" y="87" text-anchor="middle" fill="#aab2c5" font-size="10">read…</text><text x="180" y="114" text-anchor="middle" fill="#aab2c5" font-size="10">read…</text><text x="180" y="141" text-anchor="middle" fill="#38d39f" font-size="10">FOUND ✓</text><text x="180" y="168" text-anchor="middle" fill="#aab2c5" font-size="10">read…</text>
+
+            <text x="540" y="28" text-anchor="middle" fill="#38d39f" font-size="13" font-weight="700">Index lookup — jump straight there ⚡</text>
+            <rect x="420" y="60" width="100" height="80" rx="8" fill="#1b2030" stroke="#6c8cff" stroke-width="2"/>
+            <text x="470" y="95" text-anchor="middle" fill="#fff" font-size="11">sorted</text><text x="470" y="112" text-anchor="middle" fill="#fff" font-size="11">index</text>
+            <rect x="600" y="90" width="80" height="22" rx="4" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="640" y="105" text-anchor="middle" fill="#38d39f" font-size="10">row ✓</text>
+            <path d="M520,100 L598,100" stroke="#38d39f" stroke-width="2" marker-end="url(#i1)"/>
+            <defs><marker id="i1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#38d39f"/></marker></defs>
+          </svg>
+          <figcaption>Without an index the engine reads every row; with one it navigates a sorted structure straight to the answer.</figcaption>
+        </figure>
+        <p>You create an index on the columns you frequently search or join on:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">index.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">-- Speeds up: SELECT ... WHERE UserId = ...  and JOINs on UserId
+CREATE INDEX IX_Tasks_UserId ON Tasks(UserId);</code></pre>
+        </div>
+        <div class="callout info"><span class="ci">🔑</span><p>Your <strong>primary key automatically gets an index</strong> — that's why looking up a row by <code>Id</code> is always fast. You add extra indexes for the <em>other</em> columns you filter or join on a lot.</p></div>
+        <div class="callout warn"><span class="ci">⚖️</span><p><strong>The trade-off:</strong> indexes speed up <em>reads</em> but slow down <em>writes</em> — every <code>INSERT</code>/<code>UPDATE</code>/<code>DELETE</code> must also keep each index up to date, and indexes take disk space. So index the columns you search on, not every column. Index thoughtfully, not greedily.</p></div>
+      </section>
+
+      <section id="transactions" class="section">
+        <h2>⑯ Transactions &amp; ACID <span class="chip adv">Advanced</span></h2>
+        <p>Some operations involve <em>several</em> steps that must <strong>all succeed or all fail together</strong> — never halfway. The classic example is a bank transfer: subtract money from one account, add it to another. If the power dies between those two steps, money would vanish. A <strong>transaction</strong> wraps the steps so they're treated as one indivisible unit.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 220" role="img" aria-label="Transaction commit versus rollback">
+            <rect x="270" y="20" width="180" height="40" rx="8" fill="#1b2030" stroke="#ffce5c" stroke-width="2"/>
+            <text x="360" y="45" text-anchor="middle" fill="#ffce5c" font-size="13" font-weight="700">BEGIN TRANSACTION</text>
+            <rect x="270" y="78" width="180" height="34" rx="6" fill="#1b2030" stroke="#6c8cff" stroke-width="1.5"/>
+            <text x="360" y="100" text-anchor="middle" fill="#fff" font-size="11">−$100 from A</text>
+            <rect x="270" y="120" width="180" height="34" rx="6" fill="#1b2030" stroke="#6c8cff" stroke-width="1.5"/>
+            <text x="360" y="142" text-anchor="middle" fill="#fff" font-size="11">+$100 to B</text>
+            <path d="M270,170 L120,190" stroke="#38d39f" stroke-width="2" marker-end="url(#t1)"/>
+            <path d="M450,170 L600,190" stroke="#cc2927" stroke-width="2" marker-end="url(#t2)"/>
+            <rect x="40" y="180" width="160" height="34" rx="8" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="120" y="202" text-anchor="middle" fill="#38d39f" font-size="12" font-weight="700">COMMIT ✓ saved</text>
+            <rect x="520" y="180" width="160" height="34" rx="8" fill="#1b2030" stroke="#cc2927" stroke-width="2"/>
+            <text x="600" y="202" text-anchor="middle" fill="#ff8a88" font-size="12" font-weight="700">ROLLBACK ✗ undone</text>
+            <text x="195" y="150" fill="#38d39f" font-size="10">all steps OK →</text>
+            <text x="455" y="150" fill="#ff8a88" font-size="10">← any error</text>
+            <defs><marker id="t1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#38d39f"/></marker><marker id="t2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#cc2927"/></marker></defs>
+          </svg>
+          <figcaption>COMMIT makes every change permanent; ROLLBACK undoes the whole transaction as if it never happened.</figcaption>
+        </figure>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">transfer.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">BEGIN TRANSACTION;
+
+UPDATE Accounts SET Balance = Balance - 100 WHERE Id = 1;
+UPDATE Accounts SET Balance = Balance + 100 WHERE Id = 2;
+
+-- If both worked, lock it in:
+COMMIT;
+
+-- If something went wrong, undo everything instead:
+-- ROLLBACK;</code></pre>
+        </div>
+        <p>Transactions give you the <strong>ACID</strong> guarantees — four promises, in plain English:</p>
+        <table>
+          <thead><tr><th>Letter</th><th>Promise</th></tr></thead>
+          <tbody>
+            <tr><td><strong>A</strong>tomicity</td><td>All steps happen, or none do. No half-finished updates.</td></tr>
+            <tr><td><strong>C</strong>onsistency</td><td>The database moves from one valid state to another — constraints are never left broken.</td></tr>
+            <tr><td><strong>I</strong>solation</td><td>Concurrent transactions don't see each other's half-done work; it's as if they ran one at a time.</td></tr>
+            <tr><td><strong>D</strong>urability</td><td>Once committed, the change survives crashes and power loss — it's written to disk for good.</td></tr>
+          </tbody>
+        </table>
+        <div class="callout key"><span class="ci">🏦</span><p>Use a transaction whenever <strong>two or more changes must agree</strong>: transferring funds, placing an order while reducing stock, or creating a user and their default settings together. Either both happen or neither does.</p></div>
+      </section>
+
+      <section id="views-procs" class="section">
+        <h2>⑰ Views &amp; stored procedures <span class="chip adv">Advanced</span></h2>
+        <h3>Views — a saved query</h3>
+        <p>A <strong>view</strong> is a query you give a name to, then use like a table. It stores no data of its own — it's a saved <code>SELECT</code> that runs fresh each time. Views hide complexity: write the gnarly JOIN once, then everyone just selects from the simple-looking view.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">view.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">CREATE VIEW TaskOwners AS
+SELECT t.Id, t.Title, u.Name AS Owner
+FROM Tasks AS t
+LEFT JOIN Users AS u ON t.UserId = u.Id;
+
+-- Now use it like any table:
+SELECT * FROM TaskOwners WHERE Owner = 'Aisha';</code></pre>
+        </div>
+
+        <h3>Stored procedures — saved logic</h3>
+        <p>A <strong>stored procedure</strong> is a named block of SQL (which can take parameters and contain logic) stored <em>inside</em> the database. You call it by name. Teams use them to centralise important logic, reduce repeated SQL, and sometimes for performance.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">procedure.sql</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">CREATE PROCEDURE AddTask
+  @Title NVARCHAR(200)
+AS
+BEGIN
+  INSERT INTO Tasks (Title) VALUES (@Title);
+END;
+
+-- Call it:
+EXEC AddTask @Title = 'Write tests';</code></pre>
+        </div>
+        <div class="callout info"><span class="ci">💬</span><p>You don't need procedures for this course — plain parameterised queries from Node are perfectly fine and very common. But you'll meet procedures on real teams, so it's good to recognise them.</p></div>
+      </section>
+
+      <section id="node" class="section">
+        <h2>⑱ Querying MSSQL from Node</h2>
+        <p>The <code>mssql</code> npm package connects Node to SQL Server. Install it with <code>npm install mssql</code>, then create a shared <strong>connection pool</strong> and run queries.</p>
+        <p><strong>Why a pool?</strong> Opening a fresh database connection is slow (a handshake every time). A pool opens a handful of connections <em>once</em>, keeps them warm, and hands them out as requests come in. You create it a single time for the whole app and reuse it everywhere — never open a new connection per request.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">db/pool.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import sql from "mssql";
+
+const config = {
+  server: "localhost",
+  database: "devlaunch",
+  user: "sa",
+  password: process.env.DB_PASSWORD,   // from your .env file
+  options: { instanceName: "SQLEXPRESS", encrypt: true, trustServerCertificate: true },
+};
+
+// One shared pool of connections for the whole app
+export const poolPromise = sql.connect(config);</code></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">routes/tasks.js — now backed by MSSQL</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import express from "express";
+import sql from "mssql";
+import { poolPromise } from "../db/pool.js";
+
+const router = express.Router();
+
+// READ all
+router.get("/", async (req, res) => {
+  const pool = await poolPromise;
+  const result = await pool.request().query("SELECT * FROM Tasks ORDER BY Id");
+  res.json(result.recordset);     // recordset = the rows
+});
+
+// CREATE — note the SAFE, parameterised input
+router.post("/", async (req, res) => {
+  const { title } = req.body;
+  const pool = await poolPromise;
+  const result = await pool.request()
+    .input("title", sql.NVarChar, title)              // bind, don't concatenate!
+    .query("INSERT INTO Tasks (Title) OUTPUT INSERTED.* VALUES (@title)");
+  res.status(201).json(result.recordset[0]);
+});
+
+export default router;</code></pre>
+        </div>
+        <h3>Reading the result: <code>result.recordset</code></h3>
+        <p>Every query returns a result object. The rows live in <code>result.recordset</code> — an ordinary JavaScript array of plain objects, so you can use <code>.map()</code>, <code>.length</code>, destructuring, and everything else you already know:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">recordset.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">const result = await pool.request()
+  .input("id", sql.Int, 2)
+  .query("SELECT * FROM Tasks WHERE Id = @id");
+
+result.recordset;        // → [ { Id: 2, Title: "Build the API", ... } ]
+result.recordset[0];     // → the first (and only) row
+result.recordset.length; // → 1
+result.rowsAffected;     // → [1]  (handy for UPDATE/DELETE)</code></pre>
+        </div>
+
+        <h3>Handling errors</h3>
+        <p>Anything can fail — the DB might be down, a constraint might reject the data. Wrap queries in <code>try/catch</code> and return a sensible HTTP status instead of crashing the server:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">error-handling.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">router.get("/:id", async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input("id", sql.Int, Number(req.params.id))
+      .query("SELECT * FROM Tasks WHERE Id = @id");
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+    res.json(result.recordset[0]);
+  } catch (err) {
+    console.error(err);                       // log the real error server-side
+    res.status(500).json({ error: "Database error" }); // generic message to client
+  }
+});</code></pre>
+        </div>
+
+        <h3>Running a transaction from Node</h3>
+        <p>For multi-step operations that must succeed together, the <code>mssql</code> package exposes a transaction object. Begin it, run each request <em>on that transaction</em>, then commit — or roll back if anything throws:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">transaction.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">const pool = await poolPromise;
+const tx = new sql.Transaction(pool);
+await tx.begin();
+try {
+  await tx.request()
+    .input("id", sql.Int, 1)
+    .query("UPDATE Accounts SET Balance = Balance - 100 WHERE Id = @id");
+  await tx.request()
+    .input("id", sql.Int, 2)
+    .query("UPDATE Accounts SET Balance = Balance + 100 WHERE Id = @id");
+  await tx.commit();          // both succeeded — make it permanent
+} catch (err) {
+  await tx.rollback();        // something failed — undo everything
+  throw err;
+}</code></pre>
+        </div>
+        <div class="callout info"><span class="ci">🔗</span><p>This is the final link in the chain. <strong>React → fetch → Express route → <code>pool.request().query()</code> → MSSQL → rows → JSON → back to React.</strong> Every module you've done connects right here.</p></div>
+      </section>
+
+      <section id="safety" class="section">
+        <h2>⑲ Critical: SQL injection &amp; how to avoid it <span class="chip adv">Advanced</span></h2>
+        <p>The single most important security lesson in this course. <strong>Never build SQL by gluing user input into a string.</strong> A malicious user could inject their own SQL.</p>
+        <div class="grid grid-2">
+          <div class="card" style="border-color:var(--danger);">
+            <h3 class="mt0" style="color:var(--danger);">❌ Dangerous</h3>
+<pre style="font-size:0.78rem;">// NEVER do this:
+query(
+  "SELECT * FROM Users WHERE name = '"
+  + userInput + "'"
+);
+// userInput = "'; DROP TABLE Users;--"
+// → your table is gone 💀</pre>
+          </div>
+          <div class="card" style="border-color:var(--ok);">
+            <h3 class="mt0" style="color:var(--ok);">✅ Safe (parameterised)</h3>
+<pre style="font-size:0.78rem;">// ALWAYS do this:
+pool.request()
+  .input("name", sql.NVarChar, userInput)
+  .query(
+    "SELECT * FROM Users WHERE name = @name"
+  );
+// the driver safely escapes the input</pre>
+          </div>
+        </div>
+        <div class="callout warn"><span class="ci">🛡️</span><p>Parameterised queries (using <code>.input()</code> and <code>@placeholders</code>) keep user data and SQL commands separate, so input can never become code. Make this a habit from day one — it's not optional.</p></div>
+        <div class="callout key"><span class="ci">🧠</span><p><strong>Why it works:</strong> with a parameter, the database receives the SQL <em>and</em> the value down two separate channels. The query plan is fixed <em>before</em> your value arrives, so the value is always treated as plain data — never as commands to run. There is no string to "break out of." This is the gold standard, used by every serious app.</p></div>
+      </section>
+
+      <section id="orms" class="section">
+        <h2>⑳ ORMs, query builders &amp; data-modeling tips <span class="chip inter">Intermediate</span></h2>
+        <p>You now know <strong>raw SQL</strong>, which is the foundation everything else is built on. In the wild you'll also meet tools that write SQL <em>for</em> you, so it helps to know what they are and when to reach for them.</p>
+        <table>
+          <thead><tr><th>Tool</th><th>What it is</th><th>Feel</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Prisma</strong></td><td>A modern, type-safe ORM (Object-Relational Mapper). You define models; it generates a typed client.</td><td><code>prisma.task.findMany()</code></td></tr>
+            <tr><td><strong>Sequelize</strong></td><td>A long-established ORM for Node with models and associations.</td><td><code>Task.findAll()</code></td></tr>
+            <tr><td><strong>Knex</strong></td><td>A query <em>builder</em> — closer to SQL, you chain methods that map almost 1:1 to SQL clauses.</td><td><code>knex('Tasks').where('IsDone', 0)</code></td></tr>
+          </tbody>
+        </table>
+        <p><strong>Raw SQL vs a tool:</strong> raw SQL gives you full control and zero magic — great for learning and for complex queries. ORMs save boilerplate, add type-safety, and handle migrations, which shines on big apps with many tables. A common, healthy approach: use an ORM/builder for everyday CRUD, and drop to raw SQL for the few gnarly reporting queries. There's no wrong choice — just understand what's running underneath, which you now do.</p>
+        <div class="callout tip"><span class="ci">🧭</span><p>Even with an ORM, parameterisation still protects you — the tool parameterises automatically. The danger returns the moment you hand-build a raw SQL string, so the lesson from the last section never expires.</p></div>
+
+        <h3>Practical data-modeling tips</h3>
+        <ul>
+          <li><strong>Give every table a primary key</strong> — usually an <code>IDENTITY</code> <code>Id</code>. It makes rows addressable and JOINs reliable.</li>
+          <li><strong>Each fact in one place.</strong> If you're copy-pasting a value across rows, a second table probably wants to exist (remember normalization).</li>
+          <li><strong>Use foreign keys</strong> to express relationships — let the database guard integrity, don't rely on app code alone.</li>
+          <li><strong>Name consistently.</strong> Pick a convention (e.g. <code>PascalCase</code> tables, <code>UserId</code> for foreign keys) and never deviate. Future-you will be grateful.</li>
+          <li><strong>Pick the right type</strong> — <code>NVARCHAR</code> for text, <code>DECIMAL</code> for money, <code>DATETIME2</code> for timestamps, <code>BIT</code> for flags.</li>
+          <li><strong>Add <code>CreatedAt</code> / <code>UpdatedAt</code></strong> timestamps to most tables — they're invaluable for debugging and sorting.</li>
+          <li><strong>Index what you search</strong>, not everything. Measure before optimising.</li>
+        </ul>
+      </section>
+
+      <section id="quiz" class="section">
+        <h2>Quiz</h2>
+        <div class="quiz">
+          <div class="q">1. What is a <em>primary key</em>?</div>
+          <div class="opt" data-correct="true">A column that uniquely identifies each row</div>
+          <div class="opt" data-correct="false">A password for the database</div>
+          <div class="opt" data-correct="false">The first column alphabetically</div>
+          <div class="explain">✅ The primary key (usually <code>Id</code>) uniquely identifies a row, so you can reliably reference and update it.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">2. Which SQL command reads data?</div>
+          <div class="opt" data-correct="false">INSERT</div>
+          <div class="opt" data-correct="true">SELECT</div>
+          <div class="opt" data-correct="false">UPDATE</div>
+          <div class="explain">✅ SELECT reads. INSERT creates, UPDATE changes, DELETE removes — the SQL version of CRUD.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">3. What's the danger of <code>DELETE FROM Tasks;</code> with no WHERE?</div>
+          <div class="opt" data-correct="true">It deletes every row in the table</div>
+          <div class="opt" data-correct="false">It does nothing</div>
+          <div class="opt" data-correct="false">It deletes the newest row only</div>
+          <div class="explain">✅ No WHERE = applies to all rows. Always scope UPDATE and DELETE with a WHERE clause.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">4. How do you safely include user input in a query?</div>
+          <div class="opt" data-correct="false">Concatenate it into the SQL string</div>
+          <div class="opt" data-correct="true">Use parameterised queries with .input() and @placeholders</div>
+          <div class="opt" data-correct="false">Remove all spaces from it</div>
+          <div class="explain">✅ Parameterised queries separate data from commands, preventing SQL injection. Never glue input into SQL strings.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">5. You want all tasks, including ones with no owner. Which JOIN?</div>
+          <div class="opt" data-correct="false">INNER JOIN — it keeps every row</div>
+          <div class="opt" data-correct="true">LEFT JOIN — keeps every left row, owner is NULL if unmatched</div>
+          <div class="opt" data-correct="false">It's impossible with a single query</div>
+          <div class="explain">✅ INNER JOIN drops unmatched rows. LEFT JOIN keeps every row from the left (Tasks) and fills the owner with NULL when there's no match.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">6. Why does <code>WHERE UserId = NULL</code> return no rows?</div>
+          <div class="opt" data-correct="true">NULL means "unknown", so = comparisons are never true — use IS NULL</div>
+          <div class="opt" data-correct="false">NULL isn't a real value, so the query errors out</div>
+          <div class="opt" data-correct="false">It actually returns every row</div>
+          <div class="explain">✅ You can't compare to NULL with =. Use <code>IS NULL</code> / <code>IS NOT NULL</code>. This three-valued-logic quirk catches everyone once.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">7. A bank transfer subtracts from A and adds to B. What guarantees both happen or neither?</div>
+          <div class="opt" data-correct="false">An index on the Balance column</div>
+          <div class="opt" data-correct="true">A transaction (BEGIN / COMMIT / ROLLBACK) — atomicity</div>
+          <div class="opt" data-correct="false">A foreign key between the accounts</div>
+          <div class="explain">✅ A transaction makes multiple steps atomic: COMMIT saves them all, ROLLBACK undoes them all. That's the "A" in ACID.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">8. What's the trade-off of adding an index?</div>
+          <div class="opt" data-correct="false">It slows reads but speeds writes</div>
+          <div class="opt" data-correct="true">It speeds reads but slows writes and uses disk space</div>
+          <div class="opt" data-correct="false">There is no trade-off — always index every column</div>
+          <div class="explain">✅ Indexes make lookups fast, but every INSERT/UPDATE/DELETE must maintain them. Index the columns you search on, not all of them.</div>
+        </div>
+      </section>
+
+      <section id="takeaways" class="section">
+        <h2>Key takeaways</h2>
+        <div class="card">
+          <ul>
+            <li>A <strong>database</strong> stores data permanently; <strong>MSSQL</strong> is a relational DB of <strong>tables</strong> (rows &amp; columns). Relational design keeps <strong>each fact in one place</strong> — the spirit of normalization.</li>
+            <li>Pick the right <strong>data type</strong> per column (<code>NVARCHAR</code> for text, <code>DECIMAL</code> for money, <code>DATETIME2</code> for timestamps, <code>BIT</code> for flags).</li>
+            <li><strong>Constraints</strong> (PRIMARY KEY, FOREIGN KEY, NOT NULL, UNIQUE, DEFAULT, CHECK) let the database <em>guarantee</em> your data stays valid.</li>
+            <li><strong>SQL</strong> commands — <strong>SELECT / INSERT / UPDATE / DELETE</strong> — are CRUD, mapping to REST's GET/POST/PUT/DELETE.</li>
+            <li><code>SELECT</code> goes deep: aliases, <code>DISTINCT</code>, <code>TOP</code>, rich <code>WHERE</code> operators (<code>BETWEEN</code>, <code>IN</code>, <code>LIKE</code>, <code>IS NULL</code>), and <code>ORDER BY</code>. Remember <code>NULL</code> means "unknown" — test it with <code>IS NULL</code>.</li>
+            <li><strong>Aggregates</strong> (<code>COUNT/SUM/AVG/MIN/MAX</code>) with <code>GROUP BY</code> summarise data; <code>HAVING</code> filters groups, <code>WHERE</code> filters rows.</li>
+            <li>A <strong>primary key</strong> identifies each row; a <strong>foreign key</strong> + <strong>JOIN</strong> links tables. Use <strong>LEFT JOIN</strong> to keep unmatched rows; use a <strong>junction table</strong> for many-to-many.</li>
+            <li><strong>Indexes</strong> speed reads (at a write cost); <strong>transactions</strong> give all-or-nothing <strong>ACID</strong> safety.</li>
+            <li>Connect from Node with the <strong><code>mssql</code></strong> package and a shared connection pool; read rows from <code>result.recordset</code> and wrap queries in <code>try/catch</code>.</li>
+            <li><strong>Always use parameterised queries</strong> (<code>.input()</code>) to prevent SQL injection — and always include <code>WHERE</code> on UPDATE/DELETE.</li>
+          </ul>
+          <label class="complete-toggle"><input type="checkbox" data-module="database" /> Mark this module complete</label>
+        </div>
+      </section>
+
+      <div class="pager">
+        <a href="05-rest-apis.html" class="prev"><div class="dir">← Previous</div><div class="ttl">4 · REST APIs</div></a>
+        <a href="07-capstone.html" class="next"><div class="dir">Next →</div><div class="ttl">6 · Capstone Project</div></a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>DevLaunch Academy · Module 5 of 6</p>
+  <div class="signature" aria-label="Author signature">
+    <span class="sig-br">/**</span>
+    <span class="sig-line"><span class="sig-tag">* @author</span>&nbsp; Sumanth Reddy Pathi</span>
+    <span class="sig-line"><span class="sig-tag">* @role</span>&nbsp;&nbsp;&nbsp; Software Engineer · 7+ yrs — Web · AI &amp; MedTech</span>
+    <span class="sig-line"><span class="sig-tag">* @company</span> Compliance Group</span>
+    <span class="sig-br">*/<span class="sig-caret">&nbsp;▌</span></span>
+  </div>
+</footer>
+<script src="assets/app.js"></script>
+<script>
+  // Tiny in-browser SQL engine (SELECT-only, single table) for the playground.
+  (function () {
+    const seed = [
+      { Id: 1, Title: "Learn SQL", IsDone: 1, CreatedAt: "2026-06-17" },
+      { Id: 2, Title: "Build the API", IsDone: 0, CreatedAt: "2026-06-19" },
+      { Id: 3, Title: "Ship the app", IsDone: 0, CreatedAt: "2026-06-20" },
+      { Id: 4, Title: "Add a database", IsDone: 1, CreatedAt: "2026-06-18" },
+    ];
+    const input = document.getElementById("sql-input");
+    const out = document.getElementById("sql-out");
+    const original = input.value;
+
+    function err(msg) { out.innerHTML = '<div class="log-line log-err">✖ ' + msg + "</div>"; }
+
+    function runQuery() {
+      let q = input.value.trim().replace(/;$/, "");
+      const m = /^select\s+(.+?)\s+from\s+tasks(?:\s+where\s+(.+?))?(?:\s+order\s+by\s+(\w+)(\s+desc|\s+asc)?)?$/i.exec(q);
+      if (!m) return err("Only single-table SELECT queries on 'Tasks' are supported here. Try: SELECT * FROM Tasks");
+      let rows = seed.slice();
+
+      // WHERE  col OP value
+      if (m[2]) {
+        const w = /^(\w+)\s*(=|>|<|>=|<=|<>)\s*'?([^']*)'?$/.exec(m[2].trim());
+        if (!w) return err("Couldn't understand the WHERE clause.");
+        const [, col, op, rawVal] = w;
+        if (!(col in seed[0])) return err("No such column: " + col);
+        const num = Number(rawVal);
+        const val = isNaN(num) || rawVal === "" ? rawVal : num;
+        rows = rows.filter((r) => {
+          const c = r[col];
+          switch (op) { case "=": return c == val; case "<>": return c != val; case ">": return c > val; case "<": return c < val; case ">=": return c >= val; case "<=": return c <= val; }
+        });
+      }
+      // ORDER BY
+      if (m[3]) {
+        const col = m[3]; const desc = (m[4] || "").trim().toLowerCase() === "desc";
+        if (!(col in seed[0])) return err("No such column to order by: " + col);
+        rows.sort((a, b) => (a[col] > b[col] ? 1 : a[col] < b[col] ? -1 : 0) * (desc ? -1 : 1));
+      }
+      // SELECT columns
+      let cols;
+      if (m[1].trim() === "*") cols = Object.keys(seed[0]);
+      else { cols = m[1].split(",").map((c) => c.trim()); for (const c of cols) if (!(c in seed[0])) return err("No such column: " + c); }
+
+      if (!rows.length) { out.innerHTML = '<div class="log-line log-info">(0 rows)</div>'; return; }
+      let html = '<table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:0.82rem;"><thead><tr>' +
+        cols.map((c) => '<th style="text-align:left;padding:5px 10px;border-bottom:1px solid #2c3447;color:#fff;">' + c + "</th>").join("") + "</tr></thead><tbody>";
+      for (const r of rows) html += "<tr>" + cols.map((c) => '<td style="padding:5px 10px;border-bottom:1px solid #11151f;color:#cfe3ff;">' + r[c] + "</td>").join("") + "</tr>";
+      html += "</tbody></table><div class='log-info' style='margin-top:6px;'>" + rows.length + " row(s)</div>";
+      out.innerHTML = html;
+    }
+    document.getElementById("sql-run").addEventListener("click", runQuery);
+    document.getElementById("sql-reset").addEventListener("click", () => { input.value = original; runQuery(); });
+    input.addEventListener("keydown", (e) => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") runQuery(); });
+    runQuery();
+  })();
+</script>
+</body>
+</html>

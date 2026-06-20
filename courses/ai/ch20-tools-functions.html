@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 20: Tool Use &amp; Function Calling — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="6">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch20-tools-functions.html" class="current">Part 6: Agents</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Agents</a> / <span class="current">Tool Use</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 20 · Part 6 of 7 · Agents &amp; The Future —</div>
+
+  <h1 class="page-title">Tool Use &amp; <em>Function Calling</em></h1>
+  <p class="page-subtitle">An LLM is a brain in a jar. Tools give it hands. The standard mechanism — function calling — is simple, elegant, and the basis for nearly every agentic system today.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#kid">Kid Translation: Giving the AI a Toolbox</a></li>
+      <li><a href="#schema">The Tool Schema</a></li>
+      <li><a href="#loop">The Tool-Use Loop</a></li>
+      <li><a href="#categories">Common Tool Categories</a></li>
+      <li><a href="#parallel">Parallel &amp; Chained Tool Calls</a></li>
+      <li><a href="#errors">Error Handling &amp; Retries</a></li>
+      <li><a href="#design">Designing Good Tools</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="kid">Kid Translation: Giving the AI a Toolbox</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>An LLM by itself can only do one thing: produce text. It can't check the weather, look up a stock price, run a calculation, or send an email. It just talks.</p>
+    <p>So we give it a toolbox. We say: "Hey, here are 5 tools you can use. Tool 1 is <code>get_weather(city)</code>. Tool 2 is <code>send_email(to, subject, body)</code>. When you want to use one, write a special message that says which tool and what arguments. I'll run it for real and tell you what happened. Then you can keep going."</p>
+    <p>The model learned during training how to use tools this way. So now when you ask "what's the weather in Tokyo?", it doesn't make up an answer — it generates a tool call. We run the actual API. We feed the result back. The model writes a real, current answer based on real data.</p>
+    <p>That's function calling. Brain stays in the model. Hands are the tools. The protocol between them is just structured text.</p>
+  </div>
+
+  <h2 id="schema">The Tool Schema</h2>
+
+  <p>Each tool you give the model is described by a <strong>schema</strong>: name, description, and the parameters it accepts. The standard format is <strong>JSON Schema</strong>. Here's a simple example:</p>
+
+  <div class="formula">
+    <div class="formula-label">— Tool Schema (JSON) —</div>
+    <div class="formula-body" style="text-align: left; font-size: 13px;">{<br>&nbsp;&nbsp;"name": "get_weather",<br>&nbsp;&nbsp;"description": "Get current weather for a city",<br>&nbsp;&nbsp;"parameters": {<br>&nbsp;&nbsp;&nbsp;&nbsp;"type": "object",<br>&nbsp;&nbsp;&nbsp;&nbsp;"properties": {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"city": {"type": "string", "description": "City name"},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"units": {"type": "string", "enum": ["c", "f"]}<br>&nbsp;&nbsp;&nbsp;&nbsp;},<br>&nbsp;&nbsp;&nbsp;&nbsp;"required": ["city"]<br>&nbsp;&nbsp;}<br>}</div>
+  </div>
+
+  <p>The schema isn't just for documentation — it's also constraint. Modern model APIs validate tool calls against the schema and reject malformed ones. For OpenAI's structured outputs and Anthropic's tool use, the model is biased at decode time to produce only schema-conforming JSON. You get type safety for free.</p>
+
+  <p>The <strong>description fields are the most underrated part</strong>. The model uses them to decide which tool to call. A vague description ("Get info") leads to wrong tool selection. A precise one ("Returns current temperature, conditions, humidity for any city worldwide; do not use for forecasts") prevents misuse.</p>
+
+  <h2 id="loop">The Tool-Use Loop</h2>
+
+  <p>The loop has four steps. The host code (your application) runs the loop; the model only ever generates text.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr20a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+        </marker>
+      </defs>
+
+      <!-- User message -->
+      <rect x="20" y="20" width="160" height="48" rx="4" fill="#fff8e1" stroke="#d4a017" stroke-width="1.5"/>
+      <text x="100" y="42" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#8b6914" letter-spacing="0.5">USER</text>
+      <text x="100" y="60" text-anchor="middle" font-family="Newsreader, serif" font-size="12">"Weather in Tokyo?"</text>
+
+      <line x1="185" y1="44" x2="220" y2="44" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr20a)"/>
+
+      <!-- LLM box -->
+      <rect x="225" y="20" width="200" height="48" rx="4" fill="#e0eff5" stroke="#1f6f8b" stroke-width="2"/>
+      <text x="325" y="42" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#1a4a68" letter-spacing="0.5">LLM</text>
+      <text x="325" y="60" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic">decides: call a tool</text>
+
+      <line x1="430" y1="44" x2="465" y2="44" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr20a)"/>
+
+      <!-- Tool call -->
+      <rect x="470" y="20" width="210" height="48" rx="4" fill="#fdf0e3" stroke="#b54a3b" stroke-width="1.5"/>
+      <text x="575" y="42" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#8b3a2e" letter-spacing="0.5">TOOL CALL</text>
+      <text x="575" y="60" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11">get_weather("Tokyo")</text>
+
+      <!-- Down arrow -->
+      <line x1="575" y1="72" x2="575" y2="105" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr20a)"/>
+
+      <!-- Host runs it -->
+      <rect x="430" y="110" width="290" height="48" rx="4" fill="#f0e8f7" stroke="#6b4a8b" stroke-width="2"/>
+      <text x="575" y="132" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#5b3a8b" letter-spacing="0.5">HOST CODE</text>
+      <text x="575" y="150" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic">actually calls the API</text>
+
+      <!-- Down arrow with result -->
+      <line x1="575" y1="162" x2="575" y2="195" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr20a)"/>
+
+      <!-- Result -->
+      <rect x="430" y="200" width="290" height="48" rx="4" fill="#f5f3ed" stroke="#888"/>
+      <text x="575" y="222" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#6b6b6b" letter-spacing="0.5">RESULT</text>
+      <text x="575" y="240" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11">{"temp": "22°C", "sunny"}</text>
+
+      <!-- Arrow back to LLM -->
+      <line x1="425" y1="225" x2="325" y2="225" stroke="#1a1a1a" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <line x1="325" y1="225" x2="325" y2="195" stroke="#1a1a1a" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <polygon points="325,195 321,202 329,202" fill="#1a1a1a"/>
+
+      <!-- Second LLM call -->
+      <rect x="225" y="200" width="200" height="48" rx="4" fill="#e0eff5" stroke="#1f6f8b" stroke-width="2"/>
+      <text x="325" y="222" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#1a4a68" letter-spacing="0.5">LLM (2nd call)</text>
+      <text x="325" y="240" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic">composes final answer</text>
+
+      <!-- Down arrow -->
+      <line x1="325" y1="252" x2="325" y2="280" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr20a)"/>
+
+      <!-- Final response -->
+      <rect x="180" y="285" width="290" height="32" rx="4" fill="#1a1a1a" stroke="#000" stroke-width="2"/>
+      <text x="325" y="305" text-anchor="middle" font-family="Newsreader, serif" font-size="12" fill="#fff">"Tokyo is 22°C and sunny right now."</text>
+    </svg>
+    <p class="diagram-caption">The tool-use loop. Notice the model is called twice: first to decide on the tool, second to compose the answer using the tool's result. Host code is in the middle, doing the actual execution.</p>
+  </figure>
+
+  <p>For multi-step tasks the loop iterates: the model can call multiple tools in a row, with each result informing the next call. Each iteration is one LLM call. This is exactly the agent loop from Chapter 19, made concrete.</p>
+
+  <h2 id="categories">Common Tool Categories</h2>
+
+  <table class="compare-table">
+    <thead><tr><th>Category</th><th>Example tools</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Information retrieval</strong></td><td>web_search, fetch_url, db_query, vector_search</td><td>Read-only. Safest category. Almost always pays off.</td></tr>
+      <tr><td><strong>Computation</strong></td><td>execute_python, calculate, run_sql</td><td>Sandbox required. Massively expands capability for math, data, code.</td></tr>
+      <tr><td><strong>Communication</strong></td><td>send_email, post_message, create_ticket</td><td>Write actions. Needs auth + audit + often confirmation.</td></tr>
+      <tr><td><strong>File &amp; system</strong></td><td>read_file, write_file, run_command</td><td>Powerful + dangerous. Sandbox + permissions critical.</td></tr>
+      <tr><td><strong>Domain-specific APIs</strong></td><td>book_flight, charge_card, update_calendar</td><td>The real business value. Each one is a feature.</td></tr>
+      <tr><td><strong>Sub-agents / delegation</strong></td><td>research_topic, plan_trip</td><td>The tool is itself an agent. Composition pattern.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="parallel">Parallel &amp; Chained Tool Calls</h2>
+
+  <p>Modern model APIs (OpenAI, Anthropic, Gemini) support <strong>parallel tool calls</strong>: in a single response, the model can request multiple tool calls at once. The host runs them all (often concurrently), and feeds all results back together.</p>
+
+  <p>This matters for performance. If a query needs the weather in three cities, sequential calls = three round trips = ~3 seconds. Parallel calls = one round trip = ~1 second. For agents that frequently fan out (research, comparison, multi-source aggregation), this is a major speedup.</p>
+
+  <p><strong>Chained calls</strong> are when the result of one tool becomes the argument of the next. Models handle this naturally — call <code>search_users("alice")</code>, get back a user_id, then call <code>get_orders(user_id)</code>. The model holds the chain in its working memory and doesn't need explicit guidance.</p>
+
+  <h2 id="errors">Error Handling &amp; Retries</h2>
+
+  <p>Tools fail. Networks time out, APIs return 500s, schemas mismatch. Production tool-use systems need explicit error handling:</p>
+
+  <ul>
+    <li><strong>Return errors as data, not exceptions.</strong> When a tool fails, return a structured error message to the model: <code>{"error": "rate_limit", "retry_after_seconds": 30}</code>. The model can read it and decide what to do.</li>
+    <li><strong>Let the model retry.</strong> Often the right behavior — but with limits. After 3 failures, escalate or give up.</li>
+    <li><strong>Distinguish recoverable from fatal.</strong> A 401 ("unauthorized") usually means stop. A 503 ("temporarily unavailable") means retry.</li>
+    <li><strong>Sanitize inputs.</strong> Even if the model produces schema-valid JSON, it might pass nonsensical values. Validate semantically before executing.</li>
+    <li><strong>Log every call.</strong> For debugging, audit, and post-mortem when something goes wrong.</li>
+  </ul>
+
+  <h2 id="design">Designing Good Tools</h2>
+
+  <div class="callout-tip">
+    <div class="callout-label">★ Principles for tool design</div>
+    <p><strong>Few, atomic, well-named.</strong> Five clear tools beat fifty muddled ones. Models pick wrong tools when the boundaries blur.</p>
+    <p><strong>Strong descriptions.</strong> The description tells the model when to use the tool. Spend more words here than you think you need.</p>
+    <p><strong>Constrained parameters.</strong> Use enums and required fields. Don't accept "any string" if the value should be one of three options.</p>
+    <p><strong>Idempotent when possible.</strong> If the model accidentally calls <code>send_email</code> twice, did the user get two emails? Make it safe to retry.</p>
+    <p><strong>Return structured data.</strong> Models work better with structured JSON results than long prose.</p>
+    <p><strong>Bound the output.</strong> A tool that returns 100,000 tokens of database data will blow up your context. Truncate or summarize.</p>
+  </div>
+
+  <div class="key-point">
+    Tool use is what made LLMs go from "write me a paragraph" to "do my taxes." The protocol is simple JSON Schema, but the design discipline behind a good tool set is where agent reliability lives or dies.
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · How to sound fluent</div>
+    <p>"<strong>Function calling</strong>" (OpenAI's term) and "<strong>tool use</strong>" (Anthropic's term) are the same thing. "<strong>Tool calling</strong>" is increasingly the neutral term.</p>
+    <p>"<strong>JSON Schema</strong>" — the standard format for tool parameters. "<strong>Structured outputs</strong>" — the broader feature of constraining LLM output to a JSON schema, of which tool calling is a use case.</p>
+    <p>"<strong>Strict mode</strong>" — when the model is grammar-constrained at decode time to only emit schema-valid JSON. Reliable, but limits some flexibility.</p>
+    <p>"<strong>Parallel function calls</strong>" — the model emits multiple tool calls in one response, executed concurrently.</p>
+    <p>"<strong>Toolformer</strong>" — early research on teaching models to use tools (2023 Meta paper). Mostly historical now; tool use is fully native to frontier models.</p>
+    <p>"<strong>Tool poisoning</strong>" — a security risk where an attacker manipulates tool descriptions to get the model to misuse tools.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself · Answer out loud</div>
+    <ol>
+      <li>What does the LLM actually do when it "calls" a tool?
+        <details><summary>Answer</summary><p>It generates a structured message (JSON) saying which tool and what arguments. The host application reads that message and actually executes the tool. The LLM never directly executes anything.</p></details>
+      </li>
+      <li>Why are tool descriptions important?
+        <details><summary>Answer</summary><p>Because the model uses them to decide which tool to call. Vague descriptions lead to wrong selections. A precise description includes when to use the tool, what it returns, and any caveats.</p></details>
+      </li>
+      <li>How many LLM calls happen for one tool-using request?
+        <details><summary>Answer</summary><p>At least two: one where the model decides on the tool (and emits the call), one where it composes a final answer from the tool's result. Multi-step tasks have more.</p></details>
+      </li>
+      <li>What's the benefit of parallel tool calls?
+        <details><summary>Answer</summary><p>Latency. Multiple independent tool invocations run concurrently in one round trip instead of sequentially. Critical for agents that fan out across many sources.</p></details>
+      </li>
+      <li>Why is idempotency a desirable property of write-action tools?
+        <details><summary>Answer</summary><p>Because models occasionally retry, double-call, or re-invoke tools — and a write that's accidentally called twice should not double-charge the user, send two emails, etc. Idempotent design makes retries safe.</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <h3>Recommended next reading</h3>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>OpenAI: "Function calling guide"</strong> · platform.openai.com/docs/guides/function-calling · Free · The reference docs. Read all the examples.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Anthropic: "Tool use guide"</strong> · docs.anthropic.com · Free · The Claude version, with strong examples of multi-step tool use.</span>
+      </li>
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"Toolformer: Language Models Can Teach Themselves to Use Tools"</strong> by Schick et al. (Meta, 2023) — the early research paper. Historical interest.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>"How to design good tools for LLM agents"</strong> · Anthropic engineering blog · Free · Practical lessons from building Claude tools.</span>
+      </li>
+      <li>
+        <span class="ref-type tool">Tool</span>
+        <span class="ref-detail"><strong>JSON Schema</strong> · json-schema.org · Free · The official spec. You'll write a lot of these — worth a half-hour skim.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch19-agents.html">← Previous: AI Agents</a>
+    <div class="nav-spacer"></div>
+    <a href="ch21-mcp.html">Next: MCP →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 20 · Part 6 · Agents &amp; The Future · Chapter 20 of 24</div>
+</footer>
+
+</body>
+</html>

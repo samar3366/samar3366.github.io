@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 15: Prompt Engineering — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="5">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch15-prompting.html" class="current">Part 5: Building With AI</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Building With AI</a> / <span class="current">Prompt Engineering</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 15 · Part 5 of 7 · Building With AI —</div>
+
+  <h1 class="page-title">Prompt <em>Engineering</em></h1>
+  <p class="page-subtitle">Same model, totally different output — depending on what you write. The best practitioners are 10× more effective than beginners. Here's the toolkit.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#kid">Kid Translation: How You Ask Matters</a></li>
+      <li><a href="#anatomy">Anatomy of a Good Prompt</a></li>
+      <li><a href="#patterns">Core Patterns: Zero-Shot, Few-Shot, Chain-of-Thought</a></li>
+      <li><a href="#system-prompts">System Prompts &amp; Roles</a></li>
+      <li><a href="#structured">Structured Outputs</a></li>
+      <li><a href="#pitfalls">Common Pitfalls &amp; Antipatterns</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="kid">Kid Translation: How You Ask Matters</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>You know how if you say "Mom, can I have a cookie?" you might get one — but if you say "Mom, can I PLEASE have just one cookie before dinner because I had a really good day at school and didn't even argue with my brother?" — you definitely get the cookie?</p>
+    <p>It's the same with AI. The same question can get you a lazy, generic answer or a fantastic, detailed one — depending on how you ask. The trick isn't being polite (though that doesn't hurt). It's being <strong>clear, specific, and giving examples of what you want</strong>.</p>
+    <p>Prompt engineering is just learning to ask well. There's no magic spell — the techniques are practical and learnable. Once you know them, you'll get noticeably better results from every AI you use.</p>
+  </div>
+
+  <h2 id="anatomy">Anatomy of a Good Prompt</h2>
+
+  <p>A high-quality prompt typically has these parts. Not all are needed every time, but knowing them gives you a checklist.</p>
+
+  <ol class="steps">
+    <li><strong>Role / context.</strong> Tell the model who it's playing or what context to assume. "You are a senior security engineer reviewing code for vulnerabilities."</li>
+    <li><strong>Task.</strong> What you want, specifically. Not "help with my code" — "find any SQL injection risks in this function and explain each one."</li>
+    <li><strong>Inputs.</strong> The actual content the model needs to work with — code, document, data — clearly delimited.</li>
+    <li><strong>Constraints.</strong> Length, tone, format, what to avoid. "Use bullet points. Maximum 5. No code in the response."</li>
+    <li><strong>Examples (optional but powerful).</strong> Show 1–3 example inputs and outputs in the format you want.</li>
+    <li><strong>Output format.</strong> JSON? Markdown? Structured headings? Specify.</li>
+  </ol>
+
+  <div class="example">
+    <div class="example-label">Bad → Good prompt comparison</div>
+    <p><strong>Bad:</strong> "review my code"</p>
+    <p><strong>Good:</strong> "You are a senior Python engineer doing a code review. Below is a function for processing user uploads. Identify (1) any security risks, (2) edge cases that aren't handled, (3) anything that would fail at scale. Format your response as three sections with bullet points. Maximum 8 bullets total. <code>&lt;code&gt;...&lt;/code&gt;</code>"</p>
+    <p>The good version gives the model role, task, structure, and constraints. The output will be 5× more useful.</p>
+  </div>
+
+  <h2 id="patterns">Core Patterns: Zero-Shot, Few-Shot, Chain-of-Thought</h2>
+
+  <p>Three foundational patterns every practitioner should know:</p>
+
+  <h3>Zero-shot: just ask</h3>
+  <p>Just describe the task and let the model do it from its general training. Works for tasks that the model has seen many examples of during training. Best for common tasks.</p>
+
+  <h3>Few-shot: show examples</h3>
+  <p>Include 1–5 example input/output pairs in the prompt. The model learns the pattern from your examples and applies it to the new input. Powerful for tasks with specific formats, edge cases, or domain conventions.</p>
+
+  <div class="formula">
+    <div class="formula-label">— Few-Shot Pattern —</div>
+    <div class="formula-body">Input: "I love this!" → Sentiment: positive<br>Input: "Worst purchase ever." → Sentiment: negative<br>Input: "It was okay." → Sentiment: neutral<br>Input: "Couldn't be happier." → Sentiment: ?</div>
+  </div>
+
+  <h3>Chain-of-thought: ask for reasoning</h3>
+  <p>For complex problems, ask the model to think through the steps before answering. We covered this in Chapter 11 — for non-reasoning models, simply adding "Let's think step by step" or "First, list the key facts. Then reason through them. Then answer." dramatically improves accuracy.</p>
+
+  <p>For modern reasoning models (Claude with extended thinking, OpenAI o-series), this often happens automatically — but explicit guidance still helps shape the reasoning.</p>
+
+  <h2 id="system-prompts">System Prompts &amp; Roles</h2>
+
+  <p>Most chat APIs have two kinds of messages: <strong>system prompts</strong> (set up for the conversation) and <strong>user messages</strong> (what the user asks).</p>
+
+  <p>System prompts are powerful because they carry persistent context that shapes the entire conversation:</p>
+
+  <ul>
+    <li>Identity / persona ("You are a careful financial advisor named Iris.").</li>
+    <li>Capabilities and limits ("You may not give specific stock picks. You always recommend consulting a licensed advisor.").</li>
+    <li>Default behaviors ("Always cite sources. Always explain your reasoning before conclusions.").</li>
+    <li>Format preferences ("All responses in markdown. Code in fenced blocks.").</li>
+  </ul>
+
+  <p>For developer/API use, the system prompt is your main lever. For consumer chat (ChatGPT, Claude.ai), users typically can't set system prompts directly — but features like Custom Instructions or Projects effectively serve the same role.</p>
+
+  <h2 id="structured">Structured Outputs</h2>
+
+  <p>For programmatic use, you usually want the model to return data in a predictable format — JSON, XML, a specific schema. Two ways:</p>
+
+  <ol class="steps">
+    <li><strong>Tell the model the schema.</strong> "Return your answer as JSON with these exact keys: title (string), summary (string, max 100 words), tags (array of strings)." Modern models follow schemas reliably.</li>
+    <li><strong>Use API-level structured output features.</strong> OpenAI's "structured outputs" mode, Anthropic's tool use, and many model providers now offer guaranteed JSON-conforming output by constraining the decoder. When available, use it.</li>
+  </ol>
+
+  <div class="callout-tip">
+    <div class="callout-label">★ Pro tip</div>
+    <p>For complex schemas, give a complete example output. Models follow examples more reliably than schema specs. "Here's an example of correctly formatted output: <code>{...}</code>" works better than abstract type descriptions.</p>
+  </div>
+
+  <h2 id="pitfalls">Common Pitfalls &amp; Antipatterns</h2>
+
+  <table class="compare-table">
+    <thead><tr><th>Pitfall</th><th>What goes wrong</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Vague task</strong></td><td>"Help me with this." Generic, low-quality response.</td><td>State the specific task, audience, and outcome.</td></tr>
+      <tr><td><strong>Overstuffed prompt</strong></td><td>Throwing everything in. Model loses focus, ignores key parts.</td><td>Trim to what matters. Use clear sections (XML tags or markdown headers).</td></tr>
+      <tr><td><strong>Negation only</strong></td><td>"Don't be too long." Model still rambles.</td><td>State positively: "Maximum 3 sentences."</td></tr>
+      <tr><td><strong>Multiple unrelated tasks</strong></td><td>Asking for a summary, translation, and critique in one prompt. Quality drops on each.</td><td>Split into separate prompts or use clear numbered steps.</td></tr>
+      <tr><td><strong>Inputs not delimited</strong></td><td>Model confuses your text with the input.</td><td>Wrap inputs in tags: <code>&lt;document&gt;...&lt;/document&gt;</code></td></tr>
+      <tr><td><strong>No examples for a niche format</strong></td><td>Model invents a format.</td><td>Show 1–2 examples of exactly what you want.</td></tr>
+      <tr><td><strong>Asking for opinions disguised as facts</strong></td><td>Model invents confident-sounding nonsense.</td><td>Ask for sources, or use RAG (Chapter 16).</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="model-differences">Model-Specific Quirks</h2>
+
+  <p>Different models have different prompting cultures. Some patterns:</p>
+
+  <ul>
+    <li><strong>Claude</strong> responds well to XML tags as delimiters (<code>&lt;document&gt;</code>, <code>&lt;example&gt;</code>) and to natural conversational instructions. Prefers a clear role/task structure.</li>
+    <li><strong>GPT</strong> models are happy with markdown delimiters and explicit numbered instructions.</li>
+    <li><strong>Reasoning models</strong> (o-series, Claude extended thinking) need <em>less</em> hand-holding on reasoning steps but still benefit from clear task statements.</li>
+    <li><strong>Open models</strong> (Llama, Mistral, Qwen) often need more explicit examples and stricter formats; their instruction following varies more by size and fine-tune.</li>
+  </ul>
+
+  <p>The bigger principle: <strong>iterate</strong>. Run your prompt, look at the output, identify what's missing or wrong, refine. Three iterations on a prompt almost always beats one shot.</p>
+
+  <div class="key-point">
+    Prompt engineering is mostly clarity. The best prompts are clear about role, task, inputs, constraints, and format. The fancy techniques (CoT, few-shot, structured outputs) just add precision.
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · How to sound fluent</div>
+    <p>"<strong>System prompt</strong>" — the persistent setup. "<strong>User prompt</strong>" — what the end-user types.</p>
+    <p>"<strong>Few-shot</strong>" — including N example pairs. "<strong>Zero-shot</strong>" — no examples. "<strong>One-shot</strong>" — one example.</p>
+    <p>"<strong>Prompt template</strong>" — a reusable prompt with variable slots, used in production code.</p>
+    <p>"<strong>Prompt injection</strong>" — when an untrusted input (like a webpage being summarized) contains instructions that hijack the model's behavior. Major security topic — see Chapter 23.</p>
+    <p>"<strong>Jailbreak</strong>" — prompts designed to bypass a model's safety training. Active arms race between attackers and defenders.</p>
+    <p>"<strong>Meta-prompting</strong>" — using AI to write or improve prompts for other AI calls.</p>
+    <p>"<strong>Prompt chaining</strong>" — breaking a complex task into multiple sequential prompts where one's output feeds another's input.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself · Answer out loud</div>
+    <ol>
+      <li>What are the typical components of a well-structured prompt?
+        <details><summary>Answer</summary><p>Role/context, task, inputs (clearly delimited), constraints, examples (optional), and desired output format.</p></details>
+      </li>
+      <li>When does few-shot prompting help most?
+        <details><summary>Answer</summary><p>For tasks with specific formats, niche conventions, or unusual edge cases. The examples teach the model the pattern faster than describing it abstractly.</p></details>
+      </li>
+      <li>Why are positive instructions usually better than negative ones?
+        <details><summary>Answer</summary><p>Negative instructions ("don't be long") leave too much room for interpretation. Positive ones ("maximum 3 sentences") are concrete and verifiable. Models also implicitly weight positive instructions more strongly.</p></details>
+      </li>
+      <li>What's a system prompt and why does it matter?
+        <details><summary>Answer</summary><p>A persistent message that sets up role, behaviors, and constraints for the whole conversation. It shapes everything that follows and is the most powerful lever in API use.</p></details>
+      </li>
+      <li>How do you make a model reliably return JSON?
+        <details><summary>Answer</summary><p>Either: (1) use the API's structured-output mode if available, or (2) tell the model the exact schema and provide a complete example output. For complex schemas, examples beat descriptions.</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <h3>Recommended next reading</h3>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Anthropic: "Prompt Engineering Guide"</strong> · docs.anthropic.com · Free · The official, regularly updated guide. Read this twice.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>OpenAI Cookbook</strong> · cookbook.openai.com · Free · Hundreds of practical prompt examples for real tasks.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Lilian Weng: "Prompt Engineering"</strong> · lilianweng.github.io · Free · Comprehensive technical survey covering CoT, ReAct, ToT, and more.</span>
+      </li>
+      <li>
+        <span class="ref-type course">Course</span>
+        <span class="ref-detail"><strong>DeepLearning.AI: "ChatGPT Prompt Engineering for Developers"</strong> · Free · ~1.5 hours. Hands-on intro by Andrew Ng &amp; Isa Fulford.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>"Prompt Engineering Guide"</strong> · promptingguide.ai · Free · Open-source comprehensive reference, updated continuously.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch14-multimodal.html">← Previous: Multimodal</a>
+    <div class="nav-spacer"></div>
+    <a href="ch16-rag.html">Next: RAG →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 15 · Part 5 · Building With AI · Chapter 15 of 24</div>
+</footer>
+
+</body>
+</html>

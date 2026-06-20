@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 18: Knowledge Graphs &amp; Ontologies — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="5">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch18-knowledge-graphs.html" class="current">Part 5: Building With AI</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Building With AI</a> / <span class="current">Knowledge Graphs</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 18 · Part 5 of 7 · Building With AI —</div>
+
+  <h1 class="page-title">Knowledge Graphs &amp; <em>Ontologies</em></h1>
+  <p class="page-subtitle">Vectors capture similarity but not relationships. Knowledge graphs do the opposite: they encode <em>which thing connects to which thing, and how</em>. Together with RAG, they're how AI systems get factual rigor.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#kid">Kid Translation: A Web of Connections</a></li>
+      <li><a href="#triples">Triples: The Atomic Unit</a></li>
+      <li><a href="#ontologies">Ontologies: Schema for Meaning</a></li>
+      <li><a href="#kg-vs-vector">Knowledge Graphs vs. Vector Search</a></li>
+      <li><a href="#graph-rag">GraphRAG: Combining Both Worlds</a></li>
+      <li><a href="#tools">Tools &amp; Databases</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="kid">Kid Translation: A Web of Connections</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Imagine a giant family tree, but for everything in the world. Marie Curie is a scientist. Marie Curie is married to Pierre Curie. Marie Curie won the Nobel Prize in Physics. The Nobel Prize in Physics was first awarded in 1901. Each fact is a tiny arrow connecting two things.</p>
+    <p>Now imagine drawing all those arrows on one giant whiteboard. People, places, ideas, dates — every dot is a "thing," and every arrow is "how this thing connects to that thing." That's a knowledge graph.</p>
+    <p>If you want to ask "who did Marie Curie's daughter marry?", a knowledge graph can <em>walk</em> the arrows: Marie → daughter (Irène) → spouse (Frédéric Joliot). It doesn't have to guess. It follows the lines.</p>
+    <p>Vector search is great at "find me things <em>similar</em> to this." Knowledge graphs are great at "find me things <em>connected</em> to this, in this specific way." Different jobs.</p>
+  </div>
+
+  <h2 id="triples">Triples: The Atomic Unit</h2>
+
+  <p>A knowledge graph is built from <strong>triples</strong>: three-part statements of the form <code>(subject, predicate, object)</code>. Sometimes written <code>subject — predicate → object</code>. Each triple is one tiny fact.</p>
+
+  <div class="formula">
+    <div class="formula-label">— Triples —</div>
+    <div class="formula-body">(Marie Curie, born_in, Warsaw)<br>(Marie Curie, won, Nobel Prize in Physics)<br>(Nobel Prize in Physics, awarded_by, Royal Swedish Academy)</div>
+  </div>
+
+  <p>Stack millions of these together and the result is a <strong>graph</strong>: nodes (subjects and objects) connected by labelled edges (predicates).</p>
+
+  <figure>
+    <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr18a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+        </marker>
+      </defs>
+
+      <!-- Marie Curie node center -->
+      <circle cx="350" cy="160" r="42" fill="#fdf0e3" stroke="#b54a3b" stroke-width="2.5"/>
+      <text x="350" y="158" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-weight="700">Marie</text>
+      <text x="350" y="174" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-weight="700">Curie</text>
+
+      <!-- Warsaw -->
+      <circle cx="120" cy="60" r="36" fill="#e0eff5" stroke="#1f6f8b" stroke-width="2"/>
+      <text x="120" y="65" text-anchor="middle" font-family="Newsreader, serif" font-size="12">Warsaw</text>
+      <line x1="315" y1="135" x2="148" y2="78" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr18a)"/>
+      <text x="200" y="95" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8b3a2e" font-weight="700">born_in</text>
+
+      <!-- Pierre -->
+      <circle cx="580" cy="60" r="36" fill="#fdf0e3" stroke="#b54a3b" stroke-width="2"/>
+      <text x="580" y="65" text-anchor="middle" font-family="Newsreader, serif" font-size="11">Pierre Curie</text>
+      <line x1="385" y1="135" x2="552" y2="78" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr18a)"/>
+      <text x="500" y="100" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8b3a2e" font-weight="700">married_to</text>
+
+      <!-- Nobel -->
+      <circle cx="580" cy="260" r="42" fill="#fff8e1" stroke="#d4a017" stroke-width="2"/>
+      <text x="580" y="258" text-anchor="middle" font-family="Newsreader, serif" font-size="11">Nobel Prize</text>
+      <text x="580" y="272" text-anchor="middle" font-family="Newsreader, serif" font-size="11">in Physics</text>
+      <line x1="385" y1="185" x2="540" y2="245" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr18a)"/>
+      <text x="490" y="225" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8b3a2e" font-weight="700">won</text>
+
+      <!-- Daughter -->
+      <circle cx="120" cy="260" r="36" fill="#f0e8f7" stroke="#6b4a8b" stroke-width="2"/>
+      <text x="120" y="258" text-anchor="middle" font-family="Newsreader, serif" font-size="11">Irène</text>
+      <text x="120" y="272" text-anchor="middle" font-family="Newsreader, serif" font-size="11">Joliot-Curie</text>
+      <line x1="315" y1="185" x2="158" y2="245" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr18a)"/>
+      <text x="195" y="240" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8b3a2e" font-weight="700">parent_of</text>
+
+      <!-- Frédéric -->
+      <circle cx="120" cy="160" r="36" fill="#f0e8f7" stroke="#6b4a8b" stroke-width="2"/>
+      <text x="120" y="158" text-anchor="middle" font-family="Newsreader, serif" font-size="10">Frédéric</text>
+      <text x="120" y="172" text-anchor="middle" font-family="Newsreader, serif" font-size="10">Joliot</text>
+      <line x1="120" y1="225" x2="120" y2="195" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr18a)"/>
+      <text x="160" y="215" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#8b3a2e" font-weight="700">married_to</text>
+    </svg>
+    <p class="diagram-caption">A small fragment of a knowledge graph around Marie Curie. Every connection is a typed, labelled relationship — meaning a query engine can <em>traverse</em> the graph.</p>
+  </figure>
+
+  <h2 id="ontologies">Ontologies: Schema for Meaning</h2>
+
+  <p>An <strong>ontology</strong> is the schema of a knowledge graph — the formal definition of what kinds of things exist and what kinds of relationships are allowed between them. "A Person can have a born_in relationship to a Place. A Person can have a parent_of relationship to a Person. A Place cannot have a parent_of relationship to anything."</p>
+
+  <p>Ontologies enforce consistency: instead of one source saying <code>spouse</code>, another saying <code>married_to</code>, and another saying <code>partner</code>, an ontology picks one canonical predicate and rejects the rest. This makes the graph queryable.</p>
+
+  <p>Three terms you'll meet:</p>
+
+  <ul>
+    <li><strong>RDF</strong> — Resource Description Framework. The standard format for triples, used across the web (and quietly powering Google's Knowledge Graph, Wikidata, schema.org).</li>
+    <li><strong>OWL</strong> — Web Ontology Language. An RDF dialect that adds richer rules: a Father must be a Person, every Person has at most one date_of_birth, and so on.</li>
+    <li><strong>SPARQL</strong> — the query language for RDF. SQL for graphs.</li>
+  </ul>
+
+  <p>If you've never touched these, that's fine — most modern AI work uses simpler property graphs (Neo4j-style) where each node and edge can carry arbitrary attributes without strict schemas. But the underlying ideas — <em>typed entities, typed relationships, queryable structure</em> — are universal.</p>
+
+  <h2 id="kg-vs-vector">Knowledge Graphs vs. Vector Search</h2>
+
+  <p>Vector search and knowledge graphs are good at very different things. The right system often uses both.</p>
+
+  <table class="compare-table">
+    <thead><tr><th>Feature</th><th>Vector search</th><th>Knowledge graph</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Best at</strong></td><td>Fuzzy, semantic, "find similar"</td><td>Exact, structured, multi-hop relationships</td></tr>
+      <tr><td><strong>Building cost</strong></td><td>Low — just embed text</td><td>High — needs entity extraction, schema design</td></tr>
+      <tr><td><strong>Query style</strong></td><td>"Find docs about X"</td><td>"Find all employees who report to people in Acme that joined after 2020"</td></tr>
+      <tr><td><strong>Reasoning power</strong></td><td>Weak — distance is just distance</td><td>Strong — can traverse, infer, aggregate</td></tr>
+      <tr><td><strong>Updating</strong></td><td>Re-embed changed docs</td><td>Update individual triples — surgical</td></tr>
+      <tr><td><strong>Explainability</strong></td><td>Hard — why was this similar?</td><td>Easy — show the path through the graph</td></tr>
+    </tbody>
+  </table>
+
+  <p>The classic failure case for pure vector search: ask "who reports to whom in this org?" and the relevant facts may be spread across HR docs, org charts, Slack messages — and "reports to" doesn't necessarily appear as a phrase. A graph captures that structure once and answers it instantly.</p>
+
+  <h2 id="graph-rag">GraphRAG: Combining Both Worlds</h2>
+
+  <p>The hot architecture in 2024–2026 is <strong>GraphRAG</strong>: extract a knowledge graph from your documents, then use both vector search <em>and</em> graph traversal to answer questions.</p>
+
+  <ol class="steps">
+    <li><strong>Build the graph from documents.</strong> An LLM reads each chunk and extracts entities and relationships into triples. Microsoft's GraphRAG, LangChain's LLMGraphTransformer, LlamaIndex KG modules all do this.</li>
+    <li><strong>For a query, retrieve from both.</strong> Use vector search to find relevant chunks. Use graph traversal to find connected facts. Combine.</li>
+    <li><strong>Use the graph to answer multi-hop questions.</strong> "Who funded the company that acquired X?" requires walking three hops — easy on a graph, very hard via vector search alone.</li>
+    <li><strong>Use community detection.</strong> Microsoft's GraphRAG clusters the graph into "communities" and produces summaries at each level. Lets you answer big-picture queries ("what are the main themes in this corpus?") that pure RAG can't.</li>
+  </ol>
+
+  <p>The cost: building and maintaining a knowledge graph is real work. The benefit: dramatically better answers on questions that need structure or aggregation.</p>
+
+  <h2 id="tools">Tools &amp; Databases</h2>
+
+  <table class="compare-table">
+    <thead><tr><th>Tool</th><th>Type</th><th>Notable</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Neo4j</strong></td><td>Property graph DB</td><td>The most popular graph database. Cypher query language is widely known.</td></tr>
+      <tr><td><strong>Memgraph / KuzuDB</strong></td><td>Property graph DB</td><td>Newer, faster alternatives. KuzuDB embeds in your app.</td></tr>
+      <tr><td><strong>Amazon Neptune</strong></td><td>Managed graph DB</td><td>Supports both property graphs and RDF. AWS-native.</td></tr>
+      <tr><td><strong>Apache Jena / Blazegraph</strong></td><td>RDF triple stores</td><td>For "real" semantic web / SPARQL workflows.</td></tr>
+      <tr><td><strong>Wikidata</strong></td><td>Public KG</td><td>The largest open knowledge graph. Wikipedia's structured backbone. ~115M items.</td></tr>
+      <tr><td><strong>Microsoft GraphRAG</strong></td><td>Framework</td><td>Open-source pipeline for extracting graphs from text and querying with LLMs.</td></tr>
+      <tr><td><strong>LlamaIndex KG / LangChain Graph</strong></td><td>Framework</td><td>Easier on-ramp; integrate KG retrieval into existing RAG.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout-tip">
+    <div class="callout-label">★ Practical advice</div>
+    <p>Don't build a knowledge graph just because it sounds sophisticated. Start with vector RAG. If users keep asking multi-hop questions ("who reports to X's manager's peers?"), aggregation questions ("how many incidents involved component Y last quarter?"), or "explain the path" questions — that's the signal to add a graph. Many production systems use a small, focused graph layered on top of vector RAG.</p>
+  </div>
+
+  <div class="key-point">
+    Vectors encode meaning as direction. Graphs encode meaning as connection. Modern AI systems benefit from both — vectors for "find me similar," graphs for "follow the chain."
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · How to sound fluent</div>
+    <p>"<strong>Triple</strong>" — subject-predicate-object. "<strong>Property graph</strong>" — graph where nodes and edges carry arbitrary attributes (Neo4j model). "<strong>RDF graph</strong>" — strict triple-store model.</p>
+    <p>"<strong>Ontology</strong>" — the schema. "<strong>Schema</strong>" — the same idea, less academic. "<strong>Taxonomy</strong>" — a tree of categories (a degenerate ontology).</p>
+    <p>"<strong>Entity extraction</strong>" / "<strong>NER</strong>" — pulling named entities out of text. "<strong>Relation extraction</strong>" — pulling triples out of text.</p>
+    <p>"<strong>Cypher</strong>" — Neo4j's query language. "<strong>SPARQL</strong>" — RDF's. "<strong>Gremlin</strong>" — a third option.</p>
+    <p>"<strong>Multi-hop reasoning</strong>" — answering questions that require walking multiple edges of the graph.</p>
+    <p>"<strong>GraphRAG</strong>" — the family of techniques combining knowledge graphs with retrieval augmentation.</p>
+    <p>"<strong>Knowledge graph completion</strong>" — predicting missing triples (e.g., we know X works_at Y and Y is_in Z, so probably X is_based_in Z). An active research area.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself · Answer out loud</div>
+    <ol>
+      <li>What's a triple, and why is it the atomic unit of a knowledge graph?
+        <details><summary>Answer</summary><p>A subject-predicate-object statement (e.g., "Marie Curie — born_in → Warsaw"). It's atomic because it's the smallest meaningful fact, and millions of triples compose into a graph that you can traverse and query.</p></details>
+      </li>
+      <li>What's the difference between a knowledge graph and an ontology?
+        <details><summary>Answer</summary><p>The graph is the actual data — millions of specific triples. The ontology is the schema — the rules about what kinds of entities exist and what relationships are valid between them.</p></details>
+      </li>
+      <li>What kind of question is hard for pure vector RAG but easy for a graph?
+        <details><summary>Answer</summary><p>Multi-hop relational questions. "Who are the children of people who worked at Bell Labs in the 1960s?" requires walking through specific typed relationships — vectors don't model that, graphs do directly.</p></details>
+      </li>
+      <li>What is GraphRAG, in one sentence?
+        <details><summary>Answer</summary><p>A retrieval architecture that extracts a knowledge graph from a document corpus and uses both graph traversal and vector search to answer questions, especially multi-hop and aggregate ones.</p></details>
+      </li>
+      <li>When should you NOT build a knowledge graph?
+        <details><summary>Answer</summary><p>When your queries are mostly "find similar content" or "summarize this topic" — pure vector RAG is simpler and sufficient. Graph construction is expensive; only do it when the queries benefit from structure.</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <h3>Recommended next reading</h3>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type book">Book</span>
+        <span class="ref-detail"><strong>Knowledge Graphs</strong> by Hogan et al. — <em>chapters 1–4 (free PDF, ~150 pages)</em>. The most thorough academic introduction.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Microsoft Research: "GraphRAG" announcement</strong> · microsoft.com/research · Free · The reference implementation paper, with examples that show what graphs unlock vs. plain RAG.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Neo4j: "Knowledge Graphs Made Easy" (with LangChain)</strong> · neo4j.com/blog · Free · Practical tutorial for extracting and querying KGs with LLMs.</span>
+      </li>
+      <li>
+        <span class="ref-type tool">Tool</span>
+        <span class="ref-detail"><strong>Wikidata · query.wikidata.org</strong> · Free · A fully public knowledge graph you can query in SPARQL right now. Best playground for graph thinking.</span>
+      </li>
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"From Local to Global: A GraphRAG Approach to Query-Focused Summarization"</strong> by Edge et al. (Microsoft, 2024) — the GraphRAG paper.</span>
+      </li>
+      <li>
+        <span class="ref-type book">Book</span>
+        <span class="ref-detail"><strong>Designing Data-Intensive Applications</strong> by Martin Kleppmann — <em>chapter 2 ("Data Models &amp; Query Languages")</em>. The clearest engineering treatment of graph vs. relational vs. document data models.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch17-embeddings.html">← Previous: Embeddings</a>
+    <div class="nav-spacer"></div>
+    <a href="ch19-agents.html">Next: AI Agents →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 18 · Part 5 · Building With AI · Chapter 18 of 24</div>
+</footer>
+
+</body>
+</html>

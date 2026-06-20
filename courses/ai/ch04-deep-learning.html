@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 4: Deep Learning &amp; Why "Deep" — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="1">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch04-deep-learning.html" class="current">Part 1: Foundations</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Foundations</a> / <span class="current">Deep Learning</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 04 · Part 1 of 7 · Foundations —</div>
+
+  <h1 class="page-title">Deep Learning &amp; <em>Why "Deep"</em></h1>
+  <p class="page-subtitle">A neural network with many layers gets a special name. Why depth matters, and the four major flavors of deep network you'll meet.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#kid">Kid Translation: Onion of Understanding</a></li>
+      <li><a href="#why-deep">Why "Deep" Matters</a></li>
+      <li><a href="#cnn">CNNs: Networks That See</a></li>
+      <li><a href="#rnn">RNNs &amp; LSTMs: Networks That Remember</a></li>
+      <li><a href="#transformer-preview">Transformers: A Preview</a></li>
+      <li><a href="#what-changed">What Made Deep Learning Suddenly Work</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="kid">Kid Translation: The Onion of Understanding</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Imagine peeling an onion. The outer layer is the obvious stuff — colors, shapes. Peel one layer in, you find the parts — eyes, ears, wheels. Peel another layer, you find what those parts <em>mean together</em> — a face, a car. Peel another, you find what the whole picture is about — a happy day at the park.</p>
+    <p>Each layer of "understanding" is more abstract than the last. A <strong>deep</strong> neural network is just a network with lots of layers, so it can build many levels of understanding from the same raw pixels. The deeper, the more abstract the patterns it can find.</p>
+  </div>
+
+  <p>"Deep learning" is just a marketing-friendly term for "neural networks with lots of layers." There's no magic line — generally anything beyond ~3 hidden layers gets called "deep" — but the more important thing is what the depth <em>buys</em> you.</p>
+
+  <h2 id="why-deep">Why "Deep" Matters</h2>
+
+  <p>You might wonder: if one layer of neurons can already approximate any function (it can, mathematically — google "universal approximation theorem"), why do we need many layers?</p>
+
+  <p>The answer is <strong>efficiency</strong>. A 1-layer network would need a <em>preposterous</em> number of neurons to learn complex patterns. Stacking layers lets the network reuse simpler patterns to compose harder ones — exactly like how you don't memorize every face from scratch, you remember "two eyes, one nose, one mouth" and assemble.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg">
+      <!-- Shallow network -->
+      <text x="180" y="25" text-anchor="middle" font-family="Newsreader, serif" font-size="14" font-weight="700">Shallow (1 hidden layer)</text>
+      <text x="180" y="42" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#6b6b6b">needs ~10⁹ neurons for hard tasks</text>
+      <g transform="translate(80, 60)">
+        <circle cx="0" cy="40" r="8" fill="#fff8e1" stroke="#d4a017"/>
+        <circle cx="0" cy="80" r="8" fill="#fff8e1" stroke="#d4a017"/>
+        <circle cx="0" cy="120" r="8" fill="#fff8e1" stroke="#d4a017"/>
+        <!-- Many neurons in middle -->
+        <g fill="#e0eff5" stroke="#1f6f8b" stroke-width="1.5">
+          <circle cx="100" cy="20" r="6"/><circle cx="100" cy="40" r="6"/><circle cx="100" cy="60" r="6"/>
+          <circle cx="100" cy="80" r="6"/><circle cx="100" cy="100" r="6"/><circle cx="100" cy="120" r="6"/>
+          <circle cx="100" cy="140" r="6"/><circle cx="100" cy="160" r="6"/>
+        </g>
+        <text x="100" y="180" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b6b6b">very wide layer</text>
+        <circle cx="200" cy="80" r="8" fill="#f0e8f7" stroke="#6b4a8b"/>
+      </g>
+
+      <!-- Deep network -->
+      <text x="520" y="25" text-anchor="middle" font-family="Newsreader, serif" font-size="14" font-weight="700">Deep (5 hidden layers)</text>
+      <text x="520" y="42" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#6b6b6b">~10⁵ neurons for the same task</text>
+      <g transform="translate(380, 60)">
+        <circle cx="0" cy="40" r="8" fill="#fff8e1" stroke="#d4a017"/>
+        <circle cx="0" cy="80" r="8" fill="#fff8e1" stroke="#d4a017"/>
+        <circle cx="0" cy="120" r="8" fill="#fff8e1" stroke="#d4a017"/>
+        <g fill="#e0eff5" stroke="#1f6f8b" stroke-width="1.5">
+          <circle cx="50" cy="50" r="6"/><circle cx="50" cy="80" r="6"/><circle cx="50" cy="110" r="6"/>
+          <circle cx="100" cy="50" r="6"/><circle cx="100" cy="80" r="6"/><circle cx="100" cy="110" r="6"/>
+          <circle cx="150" cy="50" r="6"/><circle cx="150" cy="80" r="6"/><circle cx="150" cy="110" r="6"/>
+          <circle cx="200" cy="50" r="6"/><circle cx="200" cy="80" r="6"/><circle cx="200" cy="110" r="6"/>
+          <circle cx="250" cy="50" r="6"/><circle cx="250" cy="80" r="6"/><circle cx="250" cy="110" r="6"/>
+        </g>
+        <text x="150" y="180" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b6b6b">5 narrow layers</text>
+        <circle cx="295" cy="80" r="8" fill="#f0e8f7" stroke="#6b4a8b"/>
+      </g>
+    </svg>
+    <p class="diagram-caption">Same expressive power, but a deep network gets there with vastly fewer neurons by reusing patterns across layers. This is the practical reason "deep" wins.</p>
+  </figure>
+
+  <h2 id="cnn">CNNs: Networks That See</h2>
+
+  <p>A regular neural network treats every input pixel as independent. But pixels in an image aren't independent — neighboring pixels are obviously related (they form lines, edges, textures). A <strong>Convolutional Neural Network (CNN)</strong> exploits that.</p>
+
+  <p>The key trick is the <strong>convolution</strong>: a small "filter" (like 3×3 pixels) that slides across the image looking for a specific pattern. One filter might detect "vertical edges." Another, "diagonal lines." The network learns what filters to use during training.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg">
+      <!-- Image grid -->
+      <text x="100" y="25" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#6b6b6b" letter-spacing="1">INPUT IMAGE</text>
+      <g transform="translate(40, 40)">
+        <!-- 6x6 grid -->
+        <g fill="#f5f3ed" stroke="#888" stroke-width="0.8">
+          <rect x="0" y="0" width="20" height="20"/><rect x="20" y="0" width="20" height="20"/><rect x="40" y="0" width="20" height="20"/><rect x="60" y="0" width="20" height="20"/><rect x="80" y="0" width="20" height="20"/><rect x="100" y="0" width="20" height="20"/>
+          <rect x="0" y="20" width="20" height="20"/><rect x="20" y="20" width="20" height="20" fill="#1a1a1a"/><rect x="40" y="20" width="20" height="20"/><rect x="60" y="20" width="20" height="20"/><rect x="80" y="20" width="20" height="20"/><rect x="100" y="20" width="20" height="20"/>
+          <rect x="0" y="40" width="20" height="20"/><rect x="20" y="40" width="20" height="20" fill="#1a1a1a"/><rect x="40" y="40" width="20" height="20" fill="#1a1a1a"/><rect x="60" y="40" width="20" height="20"/><rect x="80" y="40" width="20" height="20"/><rect x="100" y="40" width="20" height="20"/>
+          <rect x="0" y="60" width="20" height="20"/><rect x="20" y="60" width="20" height="20"/><rect x="40" y="60" width="20" height="20" fill="#1a1a1a"/><rect x="60" y="60" width="20" height="20" fill="#1a1a1a"/><rect x="80" y="60" width="20" height="20"/><rect x="100" y="60" width="20" height="20"/>
+          <rect x="0" y="80" width="20" height="20"/><rect x="20" y="80" width="20" height="20"/><rect x="40" y="80" width="20" height="20"/><rect x="60" y="80" width="20" height="20" fill="#1a1a1a"/><rect x="80" y="80" width="20" height="20" fill="#1a1a1a"/><rect x="100" y="80" width="20" height="20"/>
+          <rect x="0" y="100" width="20" height="20"/><rect x="20" y="100" width="20" height="20"/><rect x="40" y="100" width="20" height="20"/><rect x="60" y="100" width="20" height="20"/><rect x="80" y="100" width="20" height="20" fill="#1a1a1a"/><rect x="100" y="100" width="20" height="20"/>
+        </g>
+        <!-- 3x3 sliding filter outlined -->
+        <rect x="0" y="0" width="60" height="60" fill="none" stroke="#b54a3b" stroke-width="3" stroke-dasharray="4 2"/>
+      </g>
+      <text x="100" y="190" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">3×3 filter slides across</text>
+
+      <!-- Arrow -->
+      <path d="M 200 100 L 270 100" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+      <polygon points="270,100 263,96 263,104" fill="#1a1a1a"/>
+      <text x="235" y="92" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#6b6b6b">convolve</text>
+
+      <!-- Feature map -->
+      <text x="380" y="25" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#6b6b6b" letter-spacing="1">FEATURE MAP</text>
+      <g transform="translate(320, 40)">
+        <g fill="#e0eff5" stroke="#1f6f8b" stroke-width="0.8">
+          <rect x="0" y="0" width="22" height="22"/><rect x="22" y="0" width="22" height="22" fill="#5a9bb8"/><rect x="44" y="0" width="22" height="22"/><rect x="66" y="0" width="22" height="22"/>
+          <rect x="0" y="22" width="22" height="22" fill="#5a9bb8"/><rect x="22" y="22" width="22" height="22" fill="#1f6f8b"/><rect x="44" y="22" width="22" height="22" fill="#5a9bb8"/><rect x="66" y="22" width="22" height="22"/>
+          <rect x="0" y="44" width="22" height="22"/><rect x="22" y="44" width="22" height="22" fill="#5a9bb8"/><rect x="44" y="44" width="22" height="22" fill="#1f6f8b"/><rect x="66" y="44" width="22" height="22" fill="#5a9bb8"/>
+          <rect x="0" y="66" width="22" height="22"/><rect x="22" y="66" width="22" height="22"/><rect x="44" y="66" width="22" height="22" fill="#5a9bb8"/><rect x="66" y="66" width="22" height="22"/>
+        </g>
+      </g>
+      <text x="370" y="170" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">where the filter "fired"</text>
+
+      <!-- Arrow -->
+      <path d="M 460 100 L 520 100" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+      <polygon points="520,100 513,96 513,104" fill="#1a1a1a"/>
+
+      <!-- Final output -->
+      <g transform="translate(540, 60)">
+        <rect width="120" height="80" rx="6" fill="#f0e8f7" stroke="#6b4a8b" stroke-width="2"/>
+        <text x="60" y="32" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700">"DIAGONAL"</text>
+        <text x="60" y="55" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">detected!</text>
+      </g>
+    </svg>
+    <p class="diagram-caption">A 3×3 filter slides across the image and produces a "feature map" showing where it found a match. Stack many such filters and you have a CNN.</p>
+  </figure>
+
+  <p>CNNs powered the first big computer-vision breakthroughs (2012's AlexNet was the moment "deep learning" became mainstream). Today they still dominate image classification, object detection, and medical imaging — and their core ideas (local patterns, translation invariance) live on inside transformers too.</p>
+
+  <h2 id="rnn">RNNs &amp; LSTMs: Networks That Remember</h2>
+
+  <p>What about sequences — language, audio, time series? In a sentence, "Mary fed the cat because <em>she</em> was hungry," who is "she"? You can only know if you remember the earlier words.</p>
+
+  <p>A <strong>Recurrent Neural Network (RNN)</strong> is a network that processes one item at a time and feeds its own output back as part of the next input. It has a "hidden state" that acts like short-term memory.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr4a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+        </marker>
+      </defs>
+
+      <!-- Sequence of words -->
+      <g font-family="Newsreader, serif" font-size="13">
+        <rect x="40" y="30" width="80" height="40" rx="4" fill="#fff8e1" stroke="#d4a017" stroke-width="1.5"/>
+        <text x="80" y="55" text-anchor="middle">Mary</text>
+        <rect x="170" y="30" width="80" height="40" rx="4" fill="#fff8e1" stroke="#d4a017" stroke-width="1.5"/>
+        <text x="210" y="55" text-anchor="middle">fed</text>
+        <rect x="300" y="30" width="80" height="40" rx="4" fill="#fff8e1" stroke="#d4a017" stroke-width="1.5"/>
+        <text x="340" y="55" text-anchor="middle">the cat</text>
+        <rect x="430" y="30" width="80" height="40" rx="4" fill="#fff8e1" stroke="#d4a017" stroke-width="1.5"/>
+        <text x="470" y="55" text-anchor="middle">because</text>
+        <rect x="560" y="30" width="80" height="40" rx="4" fill="#fff8e1" stroke="#d4a017" stroke-width="1.5"/>
+        <text x="600" y="55" text-anchor="middle">she...</text>
+      </g>
+
+      <!-- RNN cells -->
+      <g>
+        <rect x="40" y="110" width="80" height="50" rx="6" fill="#e0eff5" stroke="#1f6f8b" stroke-width="2"/>
+        <text x="80" y="142" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700">RNN</text>
+        <rect x="170" y="110" width="80" height="50" rx="6" fill="#e0eff5" stroke="#1f6f8b" stroke-width="2"/>
+        <text x="210" y="142" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700">RNN</text>
+        <rect x="300" y="110" width="80" height="50" rx="6" fill="#e0eff5" stroke="#1f6f8b" stroke-width="2"/>
+        <text x="340" y="142" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700">RNN</text>
+        <rect x="430" y="110" width="80" height="50" rx="6" fill="#e0eff5" stroke="#1f6f8b" stroke-width="2"/>
+        <text x="470" y="142" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700">RNN</text>
+        <rect x="560" y="110" width="80" height="50" rx="6" fill="#e0eff5" stroke="#1f6f8b" stroke-width="2"/>
+        <text x="600" y="142" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700">RNN</text>
+      </g>
+
+      <!-- Word to RNN arrows -->
+      <g stroke="#1a1a1a" stroke-width="1.5" fill="none">
+        <line x1="80" y1="70" x2="80" y2="105" marker-end="url(#arr4a)"/>
+        <line x1="210" y1="70" x2="210" y2="105" marker-end="url(#arr4a)"/>
+        <line x1="340" y1="70" x2="340" y2="105" marker-end="url(#arr4a)"/>
+        <line x1="470" y1="70" x2="470" y2="105" marker-end="url(#arr4a)"/>
+        <line x1="600" y1="70" x2="600" y2="105" marker-end="url(#arr4a)"/>
+      </g>
+
+      <!-- Hidden state passing -->
+      <g stroke="#b54a3b" stroke-width="2" fill="none">
+        <line x1="120" y1="135" x2="165" y2="135" marker-end="url(#arr4a)" stroke="#b54a3b"/>
+        <line x1="250" y1="135" x2="295" y2="135" marker-end="url(#arr4a)" stroke="#b54a3b"/>
+        <line x1="380" y1="135" x2="425" y2="135" marker-end="url(#arr4a)" stroke="#b54a3b"/>
+        <line x1="510" y1="135" x2="555" y2="135" marker-end="url(#arr4a)" stroke="#b54a3b"/>
+      </g>
+      <text x="350" y="195" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#8b3a2e">↑ hidden state carries memory forward ↑</text>
+    </svg>
+    <p class="diagram-caption">An RNN unrolled over a sentence. Each cell sees one word and a "memory" passed from the previous cell. By the time we hit "she," the network has carried "Mary" through five steps.</p>
+  </figure>
+
+  <p>Plain RNNs had a serious problem: their memory <em>fades</em>. By word 50, they've forgotten word 1. So researchers invented <strong>LSTMs</strong> (Long Short-Term Memory) and <strong>GRUs</strong> — fancier RNN cells with explicit "remember" and "forget" gates. These dominated language tasks from ~2015 to 2017.</p>
+
+  <p>Then in 2017, the transformer killed them. We'll meet transformers properly in Part 3 — but the short version is: instead of carrying information sequentially, transformers let every word "look at" every other word directly. Goodbye, fading memory.</p>
+
+  <h2 id="transformer-preview">Transformers: A Preview</h2>
+
+  <p>A transformer is the architecture behind GPT, Claude, Gemini, Llama — basically every modern LLM. It's a deep network with a special trick called <strong>self-attention</strong>: every token in the input gets to ask every other token, "how relevant are you to me?"</p>
+
+  <div class="callout-tip">
+    <div class="callout-label">★ Coming up</div>
+    <p>We'll spend three full chapters on transformers (Chapters 8–10) once we have the historical context to appreciate how revolutionary they were. For now: just remember the name. Transformer = the architecture. Attention = the trick.</p>
+  </div>
+
+  <h2 id="what-changed">What Made Deep Learning Suddenly Work</h2>
+
+  <p>Neural networks were invented in the 1940s. So why did "deep learning" only blow up in 2012? Three things changed simultaneously:</p>
+
+  <table class="compare-table">
+    <thead>
+      <tr><th>Ingredient</th><th>What changed</th><th>The breakthrough moment</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Data</strong></td><td>The internet meant labeled datasets exploded. ImageNet had 14M labeled images.</td><td>2009 — ImageNet launched.</td></tr>
+      <tr><td><strong>Compute</strong></td><td>GPUs (designed for video games) turned out to be perfect for neural nets — 100× faster than CPUs.</td><td>2007 — NVIDIA released CUDA.</td></tr>
+      <tr><td><strong>Algorithms</strong></td><td>Better activations (ReLU), regularization (dropout), and initialization stopped deep networks from collapsing.</td><td>2012 — AlexNet won ImageNet.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    Deep learning didn't win because of one genius idea. It won because data, compute, and algorithms all got barely-good-enough at the same time. Modern AI is what happens when three S-curves intersect.
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · How to sound fluent</div>
+    <p>"It's a <strong>CNN</strong>" — you mean a convolutional network, used for images. "It's a <strong>ResNet</strong>" — a famous 2015 CNN architecture with skip connections. "<strong>RNN</strong>" or "<strong>LSTM</strong>" — sequential data, mostly obsolete now for language.</p>
+    <p>"<strong>Vision Transformer</strong>" or <strong>ViT</strong> — applying transformers to images instead of CNNs. Often beats CNNs at scale.</p>
+    <p>"<strong>End-to-end</strong>" — training the whole network from raw input to final output, no hand-crafted features. The big paradigm shift of deep learning.</p>
+    <p>"<strong>Backbone</strong>" — the main network used to extract features, before specialized "heads" do the final task. ResNet-50 is a popular backbone.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself · Answer out loud</div>
+    <ol>
+      <li>Why does depth (many layers) buy more than width (one wide layer)?
+        <details><summary>Answer</summary><p>Depth lets the network compose simple patterns into more complex ones — it can reuse features, which is exponentially more efficient than trying to memorize every combination flat.</p></details>
+      </li>
+      <li>What's the key trick of a CNN that makes it work well for images?
+        <details><summary>Answer</summary><p>Convolutional filters: small patches that slide across the image looking for local patterns. Same filter applied everywhere = translation invariance + parameter sharing.</p></details>
+      </li>
+      <li>Why did RNNs lose to transformers for language tasks?
+        <details><summary>Answer</summary><p>RNNs process sequentially and have fading memory across long contexts. Transformers let every token attend directly to every other token — no fading, fully parallel training.</p></details>
+      </li>
+      <li>Name the three S-curves that converged to make deep learning work.
+        <details><summary>Answer</summary><p>Data (the internet → big labeled datasets), compute (GPUs), and algorithms (ReLU, dropout, batch norm, better optimizers).</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <h3>Recommended next reading</h3>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type book">Book</span>
+        <span class="ref-detail"><strong>Deep Learning with Python (2nd ed.)</strong> by François Chollet — <em>chapters 1–3 (pp. 1–94)</em>. The clearest practical intro by the creator of Keras.</span>
+      </li>
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"ImageNet Classification with Deep CNNs"</strong> (Krizhevsky et al., 2012) — the AlexNet paper. ~9 pages. Worth reading once for historical perspective.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Chris Olah: "Understanding LSTM Networks"</strong> · colah.github.io · The visual reference for understanding RNNs and LSTMs.</span>
+      </li>
+      <li>
+        <span class="ref-type video">Video</span>
+        <span class="ref-detail"><strong>3Blue1Brown: "Convolutional Neural Networks"</strong> · YouTube · ~14 min · The visual treatment of CNNs.</span>
+      </li>
+      <li>
+        <span class="ref-type course">Course</span>
+        <span class="ref-detail"><strong>Stanford CS231n: CNNs for Visual Recognition</strong> · cs231n.github.io · Free lecture notes — the gold standard course.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch03-neural-networks.html">← Previous: Neural Networks</a>
+    <div class="nav-spacer"></div>
+    <a href="ch05-math-you-need.html">Next: The Math You Need →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 04 · Part 1 · Foundations · Chapter 4 of 24</div>
+</footer>
+
+</body>
+</html>

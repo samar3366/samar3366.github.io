@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 16: RAG (Retrieval-Augmented Generation) — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="5">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch16-rag.html" class="current">Part 5: Building With AI</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Building With AI</a> / <span class="current">RAG</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 16 · Part 5 of 7 · Building With AI —</div>
+
+  <h1 class="page-title">RAG: <em>Retrieval-Augmented Generation</em></h1>
+  <p class="page-subtitle">An LLM can't know your private documents — but it can <em>read</em> them, if you hand them over at the right moment. RAG is the technique that wires search into AI, and it's one of the most important production patterns of modern AI engineering.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#kid">Kid Translation: An Open-Book Exam</a></li>
+      <li><a href="#why-rag">Why LLMs Need Help: The Hallucination Problem</a></li>
+      <li><a href="#pipeline">The RAG Pipeline</a></li>
+      <li><a href="#chunking">Chunking: Cutting Documents for Retrieval</a></li>
+      <li><a href="#retrieval">Retrieval Methods Compared</a></li>
+      <li><a href="#evaluation">Evaluating a RAG System</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="kid">Kid Translation: An Open-Book Exam</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Imagine a really smart student. They know lots of stuff, but they don't know <em>your</em> family history, <em>your</em> diary, or what was in <em>your</em> homework folder yesterday.</p>
+    <p>Now imagine the test is open-book. You hand them the right pages right before each question. They look at the pages, combine that with what they already know, and answer brilliantly. They don't memorize your folder — they read it on demand.</p>
+    <p>That's RAG. The "really smart student" is the LLM. The "right pages" come from a search system that picks the most relevant chunks from your documents and pastes them into the prompt right before the model answers. The model becomes way more useful — and way less likely to make stuff up — because it's <em>reading the source</em>, not guessing from training memory.</p>
+  </div>
+
+  <h2 id="why-rag">Why LLMs Need Help: The Hallucination Problem</h2>
+
+  <p>LLMs are trained to predict plausible-sounding text. When they don't actually know something, they don't say "I don't know" — they generate confident-sounding text that <em>looks</em> like the truth. That's hallucination. It's not a bug; it's how next-token prediction works.</p>
+
+  <p>Three failure modes:</p>
+
+  <ul>
+    <li><strong>Stale knowledge.</strong> The model's training cutoff was months ago. It doesn't know about anything since.</li>
+    <li><strong>Private knowledge.</strong> Your company's documents, your codebase, your customer data — none of it was in training.</li>
+    <li><strong>Specific facts.</strong> Even on topics it "knew," the model may smear similar facts together. Birth dates, version numbers, exact quotes — easy to get subtly wrong.</li>
+  </ul>
+
+  <p>RAG solves all three by putting authoritative source text directly into the prompt right before the model answers. Now the model doesn't have to remember — it can read.</p>
+
+  <h2 id="pipeline">The RAG Pipeline</h2>
+
+  <p>Almost every RAG system has the same shape — two phases.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr16a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+        </marker>
+      </defs>
+
+      <!-- Phase 1 label -->
+      <text x="180" y="25" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#6b6b6b" letter-spacing="1.5">PHASE 1: INDEX (ONCE, OFFLINE)</text>
+
+      <!-- Documents -->
+      <rect x="40" y="45" width="120" height="50" rx="4" fill="#fff8e1" stroke="#d4a017" stroke-width="1.5"/>
+      <text x="100" y="68" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="600">Documents</text>
+      <text x="100" y="85" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic">PDFs, wikis, code</text>
+
+      <line x1="165" y1="70" x2="195" y2="70" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr16a)"/>
+
+      <rect x="200" y="45" width="100" height="50" rx="4" fill="#fdf0e3" stroke="#b54a3b" stroke-width="1.5"/>
+      <text x="250" y="68" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="600">Chunk</text>
+      <text x="250" y="85" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic">~500 tokens each</text>
+
+      <line x1="305" y1="70" x2="335" y2="70" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr16a)"/>
+
+      <rect x="340" y="45" width="120" height="50" rx="4" fill="#f0e8f7" stroke="#6b4a8b" stroke-width="1.5"/>
+      <text x="400" y="68" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="600">Embed</text>
+      <text x="400" y="85" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic">→ vectors</text>
+
+      <line x1="465" y1="70" x2="495" y2="70" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr16a)"/>
+
+      <rect x="500" y="45" width="160" height="50" rx="4" fill="#1a1a1a" stroke="#000" stroke-width="2"/>
+      <text x="580" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#f3d77a">VECTOR DB</text>
+      <text x="580" y="83" text-anchor="middle" font-family="Newsreader, serif" font-size="11" fill="#fff" font-style="italic">stores chunks + vectors</text>
+
+      <!-- Phase 2 label -->
+      <text x="180" y="160" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#6b6b6b" letter-spacing="1.5">PHASE 2: QUERY (EVERY USER QUESTION)</text>
+
+      <!-- User question -->
+      <rect x="40" y="180" width="120" height="50" rx="4" fill="#fff8e1" stroke="#d4a017" stroke-width="1.5"/>
+      <text x="100" y="200" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-weight="600">User question</text>
+      <text x="100" y="217" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic">"What's our refund policy?"</text>
+
+      <line x1="165" y1="205" x2="195" y2="205" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr16a)"/>
+
+      <rect x="200" y="180" width="100" height="50" rx="4" fill="#f0e8f7" stroke="#6b4a8b" stroke-width="1.5"/>
+      <text x="250" y="200" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-weight="600">Embed query</text>
+      <text x="250" y="217" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic">→ vector</text>
+
+      <line x1="305" y1="205" x2="335" y2="205" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr16a)"/>
+
+      <rect x="340" y="180" width="120" height="50" rx="4" fill="#1a1a1a" stroke="#000" stroke-width="2"/>
+      <text x="400" y="200" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#f3d77a">SEARCH</text>
+      <text x="400" y="217" text-anchor="middle" font-family="Newsreader, serif" font-size="11" fill="#fff" font-style="italic">top-k chunks</text>
+
+      <line x1="465" y1="205" x2="495" y2="205" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr16a)"/>
+
+      <rect x="500" y="180" width="160" height="50" rx="4" fill="#fdf0e3" stroke="#b54a3b" stroke-width="1.5"/>
+      <text x="580" y="200" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-weight="600">Augmented prompt</text>
+      <text x="580" y="217" text-anchor="middle" font-family="Newsreader, serif" font-size="10" font-style="italic">[chunks] + question</text>
+
+      <!-- Down arrow -->
+      <line x1="580" y1="232" x2="580" y2="265" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr16a)"/>
+
+      <!-- LLM box -->
+      <rect x="270" y="270" width="320" height="60" rx="6" fill="#e0eff5" stroke="#1f6f8b" stroke-width="2.5"/>
+      <text x="430" y="295" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#1a4a68" letter-spacing="0.5">LLM</text>
+      <text x="430" y="315" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-style="italic">Generates answer grounded in retrieved chunks</text>
+
+      <line x1="500" y1="205" x2="490" y2="270" stroke="#aaa" stroke-width="1" stroke-dasharray="3 3" fill="none"/>
+
+      <!-- Output -->
+      <line x1="430" y1="332" x2="430" y2="355" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr16a)"/>
+      <rect x="280" y="358" width="300" height="32" rx="4" fill="#fff8e1" stroke="#d4a017" stroke-width="1.5"/>
+      <text x="430" y="378" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="600">Answer with citations</text>
+    </svg>
+    <p class="diagram-caption">RAG, end to end. Phase 1 builds the searchable index once. Phase 2 happens on every user question — search, retrieve, augment, generate.</p>
+  </figure>
+
+  <p>The genius of RAG: <strong>the model doesn't have to memorize your data</strong>. You can update one document and have it reflected in the next query — no retraining. You can have private data per user. You can cite sources. You get accurate answers grounded in real text instead of training-blurry recollections.</p>
+
+  <h2 id="chunking">Chunking: Cutting Documents for Retrieval</h2>
+
+  <p>You can't just dump whole documents into the prompt — context windows are limited and "lost in the middle" is real. So you cut documents into chunks. Chunking decisions massively affect retrieval quality.</p>
+
+  <table class="compare-table">
+    <thead><tr><th>Strategy</th><th>What it does</th><th>Tradeoffs</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Fixed-size</strong></td><td>Cut every N characters/tokens.</td><td>Simple. Often splits mid-sentence — loses context.</td></tr>
+      <tr><td><strong>Sentence-based</strong></td><td>Split at sentence boundaries.</td><td>Cleaner cuts. Chunks may be too small.</td></tr>
+      <tr><td><strong>Recursive</strong></td><td>Try paragraph → sentence → word splitting until chunks are right size.</td><td>The most common practical default.</td></tr>
+      <tr><td><strong>Semantic</strong></td><td>Use an embedding model to find natural topical breaks.</td><td>Best quality. More expensive to build.</td></tr>
+      <tr><td><strong>Document-structure aware</strong></td><td>Respect markdown headers, code blocks, table boundaries.</td><td>Critical for technical docs and code.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Two practical heuristics:</p>
+
+  <ul>
+    <li><strong>Use overlap.</strong> Have chunks share ~10–20% with their neighbors so concepts straddling a cut aren't lost.</li>
+    <li><strong>Include context tags.</strong> Prepend each chunk with the document title, section header, or a short summary. Helps both the embedder and the LLM understand where the chunk came from.</li>
+  </ul>
+
+  <h2 id="retrieval">Retrieval Methods Compared</h2>
+
+  <p>Three retrieval methods dominate, often combined:</p>
+
+  <ul>
+    <li><strong>Vector search (semantic)</strong>. Both query and documents are embedded; retrieve nearest neighbors by cosine similarity. Captures meaning even when wording differs ("cancellation policy" matches "how to get a refund"). The default modern approach. Chapter 17 covers embeddings deeply.</li>
+    <li><strong>Lexical search (BM25)</strong>. Old-school keyword matching with TF-IDF-style scoring. Surprisingly hard to beat for exact matches, names, codes, error messages. Many production systems still use BM25 alongside vectors.</li>
+    <li><strong>Hybrid search</strong>. Run both, combine scores. Best of both worlds — semantic meaning <em>plus</em> exact-keyword fidelity. Hybrid is the practical default for production RAG.</li>
+  </ul>
+
+  <p>Beyond raw retrieval, two refinement steps usually pay off:</p>
+
+  <ol class="steps">
+    <li><strong>Query rewriting.</strong> Use the LLM to rephrase the user question into 2–3 alternative search queries. Catches things the original phrasing missed.</li>
+    <li><strong>Reranking.</strong> After retrieving top-50 candidates with vectors, rerank them with a more expensive cross-encoder model that scores query+chunk together. The top-5 after reranking are usually much better than the top-5 after pure vector search.</li>
+  </ol>
+
+  <h2 id="evaluation">Evaluating a RAG System</h2>
+
+  <p>RAG quality depends on retrieval and generation. Both can fail independently. Standard evals to track:</p>
+
+  <table class="compare-table">
+    <thead><tr><th>Metric</th><th>What it measures</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Recall@k</strong></td><td>Did we retrieve the relevant chunk in the top-k results?</td></tr>
+      <tr><td><strong>Precision@k</strong></td><td>How much of what we retrieved is actually relevant?</td></tr>
+      <tr><td><strong>Faithfulness</strong></td><td>Does the generated answer stay grounded in the retrieved chunks (vs. hallucinating)?</td></tr>
+      <tr><td><strong>Answer relevance</strong></td><td>Does the answer actually address the question?</td></tr>
+      <tr><td><strong>Citation accuracy</strong></td><td>Do the cited sources actually support the claims?</td></tr>
+    </tbody>
+  </table>
+
+  <p>Frameworks like <strong>Ragas</strong>, <strong>TruLens</strong>, and <strong>LangSmith</strong> automate these — typically using an LLM to grade the LLM's outputs against retrieved chunks and human-labeled questions.</p>
+
+  <div class="key-point">
+    RAG is the bridge between an LLM's general intelligence and your specific data. It's how you build assistants that know your codebase, your wiki, your customer history — without retraining the model.
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · How to sound fluent</div>
+    <p>"<strong>RAG pipeline</strong>" — the index + query stages together. "<strong>Naive RAG</strong>" — basic vector search + stuff into prompt. "<strong>Advanced RAG</strong>" — add reranking, query rewriting, hybrid search.</p>
+    <p>"<strong>Top-k</strong>" — how many chunks you retrieve per query. Typical values: 3–10.</p>
+    <p>"<strong>Embedding model</strong>" — the model used to vectorize chunks (e.g., text-embedding-3-large, voyage-3, BGE-M3, Cohere Embed).</p>
+    <p>"<strong>Vector DB</strong>" — the database that stores embeddings and does fast nearest-neighbor search. Pinecone, Weaviate, Qdrant, Milvus, pgvector, Chroma — see Chapter 17.</p>
+    <p>"<strong>Reranker</strong>" — a model (often a cross-encoder) that re-scores retrieved candidates more carefully than the embedding similarity. Cohere Rerank and BGE rerankers are popular.</p>
+    <p>"<strong>Grounding</strong>" — making the model's answer trace back to retrieved sources. Critical for trust.</p>
+    <p>"<strong>Long-context vs. RAG</strong>" — the ongoing tradeoff. Frontier models with 1M+ token contexts can sometimes skip RAG and just dump all docs in. RAG still wins on cost, freshness, and recall on huge corpora.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself · Answer out loud</div>
+    <ol>
+      <li>What problem does RAG solve, and why can't pure prompting do it?
+        <details><summary>Answer</summary><p>RAG injects authoritative, current, or private data into the prompt at query time. Pure prompting can't do this because the model only knows what's in its training (which is stale, public, and approximate).</p></details>
+      </li>
+      <li>What are the two phases of a RAG pipeline?
+        <details><summary>Answer</summary><p>(1) Indexing: chunk documents, embed, store in a vector DB. Done once, offline. (2) Query: embed the user question, retrieve top-k relevant chunks, augment the prompt, generate answer. Done per query.</p></details>
+      </li>
+      <li>Why use hybrid search instead of pure vector search?
+        <details><summary>Answer</summary><p>Vector search captures semantic meaning but can miss exact strings (codes, names, error messages). BM25 catches those. Combining both gives the best of meaning and lexical fidelity.</p></details>
+      </li>
+      <li>What's a reranker, and why does it improve results?
+        <details><summary>Answer</summary><p>A model (typically a cross-encoder) that scores query+chunk pairs together, more carefully than the cheap-but-fast vector similarity. Run it on the top-50 retrieved candidates to pick the best top-5. Improves precision a lot.</p></details>
+      </li>
+      <li>What does "faithfulness" measure in RAG evaluation?
+        <details><summary>Answer</summary><p>Whether the generated answer is actually supported by the retrieved chunks — i.e., the model isn't making up things that aren't in the source material. Distinct from whether the answer is correct or relevant.</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <h3>Recommended next reading</h3>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"</strong> by Lewis et al. (2020) — the original RAG paper. Coined the term.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Anthropic: "Contextual Retrieval"</strong> · anthropic.com/news · Free · How to dramatically improve RAG by adding context to chunks before embedding.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>"Advanced RAG Techniques"</strong> · Pinecone learn · Free · Reranking, query rewriting, hybrid search — the playbook for production RAG.</span>
+      </li>
+      <li>
+        <span class="ref-type tool">Tool</span>
+        <span class="ref-detail"><strong>LlamaIndex</strong> · github.com/run-llama/llama_index · Free · Python framework for building RAG. Best place to start hands-on.</span>
+      </li>
+      <li>
+        <span class="ref-type tool">Tool</span>
+        <span class="ref-detail"><strong>Ragas</strong> · github.com/explodinggradients/ragas · Free · Evaluation framework for RAG. Use it from day one.</span>
+      </li>
+      <li>
+        <span class="ref-type course">Course</span>
+        <span class="ref-detail"><strong>DeepLearning.AI: "Building and Evaluating Advanced RAG"</strong> · Coursera · Free audit · ~1 hour. Hands-on with reranking and evaluation.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch15-prompting.html">← Previous: Prompt Engineering</a>
+    <div class="nav-spacer"></div>
+    <a href="ch17-embeddings.html">Next: Embeddings &amp; Semantic Search →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 16 · Part 5 · Building With AI · Chapter 16 of 24</div>
+</footer>
+
+</body>
+</html>

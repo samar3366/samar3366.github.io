@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DevLaunch Academy — Zero to Web App in a Week</title>
+<meta name="description" content="An interactive, beginner-friendly full-stack curriculum: JavaScript, React, Node.js, REST APIs and MSSQL." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand"><span class="logo">⚡</span> DevLaunch Academy</a>
+    <nav class="topnav">
+      <a href="index.html" class="active">Home</a>
+      <a href="01-foundations.html">Foundations</a>
+      <a href="02-javascript.html">JavaScript</a>
+      <a href="03-react.html">React</a>
+      <a href="04-node.html">Node</a>
+      <a href="05-rest-apis.html">REST</a>
+      <a href="06-database.html">MSSQL</a>
+      <a href="07-capstone.html">Capstone</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="badges">
+      <span class="badge">🟢 Zero coding required to start</span>
+      <span class="badge">⏱️ 7-day path</span>
+      <span class="badge">🧪 Interactive & hands-on</span>
+    </div>
+    <h1>From <span class="grad">zero to a working web app</span><br />in one week.</h1>
+    <p class="lead">
+      A complete, interactive full-stack curriculum. You'll learn <strong>JavaScript</strong>,
+      <strong>React</strong>, <strong>Node.js</strong>, <strong>REST APIs</strong> and
+      <strong>MSSQL databases</strong> — with live code you can run right in the page,
+      pictures that explain the hard parts, and quizzes that make it stick.
+    </p>
+    <div class="badges">
+      <a href="01-foundations.html" class="btn btn-primary">🚀 Start Day 1 →</a>
+      <a href="#curriculum" class="btn btn-ghost">📚 See the curriculum</a>
+    </div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section class="card" style="margin: 30px 0;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <div>
+        <h3 class="mt0">Your progress</h3>
+        <p class="muted" data-progress-label style="margin:0;">0 of 7 modules complete (0%)</p>
+      </div>
+      <span class="muted" style="font-size:0.85rem;">Saved automatically in your browser</span>
+    </div>
+    <div class="progress-bar" data-progress-bar><span></span></div>
+  </section>
+
+  <!-- WHO IS THIS FOR -->
+  <section style="margin: 50px 0;">
+    <div class="grid grid-3">
+      <div class="card">
+        <div style="font-size:1.6rem;">🌱</div>
+        <h3>Complete beginners</h3>
+        <p>Never written a line of code? Start at Day 1. Every term is explained in plain English before any jargon shows up.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:1.6rem;">🔁</div>
+        <h3>Career switchers</h3>
+        <p>Coming from a non-tech background? This path mirrors how real apps are built so your skills transfer to a job.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:1.6rem;">⚙️</div>
+        <h3>Self-taught coders</h3>
+        <p>Know a bit but have gaps? Each module covers basic → intermediate → advanced so you can fill them in fast.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE BIG PICTURE -->
+  <section style="margin: 60px 0;">
+    <h2 class="center">How a web app fits together</h2>
+    <p class="center muted" style="max-width:680px;margin:0 auto 10px;">
+      Every module below is one piece of this picture. Keep coming back to it — it's the map for the whole week.
+    </p>
+    <figure class="diagram">
+      <svg viewBox="0 0 920 300" role="img" aria-label="Architecture of a full-stack web application">
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#6c8cff" />
+          </marker>
+        </defs>
+        <!-- Browser -->
+        <rect x="20" y="90" width="200" height="120" rx="14" fill="#1b2030" stroke="#61dafb" stroke-width="2"/>
+        <text x="120" y="125" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">Browser</text>
+        <text x="120" y="150" text-anchor="middle" fill="#61dafb" font-size="13">React (UI)</text>
+        <text x="120" y="170" text-anchor="middle" fill="#aab2c5" font-size="12">JavaScript • HTML • CSS</text>
+        <text x="120" y="190" text-anchor="middle" fill="#707a92" font-size="11">What the user sees & clicks</text>
+        <!-- Server -->
+        <rect x="360" y="90" width="200" height="120" rx="14" fill="#1b2030" stroke="#3c873a" stroke-width="2"/>
+        <text x="460" y="125" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">Server</text>
+        <text x="460" y="150" text-anchor="middle" fill="#7bd86f" font-size="13">Node.js + Express</text>
+        <text x="460" y="170" text-anchor="middle" fill="#ff9d54" font-size="12">REST API endpoints</text>
+        <text x="460" y="190" text-anchor="middle" fill="#707a92" font-size="11">Business logic & rules</text>
+        <!-- Database -->
+        <rect x="700" y="90" width="200" height="120" rx="14" fill="#1b2030" stroke="#cc2927" stroke-width="2"/>
+        <text x="800" y="125" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">Database</text>
+        <text x="800" y="150" text-anchor="middle" fill="#ff8a88" font-size="13">MSSQL</text>
+        <text x="800" y="170" text-anchor="middle" fill="#aab2c5" font-size="12">Tables of data</text>
+        <text x="800" y="190" text-anchor="middle" fill="#707a92" font-size="11">Stores everything safely</text>
+        <!-- Arrows -->
+        <line x1="222" y1="135" x2="356" y2="135" stroke="#6c8cff" stroke-width="2.5" marker-end="url(#arrow)"/>
+        <text x="289" y="125" text-anchor="middle" fill="#aab2c5" font-size="11">request →</text>
+        <line x1="356" y1="170" x2="222" y2="170" stroke="#38d39f" stroke-width="2.5" marker-end="url(#arrow)"/>
+        <text x="289" y="188" text-anchor="middle" fill="#aab2c5" font-size="11">← response (JSON)</text>
+        <line x1="562" y1="135" x2="696" y2="135" stroke="#6c8cff" stroke-width="2.5" marker-end="url(#arrow)"/>
+        <text x="629" y="125" text-anchor="middle" fill="#aab2c5" font-size="11">query →</text>
+        <line x1="696" y1="170" x2="562" y2="170" stroke="#38d39f" stroke-width="2.5" marker-end="url(#arrow)"/>
+        <text x="629" y="188" text-anchor="middle" fill="#aab2c5" font-size="11">← rows</text>
+        <text x="460" y="40" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">The journey of a single click</text>
+        <text x="460" y="62" text-anchor="middle" fill="#707a92" font-size="12">You'll build all three pieces this week — and connect them.</text>
+      </svg>
+      <figcaption>A "full-stack" developer works across all three boxes. That's exactly what you'll be by Friday.</figcaption>
+    </figure>
+  </section>
+
+  <!-- CURRICULUM -->
+  <section id="curriculum" class="section" style="margin: 60px 0;">
+    <h2 class="center">The curriculum</h2>
+    <p class="center muted" style="max-width:680px;margin:0 auto 30px;">
+      Seven modules, designed to be done in order. Each one has live examples, diagrams, "try it yourself" challenges and a quiz.
+    </p>
+
+    <div class="grid grid-2">
+      <a href="01-foundations.html" class="module-card" data-mod="foundations">
+        <span class="tag">DAY 1 · AM</span>
+        <div class="ic" style="background:rgba(108,140,255,.15);">🧭</div>
+        <h3>0 · Foundations</h3>
+        <p>How the web works, what "front-end / back-end" means, and setting up your tools. Demystifies everything before you write code.</p>
+        <div class="meta"><span>🟢 Basics</span><span>⏱️ ~2 hrs</span></div>
+      </a>
+
+      <a href="02-javascript.html" class="module-card" data-mod="javascript">
+        <span class="tag">DAY 1–2</span>
+        <div class="ic" style="background:rgba(247,223,30,.15);">📜</div>
+        <h3>1 · JavaScript</h3>
+        <p>The language that powers everything. Variables, functions, arrays, objects, loops, the DOM, async/await — basic to advanced, all runnable in-page.</p>
+        <div class="meta"><span>🟢🔵🟣 All levels</span><span>⏱️ ~8 hrs</span></div>
+      </a>
+
+      <a href="03-react.html" class="module-card" data-mod="react">
+        <span class="tag">DAY 3</span>
+        <div class="ic" style="background:rgba(97,218,251,.15);">⚛️</div>
+        <h3>2 · React</h3>
+        <p>Build interactive user interfaces from reusable components. Props, state, hooks, events, lists and forms — with a live React playground.</p>
+        <div class="meta"><span>🔵 Intermediate</span><span>⏱️ ~6 hrs</span></div>
+      </a>
+
+      <a href="04-node.html" class="module-card" data-mod="node">
+        <span class="tag">DAY 4</span>
+        <div class="ic" style="background:rgba(60,135,58,.18);">🟩</div>
+        <h3>3 · Node.js</h3>
+        <p>Run JavaScript on the server. Modules, npm, the file system, and building your first web server with Express.</p>
+        <div class="meta"><span>🔵 Intermediate</span><span>⏱️ ~5 hrs</span></div>
+      </a>
+
+      <a href="05-rest-apis.html" class="module-card" data-mod="rest">
+        <span class="tag">DAY 5</span>
+        <div class="ic" style="background:rgba(255,157,84,.16);">🔌</div>
+        <h3>4 · REST APIs</h3>
+        <p>The contract between front-end and back-end. HTTP methods, status codes, JSON, CRUD endpoints, and connecting React to your server.</p>
+        <div class="meta"><span>🔵🟣 Inter–Adv</span><span>⏱️ ~5 hrs</span></div>
+      </a>
+
+      <a href="06-database.html" class="module-card" data-mod="database">
+        <span class="tag">DAY 6</span>
+        <div class="ic" style="background:rgba(204,41,39,.16);">🗄️</div>
+        <h3>5 · Database (MSSQL)</h3>
+        <p>Store data permanently. Tables, SQL queries, relationships, joins, and connecting MSSQL to Node with the <code>mssql</code> package.</p>
+        <div class="meta"><span>🔵🟣 Inter–Adv</span><span>⏱️ ~5 hrs</span></div>
+      </a>
+
+      <a href="07-capstone.html" class="module-card" data-mod="capstone" style="grid-column:1/-1;border-color:var(--brand-2);">
+        <span class="tag">DAY 7</span>
+        <div class="ic" style="background:linear-gradient(135deg,var(--brand),var(--brand-2));">🏆</div>
+        <h3>6 · Capstone — Build the Task Manager</h3>
+        <p>Put it all together. A full-stack "Task Manager" app: React front-end → Express REST API → MSSQL database. Step-by-step, file by file. This is your proof you can build a real app.</p>
+        <div class="meta"><span>🟣 Advanced</span><span>⏱️ ~6 hrs</span><span>🎯 Full project</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- WEEK SCHEDULE -->
+  <section style="margin: 60px 0;">
+    <h2 class="center">Your 7-day schedule</h2>
+    <div class="card">
+      <table>
+        <thead><tr><th>Day</th><th>Focus</th><th>You'll be able to…</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Day 1</strong></td><td>Foundations + JS basics</td><td>Understand how the web works and write simple JavaScript.</td></tr>
+          <tr><td><strong>Day 2</strong></td><td>JS intermediate & advanced</td><td>Use arrays, objects, functions and async code confidently.</td></tr>
+          <tr><td><strong>Day 3</strong></td><td>React</td><td>Build an interactive UI with components and state.</td></tr>
+          <tr><td><strong>Day 4</strong></td><td>Node.js</td><td>Run a back-end server with Express.</td></tr>
+          <tr><td><strong>Day 5</strong></td><td>REST APIs</td><td>Connect front-end and back-end over HTTP.</td></tr>
+          <tr><td><strong>Day 6</strong></td><td>MSSQL database</td><td>Store and query real data.</td></tr>
+          <tr><td><strong>Day 7</strong></td><td>Capstone project</td><td><strong>Ship a complete full-stack web app. 🎉</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- HOW TO USE -->
+  <section style="margin: 60px 0;">
+    <h2>How to get the most out of this</h2>
+    <div class="callout tip"><span class="ci">✅</span><p><strong>Type the code, don't just read it.</strong> Every blue editor box is live — change the values and hit <span class="kbd">Run</span> (or <span class="kbd">Ctrl</span>+<span class="kbd">Enter</span>). Breaking things and fixing them is how you learn.</p></div>
+    <div class="callout info"><span class="ci">🧪</span><p><strong>Do the challenges.</strong> Each module has "Try it yourself" boxes. Don't skip them — they turn reading into real skill.</p></div>
+    <div class="callout key"><span class="ci">🧠</span><p><strong>Take the quizzes.</strong> They're not graded — they're there to catch misunderstandings before they pile up.</p></div>
+    <div class="callout warn"><span class="ci">🔁</span><p><strong>It's okay to be confused.</strong> Confusion is the feeling of learning. Re-read, re-run, and move on — concepts click on the second and third pass.</p></div>
+  </section>
+
+  <div class="center" style="margin: 50px 0;">
+    <a href="01-foundations.html" class="btn btn-primary">Begin with Foundations →</a>
+  </div>
+
+</main>
+
+<footer>
+  <p>DevLaunch Academy · An interactive full-stack curriculum · Built to take you from zero to shipped.</p>
+  <div class="signature" aria-label="Author signature">
+    <span class="sig-br">/**</span>
+    <span class="sig-line"><span class="sig-tag">* @author</span>&nbsp; Sumanth Reddy Pathi</span>
+    <span class="sig-line"><span class="sig-tag">* @role</span>&nbsp;&nbsp;&nbsp; Software Engineer · 7+ yrs — Web · AI &amp; MedTech</span>
+    <span class="sig-line"><span class="sig-tag">* @company</span> Compliance Group</span>
+    <span class="sig-br">*/<span class="sig-caret">&nbsp;▌</span></span>
+  </div>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

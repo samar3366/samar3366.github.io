@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>REST APIs — The Front-end / Back-end Contract | DevLaunch Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/styles.css" />
+<style>
+  .api-explorer { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin: 22px 0; }
+  .api-bar { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; background: var(--bg-soft); border-bottom: 1px solid var(--border); align-items: center; }
+  .api-bar select, .api-bar input { background: #0b0e16; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-family: var(--mono); font-size: 0.86rem; }
+  .api-bar input { flex: 1; min-width: 180px; }
+  .api-bar button { background: var(--brand); color: #0b0d13; border: none; border-radius: 8px; padding: 9px 18px; font-weight: 700; cursor: pointer; }
+  .api-out { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .api-col { padding: 14px; }
+  .api-col + .api-col { border-left: 1px solid var(--border); }
+  .api-col h5 { margin: 0 0 8px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); }
+  .api-col pre { background: #0b0e16; border-radius: 8px; font-size: 0.82rem; min-height: 60px; }
+  .status-pill { display: inline-block; padding: 3px 12px; border-radius: 999px; font-family: var(--mono); font-weight: 700; font-size: 0.82rem; }
+  .method-tag { font-family: var(--mono); font-weight: 700; padding: 3px 9px; border-radius: 6px; font-size: 0.8rem; }
+  .m-get { background: rgba(56,211,159,.18); color: #38d39f; }
+  .m-post { background: rgba(108,140,255,.18); color: #6c8cff; }
+  .m-put { background: rgba(255,206,92,.18); color: #ffce5c; }
+  .m-del { background: rgba(255,107,107,.18); color: #ff6b6b; }
+  @media (max-width: 700px){ .api-out { grid-template-columns: 1fr; } .api-col + .api-col { border-left: none; border-top: 1px solid var(--border); } }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand"><span class="logo">⚡</span> DevLaunch Academy</a>
+    <nav class="topnav">
+      <a href="index.html">Home</a>
+      <a href="01-foundations.html">Foundations</a>
+      <a href="02-javascript.html">JavaScript</a>
+      <a href="03-react.html">React</a>
+      <a href="04-node.html">Node</a>
+      <a href="05-rest-apis.html" class="active">REST</a>
+      <a href="06-database.html">MSSQL</a>
+      <a href="07-capstone.html">Capstone</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <button class="menu-toggle" style="margin:18px 0;">☰ Sections</button>
+  <div class="layout">
+    <aside class="sidebar">
+      <h4>On this page</h4>
+      <a href="#what">What is a REST API?</a>
+      <a href="#anatomy">① Anatomy of a request</a>
+      <a href="#headers">② HTTP headers</a>
+      <a href="#methods">③ HTTP methods</a>
+      <a href="#idempotency">④ Idempotency &amp; safety</a>
+      <a href="#status">⑤ Status codes</a>
+      <a href="#json">⑥ JSON &amp; error shapes</a>
+      <a href="#query">⑦ Query parameters</a>
+      <a href="#validation">⑧ Validation</a>
+      <a href="#explorer">⑨ Try a live API</a>
+      <a href="#crud">⑩ Full CRUD in Express</a>
+      <a href="#connect">⑪ Connecting React</a>
+      <a href="#auth">⑫ Auth &amp; security</a>
+      <a href="#cors">⑬ CORS explained</a>
+      <a href="#design">⑭ Good API design</a>
+      <a href="#versioning">⑮ Versioning &amp; rate limits</a>
+      <a href="#testing">⑯ Testing with curl</a>
+      <a href="#styles">⑰ REST vs GraphQL/gRPC</a>
+      <a href="#quiz">Quiz</a>
+      <a href="#takeaways">Key takeaways</a>
+    </aside>
+
+    <div class="content">
+      <p class="muted" style="margin:0;">Module 4 · <span class="chip inter">Intermediate</span> <span class="chip adv">Advanced</span></p>
+      <h1 style="margin-top:6px;">🔌 REST APIs: The Contract</h1>
+      <p class="lead" style="color:var(--text-soft);font-size:1.12rem;">
+        An API is how your React front-end and Node back-end talk to each other. <strong>REST</strong> is the most
+        common set of rules for designing that conversation. Master it and you can connect any front-end to any back-end —
+        and, just as importantly, understand <em>every</em> web app you'll ever build or use.
+      </p>
+      <div class="callout info"><span class="ci">🗺️</span><p><strong>Where you are:</strong> you just finished the Node module, so you can already build a server and write routes. This module is the bridge between that server and the React app you built earlier. Next module, you'll swap our temporary in-memory data for a real <strong>MSSQL database</strong> — but the API shape you learn here won't change. That's the whole point of a good contract.</p></div>
+
+      <section id="what" class="section">
+        <h2>What is a REST API?</h2>
+        <p><strong>API</strong> = Application Programming Interface — a defined way for two programs to talk. A <strong>REST API</strong> organises that conversation around <strong>resources</strong> (things like "users", "tasks", "products"), each with a URL, acted on by standard <strong>HTTP methods</strong>. "REST" stands for <em>Representational State Transfer</em> — a fancy name for a simple idea: the client and server exchange <strong>representations</strong> (usually JSON) of <strong>resources</strong>, using the plain verbs that the web (HTTP) already gives us.</p>
+        <p>Why does REST matter? Because it's a <strong>shared convention</strong>. If everyone agrees that <code>GET /api/tasks</code> means "give me the tasks" and <code>DELETE /api/tasks/5</code> means "delete task 5", then any front-end can talk to any back-end without a custom instruction manual. You're not inventing a new language for every project — you're speaking one the whole industry already understands.</p>
+        <div class="callout key"><span class="ci">🔑</span><p>An API is a <strong>contract</strong>. The front-end promises to send requests in an agreed shape; the back-end promises to respond in an agreed shape. As long as both sides honour the contract, either side can be rewritten, replaced, or scaled independently. That separation is the superpower of full-stack development.</p></div>
+        <p>The restaurant analogy from Foundations, made precise:</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 820 220" role="img" aria-label="REST request and response anatomy">
+            <rect x="30" y="80" width="170" height="70" rx="12" fill="#1b2030" stroke="#61dafb" stroke-width="2"/>
+            <text x="115" y="110" text-anchor="middle" fill="#fff" font-size="14">React app</text>
+            <text x="115" y="132" text-anchor="middle" fill="#aab2c5" font-size="11">"the customer"</text>
+
+            <rect x="620" y="80" width="170" height="70" rx="12" fill="#1b2030" stroke="#3c873a" stroke-width="2"/>
+            <text x="705" y="110" text-anchor="middle" fill="#fff" font-size="14">Express API</text>
+            <text x="705" y="132" text-anchor="middle" fill="#aab2c5" font-size="11">"the kitchen"</text>
+
+            <rect x="250" y="58" width="320" height="40" rx="8" fill="#11203a" stroke="#6c8cff"/>
+            <text x="410" y="83" text-anchor="middle" fill="#cfe3ff" font-size="13" font-family="monospace">GET /api/tasks/5</text>
+            <path d="M200,78 L248,78" stroke="#6c8cff" stroke-width="2" marker-end="url(#p1)"/>
+            <path d="M572,78 L618,90" stroke="#6c8cff" stroke-width="2" marker-end="url(#p1)"/>
+
+            <rect x="250" y="135" width="320" height="55" rx="8" fill="#13251a" stroke="#38d39f"/>
+            <text x="410" y="157" text-anchor="middle" fill="#9ee493" font-size="12" font-family="monospace">200 OK</text>
+            <text x="410" y="177" text-anchor="middle" fill="#9ee493" font-size="12" font-family="monospace">{ "id": 5, "title": "Buy milk" }</text>
+            <path d="M618,150 L572,162" stroke="#38d39f" stroke-width="2" marker-end="url(#p2)"/>
+            <path d="M248,162 L202,150" stroke="#38d39f" stroke-width="2" marker-end="url(#p2)"/>
+            <defs>
+              <marker id="p1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6c8cff"/></marker>
+              <marker id="p2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#38d39f"/></marker>
+            </defs>
+          </svg>
+          <figcaption>A request names a <strong>method</strong> + a <strong>resource URL</strong>; the response carries a <strong>status code</strong> + <strong>JSON data</strong>.</figcaption>
+        </figure>
+      </section>
+
+      <section id="anatomy" class="section">
+        <h2>① Anatomy of an HTTP request &amp; response <span class="chip basic">Basic</span></h2>
+        <p>Before we go deeper into methods and status codes, let's slow right down and look at what a single request and its response are actually <em>made of</em>. Every time your browser loads a page or your React app calls <code>fetch</code>, this exact structure flies across the network as plain text. Once you can picture these pieces, nothing about APIs will feel mysterious again.</p>
+
+        <h3>The request — three (sometimes four) parts</h3>
+        <p>A request is a small text message that asks the server to do something. It has up to four parts, in this order:</p>
+        <ol>
+          <li><strong>Request line</strong> — the method, the path, and the HTTP version. Example: <code>POST /api/tasks HTTP/1.1</code>. This is the "what do you want and where" line.</li>
+          <li><strong>Headers</strong> — a list of <code>Key: Value</code> lines giving <em>metadata</em> about the request (what format the body is in, who's asking, what they can accept back). More on these in the next section.</li>
+          <li><strong>A blank line</strong> — separates the headers from the body. Small but mandatory.</li>
+          <li><strong>Body</strong> (optional) — the actual data you're sending, usually JSON. <code>GET</code> and <code>DELETE</code> requests typically have no body; <code>POST</code> and <code>PUT</code> almost always do.</li>
+        </ol>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">a raw HTTP request</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">POST /api/tasks HTTP/1.1          &lt;-- request line: method + path + version
+Host: localhost:4000             &lt;-- headers start here
+Content-Type: application/json    &lt;-- "my body is JSON"
+Accept: application/json          &lt;-- "please reply with JSON"
+Authorization: Bearer eyJhbGc...  &lt;-- "here's my login token"
+                                  &lt;-- BLANK LINE separates headers from body
+{ "title": "Buy milk" }           &lt;-- the body (the data)</code></pre>
+        </div>
+
+        <h3>The response — the same shape, mirrored</h3>
+        <p>The server replies with a message built almost identically, except the first line is a <strong>status line</strong> instead of a request line:</p>
+        <ol>
+          <li><strong>Status line</strong> — the HTTP version, the status code, and a short reason phrase. Example: <code>HTTP/1.1 201 Created</code>.</li>
+          <li><strong>Headers</strong> — metadata about the <em>response</em> (what format the body is, how long it is, caching rules, etc.).</li>
+          <li><strong>A blank line.</strong></li>
+          <li><strong>Body</strong> (optional) — the data the server is sending back, usually JSON.</li>
+        </ol>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">a raw HTTP response</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">HTTP/1.1 201 Created              &lt;-- status line: version + code + reason
+Content-Type: application/json    &lt;-- "my body is JSON"
+Content-Length: 41                &lt;-- "the body is 41 bytes"
+                                  &lt;-- BLANK LINE
+{ "id": 5, "title": "Buy milk", "done": false }   &lt;-- the body</code></pre>
+        </div>
+
+        <figure class="diagram">
+          <svg viewBox="0 0 820 360" role="img" aria-label="Anatomy of an HTTP request and response">
+            <text x="210" y="26" text-anchor="middle" fill="#6c8cff" font-size="14" font-weight="bold">REQUEST</text>
+            <rect x="30" y="40" width="360" height="40" rx="8" fill="#11203a" stroke="#6c8cff"/>
+            <text x="44" y="58" fill="#cfe3ff" font-size="11" font-family="monospace">POST /api/tasks HTTP/1.1</text>
+            <text x="44" y="73" fill="#7f8aa3" font-size="9">request line — method + path + version</text>
+
+            <rect x="30" y="86" width="360" height="78" rx="8" fill="#1b2030" stroke="#ff9d54"/>
+            <text x="44" y="104" fill="#ffce5c" font-size="11" font-family="monospace">Content-Type: application/json</text>
+            <text x="44" y="119" fill="#ffce5c" font-size="11" font-family="monospace">Authorization: Bearer ...</text>
+            <text x="44" y="134" fill="#ffce5c" font-size="11" font-family="monospace">Accept: application/json</text>
+            <text x="44" y="156" fill="#7f8aa3" font-size="9">headers — metadata (key: value)</text>
+
+            <rect x="30" y="170" width="360" height="46" rx="8" fill="#13251a" stroke="#38d39f"/>
+            <text x="44" y="190" fill="#9ee493" font-size="11" font-family="monospace">{ "title": "Buy milk" }</text>
+            <text x="44" y="208" fill="#7f8aa3" font-size="9">body — the data (JSON)</text>
+
+            <text x="610" y="26" text-anchor="middle" fill="#38d39f" font-size="14" font-weight="bold">RESPONSE</text>
+            <rect x="430" y="40" width="360" height="40" rx="8" fill="#13251a" stroke="#38d39f"/>
+            <text x="444" y="58" fill="#9ee493" font-size="11" font-family="monospace">HTTP/1.1 201 Created</text>
+            <text x="444" y="73" fill="#7f8aa3" font-size="9">status line — version + code + reason</text>
+
+            <rect x="430" y="86" width="360" height="62" rx="8" fill="#1b2030" stroke="#ff9d54"/>
+            <text x="444" y="104" fill="#ffce5c" font-size="11" font-family="monospace">Content-Type: application/json</text>
+            <text x="444" y="119" fill="#ffce5c" font-size="11" font-family="monospace">Content-Length: 41</text>
+            <text x="444" y="140" fill="#7f8aa3" font-size="9">headers — metadata about the reply</text>
+
+            <rect x="430" y="154" width="360" height="62" rx="8" fill="#13251a" stroke="#38d39f"/>
+            <text x="444" y="174" fill="#9ee493" font-size="11" font-family="monospace">{ "id": 5, "title": "Buy milk",</text>
+            <text x="444" y="189" fill="#9ee493" font-size="11" font-family="monospace">  "done": false }</text>
+            <text x="444" y="208" fill="#7f8aa3" font-size="9">body — the data sent back</text>
+
+            <path d="M395,128 L425,128" stroke="#aab2c5" stroke-width="2" marker-end="url(#a1)"/>
+            <path d="M425,250 L395,250" stroke="#aab2c5" stroke-width="2" marker-end="url(#a1)"/>
+            <text x="410" y="300" text-anchor="middle" fill="#aab2c5" font-size="11">Same four-part shape, mirrored:</text>
+            <text x="410" y="318" text-anchor="middle" fill="#7f8aa3" font-size="10">first line · headers · blank line · body</text>
+            <defs>
+              <marker id="a1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#aab2c5"/></marker>
+            </defs>
+          </svg>
+          <figcaption>A request and a response share the same skeleton: a <strong>first line</strong>, a block of <strong>headers</strong>, a <strong>blank line</strong>, then an optional <strong>body</strong>.</figcaption>
+        </figure>
+        <div class="callout tip"><span class="ci">🛠️</span><p>You normally never type raw HTTP like this — <code>fetch</code>, Express, and your browser build and parse it for you. But knowing the shape means you can read the "Network" tab in your browser's dev tools and instantly understand what your app is actually sending.</p></div>
+      </section>
+
+      <section id="headers" class="section">
+        <h2>② HTTP headers — the metadata <span class="chip basic">Basic</span></h2>
+        <p><strong>Headers</strong> are <code>Key: Value</code> lines that travel with every request and response. They don't carry the main data (that's the body) — they carry <em>information about</em> the message: what format it's in, who's sending it, what the sender can accept back, how it should be cached, and more. Think of them as the label on a parcel versus the contents inside.</p>
+        <p>You'll meet a handful constantly. Here are the ones that matter most early on:</p>
+        <table>
+          <thead><tr><th>Header</th><th>On request / response</th><th>What it means</th></tr></thead>
+          <tbody>
+            <tr><td><code>Content-Type</code></td><td>Both</td><td>The format of <em>this message's body</em>. <code>application/json</code> for JSON, <code>text/html</code> for a web page, etc. The receiver uses it to know how to parse the body.</td></tr>
+            <tr><td><code>Accept</code></td><td>Request</td><td>The format the client <em>would like back</em>. <code>Accept: application/json</code> says "please reply with JSON." It's a preference, not a command.</td></tr>
+            <tr><td><code>Authorization</code></td><td>Request</td><td>Proof of who you are — usually a token: <code>Authorization: Bearer &lt;token&gt;</code>. The server checks it to decide if you're allowed.</td></tr>
+            <tr><td><code>User-Agent</code></td><td>Request</td><td>Identifies the client software (which browser/app/version). Set automatically by the browser.</td></tr>
+            <tr><td><code>Content-Length</code></td><td>Both</td><td>How many bytes the body is. Set automatically.</td></tr>
+            <tr><td><code>Cache-Control</code></td><td>Response</td><td>Tells the browser whether/how long it may reuse this response instead of asking again.</td></tr>
+            <tr><td><code>Set-Cookie</code></td><td>Response</td><td>Asks the browser to store a cookie (used for sessions). The browser sends it back on later requests.</td></tr>
+          </tbody>
+        </table>
+        <div class="callout key"><span class="ci">🔑</span><p><strong>Content-Type vs Accept</strong> — the classic confusion. <code>Content-Type</code> describes the body that <em>this very message is carrying</em>. <code>Accept</code> describes the body the client <em>hopes to receive in reply</em>. A POST request often sets both: "I'm sending JSON (<code>Content-Type</code>), and I'd like JSON back (<code>Accept</code>)."</p></div>
+        <p>This is exactly why, when you POST from React, you write <code>headers: { "Content-Type": "application/json" }</code> — you're telling Express "the body I'm about to send is JSON, so parse it as JSON." Forget that header and <code>express.json()</code> won't parse your body, and <code>req.body</code> will be empty. A very common beginner bug!</p>
+        <p>Headers arrive on the server as a plain object you can read. Let's parse a raw header block ourselves to demystify it:</p>
+        <div class="code-wrap live">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">parse-headers.js (live)</span><span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">// A raw header block, exactly as it travels over the wire:
+const raw = [
+  "Content-Type: application/json",
+  "Accept: application/json",
+  "Authorization: Bearer abc.123.xyz"
+].join("\n");
+
+// Turn those text lines into a usable object { key: value }
+const headers = {};
+raw.split("\n").forEach(function (line) {
+  const i = line.indexOf(":");
+  const key = line.slice(0, i).trim();
+  const value = line.slice(i + 1).trim();
+  headers[key] = value;
+});
+
+console.log("Parsed headers object:");
+console.log(JSON.stringify(headers, null, 2));
+console.log("Is this JSON?", headers["Content-Type"] === "application/json");
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout info"><span class="ci">💡</span><p>Header <em>names</em> are case-insensitive (<code>Content-Type</code> and <code>content-type</code> mean the same thing). In Express, <code>req.headers</code> gives you them all lower-cased: <code>req.headers["content-type"]</code>.</p></div>
+      </section>
+
+      <section id="methods" class="section">
+        <h2>③ HTTP methods — the verbs <span class="chip basic">Basic</span></h2>
+        <p>Each method expresses an <em>intent</em>. Together they map perfectly to the things you do with data — <strong>CRUD</strong>: Create, Read, Update, Delete. The method is a <em>promise about what you want to do</em>; the server then decides whether to allow it.</p>
+        <table>
+          <thead><tr><th>Method</th><th>Intent</th><th>CRUD</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method-tag m-get">GET</span></td><td>Read / fetch data</td><td>Read</td><td><code>GET /api/tasks</code> → all tasks</td></tr>
+            <tr><td><span class="method-tag m-post">POST</span></td><td>Create something new</td><td>Create</td><td><code>POST /api/tasks</code> → add a task</td></tr>
+            <tr><td><span class="method-tag m-put">PUT</span></td><td><strong>Replace</strong> an existing item (whole)</td><td>Update</td><td><code>PUT /api/tasks/5</code> → replace task 5</td></tr>
+            <tr><td><span class="method-tag m-put">PATCH</span></td><td><strong>Partially update</strong> an item</td><td>Update</td><td><code>PATCH /api/tasks/5</code> → tweak one field</td></tr>
+            <tr><td><span class="method-tag m-del">DELETE</span></td><td>Remove an item</td><td>Delete</td><td><code>DELETE /api/tasks/5</code> → delete task 5</td></tr>
+          </tbody>
+        </table>
+        <div class="callout key"><span class="ci">🔑</span><p>The URL names the <em>thing</em> (the resource); the method names the <em>action</em>. <code>/api/tasks/5</code> always refers to task #5 — what you <em>do</em> to it depends on the method.</p></div>
+
+        <h3>PUT vs PATCH — full replace vs partial update</h3>
+        <p>This trips up almost everyone at first, so let's be crystal clear. Both update an existing resource, but they mean different things:</p>
+        <ul>
+          <li><strong>PUT = "here is the complete new version, replace what's there."</strong> You send <em>all</em> the fields. Any field you leave out may be wiped or reset to a default. Think "overwrite the whole record."</li>
+          <li><strong>PATCH = "here are just the fields I want to change."</strong> You send <em>only</em> the changed fields; everything else stays as it was. Think "edit these few things."</li>
+        </ul>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">put-vs-patch (bodies)</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">// Existing task on the server:
+// { "id": 5, "title": "Buy milk", "done": false, "priority": "low" }
+
+// PUT /api/tasks/5  — must send the WHOLE object (it replaces everything)
+{ "title": "Buy oat milk", "done": true, "priority": "high" }
+
+// PATCH /api/tasks/5 — send ONLY what changes (everything else untouched)
+{ "done": true }</code></pre>
+        </div>
+        <div class="callout tip"><span class="ci">💡</span><p>In practice many beginners (and plenty of real APIs) use <code>PUT</code> loosely to mean "update", merging fields like PATCH. That works, but if you want to be precise and friendly to other developers: use <strong>PATCH for partial edits</strong>. It signals your intent clearly.</p></div>
+      </section>
+
+      <section id="idempotency" class="section">
+        <h2>④ Idempotency &amp; safety — two words worth knowing <span class="chip inter">Intermediate</span></h2>
+        <p>These sound intimidating but the ideas are simple, and understanding them will make you reason about APIs like a pro.</p>
+        <ul>
+          <li><strong>Safe</strong> = the request <em>doesn't change anything</em> on the server. It only reads. <code>GET</code> is safe — fetching a task ten times changes nothing.</li>
+          <li><strong>Idempotent</strong> = making the <em>same</em> request many times has the <em>same</em> end result as making it once. The server might do work each time, but the final state is identical.</li>
+        </ul>
+        <p>Why care? Networks are unreliable. If a response gets lost, a client (or a phone on a flaky connection) might retry. If the method is idempotent, retrying is safe. If it isn't — like <code>POST</code> — a retry might create a <em>second</em> task by accident. That's the real-world "I clicked submit twice and got charged twice" bug.</p>
+        <table>
+          <thead><tr><th>Method</th><th>Safe?</th><th>Idempotent?</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method-tag m-get">GET</span></td><td>✅ Yes</td><td>✅ Yes</td><td>Only reads; nothing changes no matter how often you call it.</td></tr>
+            <tr><td><span class="method-tag m-post">POST</span></td><td>❌ No</td><td>❌ No</td><td>Creates a new resource each time — call it twice, get two items.</td></tr>
+            <tr><td><span class="method-tag m-put">PUT</span></td><td>❌ No</td><td>✅ Yes</td><td>Replaces with the same data → same result every time.</td></tr>
+            <tr><td><span class="method-tag m-put">PATCH</span></td><td>❌ No</td><td>⚠️ Usually*</td><td>Depends on the change. "Set done=true" is idempotent; "increment count" is not.</td></tr>
+            <tr><td><span class="method-tag m-del">DELETE</span></td><td>❌ No</td><td>✅ Yes</td><td>Delete task 5 once or five times → it's gone either way.</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn"><span class="ci">⚠️</span><p>The one to remember: <strong>POST is the odd one out</strong> — not safe, not idempotent. That's exactly why double-clicking a "Buy" or "Submit" button can create duplicates, and why such buttons should disable themselves after the first click.</p></div>
+      </section>
+
+      <section id="status" class="section">
+        <h2>⑤ Status codes — the server's reply code <span class="chip basic">Basic</span></h2>
+        <p>Every response includes a 3-digit status code summarising what happened. The first digit tells you the <em>family</em> — that alone gets you 80% of the way. Memorise the families first, then learn the common specific codes:</p>
+        <div class="grid grid-2">
+          <div class="card" style="border-color:var(--ok);"><h3 class="mt0">2xx — Success ✅</h3><p><code>200 OK</code> · general success<br/><code>201 Created</code> · new item made (after POST)<br/><code>204 No Content</code> · success, nothing to return (after DELETE)</p></div>
+          <div class="card" style="border-color:var(--brand);"><h3 class="mt0">3xx — Redirect ↪️</h3><p><code>301/302</code> · the resource lives elsewhere now. You'll rarely set these by hand early on.</p></div>
+          <div class="card" style="border-color:var(--warn);"><h3 class="mt0">4xx — You messed up 🙋</h3><p><code>400 Bad Request</code> · invalid data sent<br/><code>401 Unauthorized</code> · not logged in<br/><code>403 Forbidden</code> · logged in, not allowed<br/><code>404 Not Found</code> · no such resource</p></div>
+          <div class="card" style="border-color:var(--danger);"><h3 class="mt0">5xx — Server messed up 💥</h3><p><code>500 Internal Server Error</code> · your code threw an error. When you see this, check your server's terminal logs.</p></div>
+        </div>
+        <div class="callout tip"><span class="ci">🧠</span><p>Memory hook: <strong>4xx = client's fault</strong> (the request was wrong), <strong>5xx = server's fault</strong> (the code broke).</p></div>
+
+        <h3>A fuller reference — the codes you'll actually meet</h3>
+        <p>You don't need to memorise all of these, but knowing what each means lets you debug instantly when you see one. Bookmark this table.</p>
+        <table>
+          <thead><tr><th>Family</th><th>Code</th><th>Meaning</th><th>When to use / what it tells you</th></tr></thead>
+          <tbody>
+            <tr><td>1xx info</td><td><code>100</code></td><td>Continue</td><td>Rare; low-level "keep going." You'll basically never set this yourself.</td></tr>
+            <tr><td rowspan="4">2xx ✅</td><td><code>200</code></td><td>OK</td><td>General success. Use for a successful GET or PUT/PATCH that returns data.</td></tr>
+            <tr><td><code>201</code></td><td>Created</td><td>A new resource was made. Return after a successful <code>POST</code>, ideally with the new item in the body.</td></tr>
+            <tr><td><code>202</code></td><td>Accepted</td><td>Request accepted but processing happens later (e.g. queued background job).</td></tr>
+            <tr><td><code>204</code></td><td>No Content</td><td>Success, but there's nothing to send back. Perfect for <code>DELETE</code>.</td></tr>
+            <tr><td rowspan="3">3xx ↪️</td><td><code>301</code></td><td>Moved Permanently</td><td>This URL has permanently moved; use the new one from now on.</td></tr>
+            <tr><td><code>302</code></td><td>Found (temp redirect)</td><td>Temporarily somewhere else; keep using this URL.</td></tr>
+            <tr><td><code>304</code></td><td>Not Modified</td><td>"Your cached copy is still good." Saves bandwidth; handled via caching headers.</td></tr>
+            <tr><td rowspan="8">4xx 🙋</td><td><code>400</code></td><td>Bad Request</td><td>The request itself is malformed — bad JSON, missing required field.</td></tr>
+            <tr><td><code>401</code></td><td>Unauthorized</td><td>You're not authenticated. (Confusingly named — it really means "not logged in.")</td></tr>
+            <tr><td><code>403</code></td><td>Forbidden</td><td>You <em>are</em> logged in, but you're not allowed to do this.</td></tr>
+            <tr><td><code>404</code></td><td>Not Found</td><td>No resource at that URL/id.</td></tr>
+            <tr><td><code>405</code></td><td>Method Not Allowed</td><td>The URL exists but not for this method (e.g. <code>DELETE</code> on a read-only route).</td></tr>
+            <tr><td><code>409</code></td><td>Conflict</td><td>Clashes with current state — e.g. signing up with an email that already exists.</td></tr>
+            <tr><td><code>422</code></td><td>Unprocessable Entity</td><td>JSON was valid but the <em>values</em> fail validation (e.g. age = -5). Great for form errors.</td></tr>
+            <tr><td><code>429</code></td><td>Too Many Requests</td><td>You're rate-limited — slow down (see the rate-limiting section).</td></tr>
+            <tr><td rowspan="3">5xx 💥</td><td><code>500</code></td><td>Internal Server Error</td><td>Your code threw an unhandled error. Check the server terminal logs.</td></tr>
+            <tr><td><code>502</code></td><td>Bad Gateway</td><td>A server in front got a bad reply from the one behind it.</td></tr>
+            <tr><td><code>503</code></td><td>Service Unavailable</td><td>Server is down or overloaded; try again later.</td></tr>
+          </tbody>
+        </table>
+        <div class="callout key"><span class="ci">🔑</span><p><strong>400 vs 422:</strong> use <code>400</code> when the request is broken at the format level (not even valid JSON, missing a required field). Use <code>422</code> when the JSON parsed fine but the <em>values</em> don't make sense (email isn't a valid email, price is negative). Both are fine for forms; <code>422</code> is just more specific.</p></div>
+      </section>
+
+      <section id="json" class="section">
+        <h2>⑥ JSON &amp; consistent error shapes <span class="chip basic">Basic</span></h2>
+        <p><strong>JSON</strong> (JavaScript Object Notation) is how data is formatted when sent over the web. It looks almost exactly like a JavaScript object — because it's based on one. It's just text, so any language can read it.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">a task, as JSON</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">{
+  "id": 5,
+  "title": "Buy milk",
+  "done": false,
+  "tags": ["shopping", "home"]
+}</code></pre>
+        </div>
+        <p>The only differences from a JS object: keys must be in <code>"double quotes"</code>, and no trailing commas. In JavaScript you convert between them with two functions:</p>
+        <div class="code-wrap live">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">json.js (live)</span><span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">const task = { id: 5, title: "Buy milk", done: false };
+
+// Object → JSON text (to send over the network)
+const text = JSON.stringify(task);
+console.log("As text:", text);
+
+// JSON text → Object (after receiving it)
+const back = JSON.parse(text);
+console.log("Back to object:", back.title);
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p><code>JSON.parse</code> throws an error if the text isn't valid JSON (a trailing comma, single quotes, a missing brace). Always wrap parsing of untrusted text in <code>try/catch</code> — which is exactly what robust servers do before reading <code>req.body</code>.</p></div>
+
+        <h3>A consistent error-response shape</h3>
+        <p>When something goes wrong, don't just send a bare string. Pick <strong>one consistent JSON shape</strong> for <em>every</em> error your API returns, and stick to it everywhere. The front-end then has exactly one way to read errors — no guessing. A widely-used shape wraps everything in an <code>error</code> object:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">a consistent error body</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">// Every error from your API looks like this:
+{
+  "error": {
+    "message": "title is required",   // human-readable, safe to show
+    "code": "VALIDATION_ERROR",        // stable string your code can switch on
+    "field": "title"                   // optional extra context
+  }
+}</code></pre>
+        </div>
+        <p>Let's build that shape with a small helper, exactly like you might in Express:</p>
+        <div class="code-wrap live">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">error-shape.js (live)</span><span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">// A reusable helper that always returns the SAME error shape
+function apiError(message, code, field) {
+  const error = { message: message, code: code };
+  if (field) error.field = field;
+  return { error: error };
+}
+
+// Use it everywhere your API fails:
+const missingTitle = apiError("title is required", "VALIDATION_ERROR", "title");
+const notFound = apiError("No task with id 999", "NOT_FOUND");
+
+console.log(JSON.stringify(missingTitle, null, 2));
+console.log("---");
+console.log(JSON.stringify(notFound, null, 2));
+
+// The front-end always reads it the same way:
+console.log("Show user:", missingTitle.error.message);
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout tip"><span class="ci">💡</span><p>Consistency is kindness. When every success returns the resource and every failure returns <code>{ error: { ... } }</code>, your React code can handle results with a single predictable pattern instead of a tangle of special cases.</p></div>
+      </section>
+
+      <section id="query" class="section">
+        <h2>⑦ Query parameters — filtering, sorting, paging <span class="chip inter">Intermediate</span></h2>
+        <p>Sometimes <code>GET /api/tasks</code> would return thousands of items, or you only want <em>some</em> of them. Instead of inventing new URLs, you tack <strong>query parameters</strong> onto the end after a <code>?</code>. They're <code>key=value</code> pairs joined by <code>&amp;</code>, and they tweak <em>how</em> a GET behaves without changing <em>which resource</em> you're asking about.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">query string anatomy</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">GET /api/tasks?status=active&amp;sort=-createdAt&amp;page=2&amp;limit=20
+//             |---------------- the query string ----------------|
+//  status=active   -> filter: only active tasks
+//  sort=-createdAt -> sort by createdAt, the "-" means descending
+//  page=2          -> pagination: which page of results
+//  limit=20        -> how many per page</code></pre>
+        </div>
+        <p>Three jobs query params do constantly:</p>
+        <ul>
+          <li><strong>Filtering</strong> — narrow the list: <code>?status=active</code>, <code>?done=true</code>.</li>
+          <li><strong>Sorting</strong> — order the list: <code>?sort=title</code> or <code>?sort=-createdAt</code> (newest first).</li>
+          <li><strong>Pagination</strong> — return a slice, not everything: <code>?page=2&amp;limit=20</code>.</li>
+        </ul>
+        <p>In Express you read these from <code>req.query</code> — already parsed into an object for you (<code>req.query.status</code>, <code>req.query.page</code>). Building them by hand in JavaScript is easy too — the browser gives you <code>URLSearchParams</code>, which handles the fiddly bits like joining with <code>&amp;</code> and escaping special characters:</p>
+        <div class="code-wrap live">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">query-builder.js (live)</span><span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">// Build a query string safely with URLSearchParams (no manual & or ? juggling)
+const filters = {
+  status: "active",
+  sort: "-createdAt",
+  page: 2,
+  limit: 20
+};
+
+const params = new URLSearchParams(filters);
+const url = "/api/tasks?" + params.toString();
+console.log("Request URL:", url);
+
+// And reading them back, as the server would:
+const parsed = new URLSearchParams("status=active&page=2&limit=20");
+console.log("status =", parsed.get("status"));
+console.log("page   =", parsed.get("page"));
+
+// Notice it auto-escapes special characters for you:
+const search = new URLSearchParams({ q: "buy milk & eggs" });
+console.log("Escaped:", search.toString());
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p>Query values always arrive as <strong>strings</strong> on the server. <code>req.query.page</code> is <code>"2"</code>, not the number <code>2</code>. Convert with <code>Number(req.query.page)</code> before doing maths, and always provide sensible defaults (e.g. <code>limit = Number(req.query.limit) || 20</code>).</p></div>
+      </section>
+
+      <section id="validation" class="section">
+        <h2>⑧ Validation — never trust the client <span class="chip inter">Intermediate</span></h2>
+        <p>This is one of the most important habits in all of back-end development, so let it sink in: <strong>anything that reaches your server from the outside is untrusted.</strong> A friendly user might forget a field. A buggy front-end might send the wrong type. A malicious actor will deliberately send garbage to break or abuse your API. Front-end validation (a "required" field in a form) is for <em>user convenience</em> only — it's trivially bypassed. The <strong>server</strong> is the only place validation actually protects you.</p>
+        <p>Validating means checking, before you act on the data, that it's present, the right type, and within sensible limits — and returning a clear <code>400</code> or <code>422</code> with a helpful message when it isn't.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">validating in a route</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">router.post("/", (req, res) => {
+  const { title, priority } = req.body;
+
+  // 1. Required?
+  if (!title || typeof title !== "string" || title.trim() === "") {
+    return res.status(422).json({
+      error: { message: "title is required", code: "VALIDATION", field: "title" }
+    });
+  }
+  // 2. Within limits?
+  if (title.length &gt; 100) {
+    return res.status(422).json({
+      error: { message: "title must be 100 chars or fewer", code: "VALIDATION", field: "title" }
+    });
+  }
+  // 3. Allowed value?
+  const allowed = ["low", "medium", "high"];
+  if (priority &amp;&amp; !allowed.includes(priority)) {
+    return res.status(422).json({
+      error: { message: "priority must be low, medium, or high", code: "VALIDATION", field: "priority" }
+    });
+  }
+
+  // Only now is it safe to use the data:
+  const task = { id: nextId++, title: title.trim(), priority: priority || "low", done: false };
+  tasks.push(task);
+  res.status(201).json(task);
+});</code></pre>
+        </div>
+        <div class="callout tip"><span class="ci">💡</span><p>Writing these checks by hand teaches you the idea, but in real projects you'll reach for a <strong>validation library</strong> like <a href="https://zod.dev" target="_blank" rel="noopener">Zod</a> or <a href="https://joi.dev" target="_blank" rel="noopener">Joi</a>. They let you declare the expected shape once and reject anything that doesn't match, with good error messages for free. Something to explore after this course.</p></div>
+        <div class="callout key"><span class="ci">🔑</span><p><strong>Golden rule:</strong> validate on the server <em>even if</em> you already validate on the client. Client checks improve the experience; server checks keep your data and your app safe. You need both, but the server one is non-negotiable.</p></div>
+      </section>
+
+      <section id="explorer" class="section">
+        <h2>⑨ Try a live API explorer 🧪 <span class="chip basic">Basic</span></h2>
+        <p>This is a <strong>simulated REST API</strong> running entirely in your browser — a mini "tasks" service. Pick a method and URL, send the request, and see the real status code and JSON response. Experiment freely; the data resets on reload.</p>
+        <div class="api-explorer">
+          <div class="api-bar">
+            <select id="api-method">
+              <option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option>
+            </select>
+            <input id="api-url" value="/api/tasks" spellcheck="false" />
+            <button id="api-send">Send ▶</button>
+          </div>
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:0.8rem;color:var(--text-dim);">
+            Body (for POST/PUT): <input id="api-body" value='{"title":"New task"}' spellcheck="false" style="width:100%;margin-top:6px;background:#0b0e16;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 11px;font-family:var(--mono);font-size:0.82rem;" />
+          </div>
+          <div class="api-out">
+            <div class="api-col"><h5>Request</h5><pre id="api-req" style="margin:0;">Click "Send" to try it.</pre></div>
+            <div class="api-col"><h5>Response</h5><div id="api-status" style="margin-bottom:8px;"></div><pre id="api-res" style="margin:0;">—</pre></div>
+          </div>
+        </div>
+        <p class="muted" style="font-size:0.88rem;">Quick recipes to try:
+          <br/>• <code>GET /api/tasks</code> — list all &nbsp; • <code>GET /api/tasks/1</code> — one task &nbsp; • <code>GET /api/tasks/999</code> — a 404
+          <br/>• <code>POST /api/tasks</code> with body <code>{"title":"Walk dog"}</code> — create (201) &nbsp; • <code>DELETE /api/tasks/2</code> — delete (204)
+        </p>
+      </section>
+
+      <section id="crud" class="section">
+        <h2>⑩ Full CRUD in Express <span class="chip inter">Intermediate</span></h2>
+        <p>Here's a complete REST API for "tasks" — all four operations. This is the back-end shape of your capstone (we'll swap the in-memory array for MSSQL in the next module). Read it slowly; you already know every piece.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">routes/tasks.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import express from "express";
+const router = express.Router();
+
+// Temporary in-memory data (replaced by MSSQL in Module 5)
+let tasks = [
+  { id: 1, title: "Learn REST", done: true },
+  { id: 2, title: "Build API", done: false },
+];
+let nextId = 3;
+
+// READ all  →  GET /api/tasks
+router.get("/", (req, res) => {
+  res.json(tasks);
+});
+
+// READ one  →  GET /api/tasks/:id
+router.get("/:id", (req, res) => {
+  const task = tasks.find((t) => t.id === Number(req.params.id));
+  if (!task) return res.status(404).json({ error: "Not found" });
+  res.json(task);
+});
+
+// CREATE  →  POST /api/tasks
+router.post("/", (req, res) => {
+  const { title } = req.body;
+  if (!title) return res.status(400).json({ error: "title is required" });
+  const task = { id: nextId++, title, done: false };
+  tasks.push(task);
+  res.status(201).json(task);     // 201 = Created
+});
+
+// UPDATE  →  PUT /api/tasks/:id
+router.put("/:id", (req, res) => {
+  const task = tasks.find((t) => t.id === Number(req.params.id));
+  if (!task) return res.status(404).json({ error: "Not found" });
+  task.title = req.body.title ?? task.title;
+  task.done = req.body.done ?? task.done;
+  res.json(task);
+});
+
+// DELETE  →  DELETE /api/tasks/:id
+router.delete("/:id", (req, res) => {
+  tasks = tasks.filter((t) => t.id !== Number(req.params.id));
+  res.status(204).end();          // 204 = success, no content
+});
+
+export default router;</code></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">server.js — wire it up</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import express from "express";
+import cors from "cors";
+import tasksRouter from "./routes/tasks.js";
+
+const app = express();
+app.use(cors());            // allow the React app to call us
+app.use(express.json());    // parse JSON bodies
+app.use("/api/tasks", tasksRouter);
+
+app.listen(4000, () => console.log("API on http://localhost:4000"));</code></pre>
+        </div>
+        <div class="callout warn"><span class="ci">🌐</span><p><strong>CORS:</strong> browsers block a page on one address (your React app at <code>:5173</code>) from calling a server on another (<code>:4000</code>) unless the server opts in. The <code>cors()</code> middleware does that. Forget it and you'll see a confusing "CORS error" — there's a whole section on <a href="#cors">why this happens</a> below.</p></div>
+      </section>
+
+      <section id="connect" class="section">
+        <h2>⑪ Connecting React to your API <span class="chip inter">Intermediate</span></h2>
+        <p>Back in React, you call your API with the browser's built-in <code>fetch</code>, inside <code>useEffect</code> (for loading) or an event handler (for actions). This is the moment the front-end and back-end become one app:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">TaskApp.jsx (front-end side)</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">const API = "http://localhost:4000/api/tasks";
+
+// READ — load tasks when the component appears
+useEffect(() => {
+  fetch(API)
+    .then((res) => res.json())
+    .then((data) => setTasks(data));
+}, []);
+
+// CREATE — add a task on form submit
+async function addTask(title) {
+  const res = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title }),
+  });
+  const newTask = await res.json();
+  setTasks((prev) => [...prev, newTask]);   // update UI
+}
+
+// DELETE — remove a task
+async function removeTask(id) {
+  await fetch(`${API}/${id}`, { method: "DELETE" });
+  setTasks((prev) => prev.filter((t) => t.id !== id));
+}</code></pre>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>See how everything connects? <code>fetch</code> + <code>method</code> + JSON <code>body</code> on the front-end maps directly to <code>app.get/post/delete</code> on the back-end. The status code tells React whether it worked. <strong>This is full-stack.</strong></p></div>
+      </section>
+
+      <section id="auth" class="section">
+        <h2>⑫ Authentication &amp; authorization <span class="chip adv">Advanced</span></h2>
+        <div class="callout info"><span class="ci">📌</span><p>This is a <strong>concepts</strong> section — a map of what to learn next, not a full implementation. You don't need to build auth for this course's capstone, but every real API needs it, so understanding the vocabulary now will pay off enormously.</p></div>
+        <p>Two words that sound alike but mean different things:</p>
+        <ul>
+          <li><strong>Authentication (authn) — "who are you?"</strong> Proving identity. Logging in with email + password is authentication.</li>
+          <li><strong>Authorization (authz) — "what are you allowed to do?"</strong> Checking permissions. An admin can delete any task; a normal user can only delete their own. That's authorization.</li>
+        </ul>
+        <p>Tie this back to status codes: <code>401 Unauthorized</code> means "I don't know who you are" (authentication failed), while <code>403 Forbidden</code> means "I know who you are, but you can't do this" (authorization failed).</p>
+
+        <h3>Common ways to prove identity</h3>
+        <table>
+          <thead><tr><th>Approach</th><th>How it works</th><th>Good for</th></tr></thead>
+          <tbody>
+            <tr><td><strong>API key</strong></td><td>A long secret string sent in a header. Identifies an app/account.</td><td>Server-to-server, third-party access.</td></tr>
+            <tr><td><strong>Token / JWT</strong></td><td>Server gives you a signed token on login; you send it back on every request in the <code>Authorization</code> header.</td><td>Single-page apps (React + API). Very common.</td></tr>
+            <tr><td><strong>Sessions + cookies</strong></td><td>Server stores a session and sends a cookie; the browser returns it automatically each request.</td><td>Traditional server-rendered sites.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Token-based auth (JWT), step by step</h3>
+        <p>This is the pattern you'll see most with React front-ends. A <strong>JWT</strong> (JSON Web Token) is a compact, digitally <em>signed</em> string. Because it's signed with a secret only the server knows, the server can hand it to the client, get it back later, and trust it hasn't been tampered with. Here's the flow:</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 820 300" role="img" aria-label="Token-based authentication flow">
+            <rect x="40" y="120" width="160" height="64" rx="12" fill="#1b2030" stroke="#61dafb" stroke-width="2"/>
+            <text x="120" y="148" text-anchor="middle" fill="#fff" font-size="14">React app</text>
+            <text x="120" y="168" text-anchor="middle" fill="#aab2c5" font-size="11">(the client)</text>
+
+            <rect x="620" y="120" width="160" height="64" rx="12" fill="#1b2030" stroke="#3c873a" stroke-width="2"/>
+            <text x="700" y="148" text-anchor="middle" fill="#fff" font-size="14">API server</text>
+            <text x="700" y="168" text-anchor="middle" fill="#aab2c5" font-size="11">(knows the secret)</text>
+
+            <path d="M200,108 L618,108" stroke="#6c8cff" stroke-width="2" marker-end="url(#t1)"/>
+            <text x="410" y="100" text-anchor="middle" fill="#cfe3ff" font-size="11">1. POST /login  { email, password }</text>
+
+            <path d="M620,140 L202,140" stroke="#38d39f" stroke-width="2" marker-end="url(#t2)"/>
+            <text x="410" y="134" text-anchor="middle" fill="#9ee493" font-size="11">2. 200 OK  { token: "eyJhbGc..." }</text>
+
+            <rect x="40" y="200" width="740" height="30" rx="6" fill="#241a2e" stroke="#ff7eb6"/>
+            <text x="410" y="219" text-anchor="middle" fill="#ffc4e3" font-size="11">3. Client stores the token, then sends it on EVERY later request:</text>
+
+            <path d="M200,258 L618,258" stroke="#ff9d54" stroke-width="2" marker-end="url(#t3)"/>
+            <text x="410" y="250" text-anchor="middle" fill="#ffd2ad" font-size="11" font-family="monospace">GET /api/tasks   Authorization: Bearer eyJhbGc...</text>
+            <text x="410" y="280" text-anchor="middle" fill="#7f8aa3" font-size="10">Server verifies the signature on each request — no need to log in again.</text>
+            <defs>
+              <marker id="t1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6c8cff"/></marker>
+              <marker id="t2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#38d39f"/></marker>
+              <marker id="t3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#ff9d54"/></marker>
+            </defs>
+          </svg>
+          <figcaption>Log in once → receive a token → attach it to every request in the <code>Authorization: Bearer &lt;token&gt;</code> header.</figcaption>
+        </figure>
+        <p>That <code>Bearer</code> word just means "whoever <em>bears</em> (carries) this token is treated as authenticated" — so guard your tokens carefully. Let's parse a bearer header the way a server would:</p>
+        <div class="code-wrap live">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">bearer-token.js (live)</span><span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">// What the server receives in req.headers.authorization:
+const authHeader = "Bearer eyJhbGciOiJIUzI1NiJ9.payload.signature";
+
+// Pull the token out of the "Bearer TOKEN" format:
+function extractToken(header) {
+  if (!header || !header.startsWith("Bearer ")) return null;
+  return header.slice("Bearer ".length).trim();
+}
+
+const token = extractToken(authHeader);
+console.log("Token:", token);
+
+// A JWT has 3 dot-separated parts: header.payload.signature
+const parts = token.split(".");
+console.log("Number of parts:", parts.length);
+console.log("Looks like a JWT?", parts.length === 3);
+
+// No header? That's a 401:
+console.log("Missing header ->", extractToken(undefined));
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout warn"><span class="ci">🔒</span><p><strong>Security essentials</strong> — even at beginner level, internalise these:</p></div>
+        <ul>
+          <li><strong>Always use HTTPS</strong> in production. Plain HTTP sends tokens and passwords as readable text anyone on the network can grab.</li>
+          <li><strong>Never trust the client.</strong> The browser can be modified; re-check permissions on the server for every protected action.</li>
+          <li><strong>Never store secrets in front-end code.</strong> Anything in your React bundle is public. API secret keys live on the server only.</li>
+          <li><strong>Hash passwords</strong> (e.g. with bcrypt) — never store them as plain text.</li>
+          <li><strong>Tokens expire.</strong> Short-lived tokens limit the damage if one leaks.</li>
+        </ul>
+      </section>
+
+      <section id="cors" class="section">
+        <h2>⑬ CORS explained — why the browser blocks you <span class="chip adv">Advanced</span></h2>
+        <p>You already met the <code>cors()</code> one-liner. Now let's understand <em>why</em> it's needed, because "CORS error" is the single most confusing message new full-stack developers hit.</p>
+        <h3>The same-origin policy</h3>
+        <p>For security, browsers enforce the <strong>same-origin policy</strong>: by default, JavaScript running on one <em>origin</em> may not read responses from a <em>different</em> origin. An <strong>origin</strong> is the combination of <em>protocol + host + port</em> — so <code>http://localhost:5173</code> and <code>http://localhost:4000</code> are <strong>different origins</strong> (different port), even though both are "localhost."</p>
+        <p>Why does this rule exist? Imagine you're logged into your bank in one tab. Without the same-origin policy, a malicious site in another tab could quietly fire requests to your bank's API using your logged-in session and read the responses. The policy stops that by default. CORS is the <strong>controlled, opt-in way</strong> for a server to say "actually, this specific other origin <em>is</em> allowed to read my responses."</p>
+        <h3>How the server opts in</h3>
+        <p>CORS works through <strong>response headers</strong>. When the server wants to allow a cross-origin caller, it adds a header like <code>Access-Control-Allow-Origin: http://localhost:5173</code>. The browser sees that header and permits your JavaScript to read the response. No header → the browser blocks it and logs a CORS error. Crucially, <strong>CORS is enforced by the browser, configured by the server</strong> — your front-end code can't "fix" it; the fix lives on the back-end.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">configuring CORS in Express</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import cors from "cors";
+
+// Wide open (fine for learning / public read-only APIs):
+app.use(cors());
+
+// Locked down to just your front-end (better for real apps):
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));</code></pre>
+        </div>
+        <h3>Preflight requests (the secret extra request)</h3>
+        <p>For "non-simple" requests — anything with a JSON body, a <code>PUT</code>/<code>DELETE</code>/<code>PATCH</code>, or an <code>Authorization</code> header — the browser does something clever first. Before sending your actual request, it sends an automatic <code>OPTIONS</code> request called a <strong>preflight</strong>, essentially asking "Hey server, am I allowed to send this?" If the server answers with the right CORS headers, the browser then sends the real request. If not, your real request never even leaves the browser.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 820 230" role="img" aria-label="CORS preflight request flow">
+            <rect x="40" y="90" width="150" height="60" rx="12" fill="#1b2030" stroke="#61dafb" stroke-width="2"/>
+            <text x="115" y="116" text-anchor="middle" fill="#fff" font-size="13">Browser</text>
+            <text x="115" y="135" text-anchor="middle" fill="#aab2c5" font-size="10">:5173</text>
+            <rect x="630" y="90" width="150" height="60" rx="12" fill="#1b2030" stroke="#3c873a" stroke-width="2"/>
+            <text x="705" y="116" text-anchor="middle" fill="#fff" font-size="13">API server</text>
+            <text x="705" y="135" text-anchor="middle" fill="#aab2c5" font-size="10">:4000</text>
+
+            <path d="M190,76 L628,76" stroke="#ffce5c" stroke-width="2" marker-end="url(#c1)"/>
+            <text x="409" y="68" text-anchor="middle" fill="#ffe08a" font-size="11" font-family="monospace">1. OPTIONS /api/tasks  (preflight: "may I?")</text>
+
+            <path d="M630,104 L192,104" stroke="#38d39f" stroke-width="2" marker-end="url(#c2)"/>
+            <text x="409" y="98" text-anchor="middle" fill="#9ee493" font-size="11" font-family="monospace">2. 204 + Access-Control-Allow-Origin: ...</text>
+
+            <path d="M190,160 L628,160" stroke="#6c8cff" stroke-width="2" marker-end="url(#c3)"/>
+            <text x="409" y="184" text-anchor="middle" fill="#cfe3ff" font-size="11" font-family="monospace">3. The REAL request: POST /api/tasks { ... }</text>
+            <text x="409" y="206" text-anchor="middle" fill="#7f8aa3" font-size="10">Only sent because the preflight was approved.</text>
+            <defs>
+              <marker id="c1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#ffce5c"/></marker>
+              <marker id="c2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#38d39f"/></marker>
+              <marker id="c3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6c8cff"/></marker>
+            </defs>
+          </svg>
+          <figcaption>For protected/complex requests, the browser quietly checks permission with an <code>OPTIONS</code> preflight before sending the real request.</figcaption>
+        </figure>
+        <div class="callout tip"><span class="ci">💡</span><p>Good news: the <code>cors()</code> middleware handles preflight <code>OPTIONS</code> requests for you automatically. You rarely write this logic by hand — but when a CORS error appears, you now know it's a <em>server configuration</em> issue, not a bug in your fetch call.</p></div>
+      </section>
+
+      <section id="design" class="section">
+        <h2>⑭ Good API design — the conventions <span class="chip adv">Advanced</span></h2>
+        <p>None of these rules are enforced by the computer — your code runs fine either way. They're <strong>conventions</strong> that make your API predictable to other developers (including future-you). Following them is the difference between an API people enjoy using and one they dread.</p>
+        <table>
+          <thead><tr><th>Do ✅</th><th>Avoid ❌</th></tr></thead>
+          <tbody>
+            <tr><td><code>GET /api/tasks</code> (plural nouns)</td><td><code>GET /api/getTasks</code> (verb in URL)</td></tr>
+            <tr><td><code>DELETE /api/tasks/5</code></td><td><code>GET /api/deleteTask?id=5</code></td></tr>
+            <tr><td>Return <code>201</code> after creating</td><td>Always returning <code>200</code></td></tr>
+            <tr><td>Nest related: <code>/api/users/3/tasks</code></td><td>Flat, ambiguous URLs</td></tr>
+            <tr><td>Validate input, return <code>400/422</code> on bad data</td><td>Trusting whatever the client sends</td></tr>
+          </tbody>
+        </table>
+
+        <h3>The big ideas behind those rules</h3>
+        <ul>
+          <li><strong>Resources are nouns, methods are verbs.</strong> The URL should name a <em>thing</em> (<code>/tasks</code>), never an action (<code>/getTasks</code>). The action is already expressed by the HTTP method. So <code>GET /tasks</code>, not <code>/getTasks</code>; <code>DELETE /tasks/5</code>, not <code>/deleteTask</code>.</li>
+          <li><strong>Use plural nouns consistently.</strong> <code>/tasks</code> for the collection, <code>/tasks/5</code> for one item in it. Pick plural and stick with it everywhere — mixing <code>/task</code> and <code>/tasks</code> is a constant source of bugs.</li>
+          <li><strong>Nest to show relationships.</strong> "The tasks belonging to user 3" reads naturally as <code>/api/users/3/tasks</code>. But don't over-nest — more than two levels deep gets unwieldy; switch to query params instead.</li>
+          <li><strong>Be predictable.</strong> If <code>/tasks</code> behaves a certain way, <code>/users</code> and <code>/projects</code> should behave the same way. Consistency means a developer who learns one endpoint already understands the rest.</li>
+        </ul>
+
+        <h3>Statelessness — what it means and why it matters</h3>
+        <p>The "ST" in REST hints at it, but the key principle is that REST APIs are <strong>stateless</strong>: <em>each request must contain everything the server needs to handle it.</em> The server doesn't remember anything about you between requests — no "we were in the middle of something." If a request needs to know who you are, it carries that proof itself (the <code>Authorization</code> token), every single time.</p>
+        <p>Why is that a good thing? Because it makes your API <strong>scalable and reliable</strong>. If the server keeps no per-client memory, you can run ten copies of it behind a load balancer and it doesn't matter which copy handles your next request — they're all interchangeable. If a server crashes and restarts, no conversation is lost, because there was no conversation to lose. Each request stands alone.</p>
+        <div class="callout key"><span class="ci">🔑</span><p>Stateless doesn't mean "no data is stored" — your tasks still live in the database. It means the <em>server process</em> holds no memory of previous requests from a given client. Identity and context ride along <em>in each request</em>, not in the server's head.</p></div>
+        <div class="callout info"><span class="ci">💡</span><p><strong>Test your API without a front-end</strong> using a tool like <a href="https://www.postman.com" target="_blank" rel="noopener">Postman</a>, the VS Code "REST Client" extension, or <code>curl</code> — see the <a href="#testing">testing section</a> for hands-on examples.</p></div>
+      </section>
+
+      <section id="versioning" class="section">
+        <h2>⑮ Versioning &amp; rate limiting <span class="chip adv">Advanced</span></h2>
+        <h3>API versioning — <code>/api/v1/...</code></h3>
+        <p>Once real apps depend on your API, you can't freely change it — a change that breaks the response shape would break every client overnight. The solution is to put a <strong>version number in the URL</strong>: <code>/api/v1/tasks</code>. When you need to make breaking changes, you publish <code>/api/v2/tasks</code> and leave <code>v1</code> running. Old clients keep working on v1; new clients move to v2 at their own pace.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">versioned routes</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">app.use("/api/v1/tasks", tasksRouterV1);   // the original API
+app.use("/api/v2/tasks", tasksRouterV2);   // new shape, old one still works
+
+// Clients choose which they target:
+//   GET /api/v1/tasks   -> stable, unchanged forever
+//   GET /api/v2/tasks   -> new features / new response shape</code></pre>
+        </div>
+        <div class="callout tip"><span class="ci">💡</span><p>You don't need versioning on day one of a hobby project. But knowing the convention means that when you see <code>/v1/</code> in real APIs, you understand it's a promise: "this shape won't break under you."</p></div>
+
+        <h3>Rate limiting — protecting your API</h3>
+        <p>Without limits, one buggy script (or one bad actor) could hammer your API with thousands of requests a second, slowing it to a crawl for everyone or running up your bills. <strong>Rate limiting</strong> caps how many requests a given client may make in a window of time — say 100 requests per minute. Exceed it and the server replies <code>429 Too Many Requests</code>, often with a <code>Retry-After</code> header telling you when to try again.</p>
+        <div class="callout info"><span class="ci">🛡️</span><p>In Express you'd add this with a middleware like <code>express-rate-limit</code> — a few lines that track requests per IP and reject the excess. The takeaway for now: APIs protect themselves, and <code>429</code> means "you're going too fast, back off."</p></div>
+      </section>
+
+      <section id="testing" class="section">
+        <h2>⑯ Testing &amp; exploring APIs <span class="chip inter">Intermediate</span></h2>
+        <p>You don't need a finished React front-end to test your back-end — and you shouldn't wait for one. Build and test your API in isolation first. Three tools make this easy:</p>
+        <ul>
+          <li><strong>Postman</strong> — a friendly app with buttons and forms. Great for poking at APIs visually and saving collections of requests.</li>
+          <li><strong>VS Code REST Client</strong> — an extension where you write requests in a <code>.http</code> file right next to your code and click "Send." No leaving the editor.</li>
+          <li><strong><code>curl</code></strong> — a command-line tool built into macOS/Linux (and modern Windows). No install, scriptable, and great to understand because it maps so directly onto the raw HTTP you saw earlier.</li>
+        </ul>
+        <p>Here are the three workhorse <code>curl</code> commands. Try them against your own Express server once it's running:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">curl — GET (read)</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js"># Read all tasks (GET is the default, so no -X needed)
+curl http://localhost:4000/api/tasks
+
+# Read one task
+curl http://localhost:4000/api/tasks/1
+
+# Add -i to also see the status line and headers in the reply
+curl -i http://localhost:4000/api/tasks/1</code></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">curl — POST (create, with JSON body)</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js"># Create a task. -X sets the method, -H sets a header, -d sends the body.
+curl -X POST http://localhost:4000/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Walk the dog"}'
+
+# Notice the two pieces that MUST match what Express expects:
+#   -H "Content-Type: application/json"  -> so express.json() parses it
+#   -d '{...}'                           -> the JSON body itself</code></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">curl — DELETE, and sending a token</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js"># Delete task 2
+curl -X DELETE http://localhost:4000/api/tasks/2
+
+# A protected request, attaching a bearer token:
+curl http://localhost:4000/api/tasks \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.xxx.yyy"</code></pre>
+        </div>
+        <div class="callout tip"><span class="ci">💡</span><p>See how <code>curl</code> mirrors everything you learned? <code>-X</code> is the method, <code>-H</code> adds headers, <code>-d</code> is the body. It's the raw HTTP request from section ① made typeable. Master this and you can test any API anywhere.</p></div>
+      </section>
+
+      <section id="styles" class="section">
+        <h2>⑰ REST vs GraphQL vs gRPC <span class="chip adv">Advanced</span></h2>
+        <p>REST is the most common API style, but not the only one. You don't need these for the course — this is just so the names don't surprise you later.</p>
+        <div class="callout info"><span class="ci">🔭</span><p><strong>REST</strong> — resources at URLs, standard HTTP verbs, usually JSON. Simple, universal, easy to cache and debug. The right default, and what this whole module teaches.<br/><br/>
+        <strong>GraphQL</strong> — one endpoint where the client sends a <em>query</em> describing exactly the fields it wants. Great when different screens need different slices of data and you want to avoid over- or under-fetching. More setup to learn.<br/><br/>
+        <strong>gRPC</strong> — a fast, binary protocol built for <em>service-to-service</em> communication inside large systems. Very efficient, but not something a browser talks to directly. You'll meet it in big back-end architectures.</p></div>
+        <div class="callout key"><span class="ci">🔑</span><p>Start with REST. It's the lingua franca of the web, it's what 90% of jobs and tutorials use, and the concepts (methods, status codes, headers, JSON) transfer to <em>every</em> other style. Learn the others later, when a real need appears.</p></div>
+      </section>
+
+      <section id="quiz" class="section">
+        <h2>Quiz</h2>
+        <div class="quiz">
+          <div class="q">1. Which method would you use to create a new task?</div>
+          <div class="opt" data-correct="false">GET</div>
+          <div class="opt" data-correct="true">POST</div>
+          <div class="opt" data-correct="false">DELETE</div>
+          <div class="explain">✅ POST creates new resources. GET reads, PUT updates, DELETE removes.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">2. You get a <code>404</code> response. What does it mean?</div>
+          <div class="opt" data-correct="true">The resource wasn't found</div>
+          <div class="opt" data-correct="false">The server crashed</div>
+          <div class="opt" data-correct="false">Success</div>
+          <div class="explain">✅ 404 Not Found — there's no resource at that URL. It's a 4xx, so it's a client-side issue (wrong URL/id).</div>
+        </div>
+        <div class="quiz">
+          <div class="q">3. A <code>500</code> error usually means…</div>
+          <div class="opt" data-correct="false">You sent invalid data</div>
+          <div class="opt" data-correct="true">The server's code threw an error — check its logs</div>
+          <div class="opt" data-correct="false">You need to log in</div>
+          <div class="explain">✅ 5xx = server's fault. Something in your back-end code broke; the terminal running your server will show the error.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">4. What turns a JavaScript object into text you can send over the network?</div>
+          <div class="opt" data-correct="false">JSON.parse()</div>
+          <div class="opt" data-correct="true">JSON.stringify()</div>
+          <div class="opt" data-correct="false">fetch()</div>
+          <div class="explain">✅ <code>JSON.stringify(obj)</code> → text (to send). <code>JSON.parse(text)</code> → object (after receiving).</div>
+        </div>
+        <div class="quiz">
+          <div class="q">5. You only want to change a task's <code>done</code> field, leaving everything else alone. Which method best expresses that?</div>
+          <div class="opt" data-correct="false">PUT (send the whole object)</div>
+          <div class="opt" data-correct="true">PATCH (send only the changed field)</div>
+          <div class="opt" data-correct="false">POST</div>
+          <div class="explain">✅ PATCH = partial update; send just <code>{ "done": true }</code>. PUT means "replace the whole resource," so it expects all fields.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">6. Which header tells the server "the body I'm sending is JSON"?</div>
+          <div class="opt" data-correct="false">Accept</div>
+          <div class="opt" data-correct="true">Content-Type</div>
+          <div class="opt" data-correct="false">Authorization</div>
+          <div class="explain">✅ <code>Content-Type: application/json</code> describes THIS message's body. <code>Accept</code> describes what you want back; <code>Authorization</code> carries your token.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">7. You see a "CORS error" in the browser console. Where is the fix?</div>
+          <div class="opt" data-correct="false">In your React fetch call</div>
+          <div class="opt" data-correct="true">On the server — it must send the right CORS headers</div>
+          <div class="opt" data-correct="false">In the browser settings</div>
+          <div class="explain">✅ CORS is enforced by the browser but configured by the server. You allow the origin server-side (e.g. the <code>cors()</code> middleware in Express).</div>
+        </div>
+        <div class="quiz">
+          <div class="q">8. A user is logged in but tries to delete someone else's data. The best status code is…</div>
+          <div class="opt" data-correct="false">401 Unauthorized</div>
+          <div class="opt" data-correct="true">403 Forbidden</div>
+          <div class="opt" data-correct="false">404 Not Found</div>
+          <div class="explain">✅ 403 = "I know who you are, but you're not allowed." 401 means "I don't know who you are" (not authenticated).</div>
+        </div>
+        <div class="quiz">
+          <div class="q">9. Why validate input on the server even if the form already checks it on the client?</div>
+          <div class="opt" data-correct="true">Client checks can be bypassed; only the server can be trusted</div>
+          <div class="opt" data-correct="false">It makes the page load faster</div>
+          <div class="opt" data-correct="false">Server validation is optional and just nice-to-have</div>
+          <div class="explain">✅ Never trust the client. Anyone can bypass front-end checks with curl or dev tools. Server validation is the real defence.</div>
+        </div>
+      </section>
+
+      <section id="takeaways" class="section">
+        <h2>Key takeaways</h2>
+        <div class="card">
+          <ul>
+            <li>A <strong>REST API</strong> exposes <strong>resources</strong> (URLs, named with plural nouns) acted on by <strong>HTTP methods</strong>.</li>
+            <li>Every request/response is <strong>first line · headers · blank line · body</strong>. Headers carry metadata (<code>Content-Type</code>, <code>Accept</code>, <code>Authorization</code>).</li>
+            <li><strong>GET/POST/PUT/PATCH/DELETE</strong> map to CRUD. <strong>PUT replaces</strong>, <strong>PATCH partially updates</strong>. GET is safe; GET/PUT/DELETE are idempotent; <strong>POST is neither</strong>.</li>
+            <li><strong>Status codes:</strong> 2xx success, 3xx redirect, 4xx client's fault, 5xx server's fault. Know 200/201/204, 400/401/403/404/422/429, 500.</li>
+            <li>Data travels as <strong>JSON</strong> (<code>JSON.stringify</code> / <code>JSON.parse</code>); use <strong>one consistent error shape</strong> like <code>{ error: { message, code } }</code>.</li>
+            <li><strong>Query params</strong> (<code>?status=active&amp;page=2&amp;limit=20</code>) filter, sort, and paginate. <strong>Always validate on the server</strong> — never trust the client.</li>
+            <li><strong>Auth:</strong> authentication = "who are you?" (401), authorization = "what may you do?" (403). Tokens flow in the <code>Authorization: Bearer</code> header. Always use HTTPS.</li>
+            <li><strong>CORS</strong> is the browser's same-origin policy; the <em>server</em> opts in via headers. <strong>Versioning</strong> (<code>/api/v1/</code>) and <strong>rate limiting</strong> (429) keep APIs stable and safe.</li>
+            <li>Test with <strong>Postman</strong>, the <strong>REST Client</strong>, or <strong>curl</strong> — no front-end required. REST is the default style; GraphQL/gRPC come later.</li>
+          </ul>
+          <label class="complete-toggle"><input type="checkbox" data-module="rest" /> Mark this module complete</label>
+        </div>
+      </section>
+
+      <div class="pager">
+        <a href="04-node.html" class="prev"><div class="dir">← Previous</div><div class="ttl">3 · Node.js</div></a>
+        <a href="06-database.html" class="next"><div class="dir">Next →</div><div class="ttl">5 · Database (MSSQL)</div></a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>DevLaunch Academy · Module 4 of 6</p>
+  <div class="signature" aria-label="Author signature">
+    <span class="sig-br">/**</span>
+    <span class="sig-line"><span class="sig-tag">* @author</span>&nbsp; Sumanth Reddy Pathi</span>
+    <span class="sig-line"><span class="sig-tag">* @role</span>&nbsp;&nbsp;&nbsp; Software Engineer · 7+ yrs — Web · AI &amp; MedTech</span>
+    <span class="sig-line"><span class="sig-tag">* @company</span> Compliance Group</span>
+    <span class="sig-br">*/<span class="sig-caret">&nbsp;▌</span></span>
+  </div>
+</footer>
+<script src="assets/app.js"></script>
+<script>
+  // In-browser mock REST API for the explorer
+  (function () {
+    let tasks = [
+      { id: 1, title: "Learn REST", done: true },
+      { id: 2, title: "Build an API", done: false },
+      { id: 3, title: "Connect React", done: false },
+    ];
+    let nextId = 4;
+
+    function handle(method, url, body) {
+      const m = url.match(/^\/api\/tasks(?:\/(\d+))?\/?$/);
+      if (!m) return { status: 404, statusText: "Not Found", json: { error: "Unknown route. Try /api/tasks" } };
+      const id = m[1] ? Number(m[1]) : null;
+
+      if (method === "GET" && id === null) return { status: 200, statusText: "OK", json: tasks };
+      if (method === "GET") {
+        const t = tasks.find((x) => x.id === id);
+        return t ? { status: 200, statusText: "OK", json: t } : { status: 404, statusText: "Not Found", json: { error: `No task with id ${id}` } };
+      }
+      if (method === "POST") {
+        if (!body || !body.title) return { status: 400, statusText: "Bad Request", json: { error: "title is required" } };
+        const t = { id: nextId++, title: body.title, done: false };
+        tasks.push(t);
+        return { status: 201, statusText: "Created", json: t };
+      }
+      if (method === "PUT") {
+        const t = tasks.find((x) => x.id === id);
+        if (!t) return { status: 404, statusText: "Not Found", json: { error: `No task with id ${id}` } };
+        if (body && body.title !== undefined) t.title = body.title;
+        if (body && body.done !== undefined) t.done = body.done;
+        return { status: 200, statusText: "OK", json: t };
+      }
+      if (method === "DELETE") {
+        const before = tasks.length;
+        tasks = tasks.filter((x) => x.id !== id);
+        if (tasks.length === before) return { status: 404, statusText: "Not Found", json: { error: `No task with id ${id}` } };
+        return { status: 204, statusText: "No Content", json: null };
+      }
+      return { status: 405, statusText: "Method Not Allowed", json: { error: method + " not supported here" } };
+    }
+
+    const methodEl = document.getElementById("api-method");
+    const urlEl = document.getElementById("api-url");
+    const bodyEl = document.getElementById("api-body");
+    const reqEl = document.getElementById("api-req");
+    const resEl = document.getElementById("api-res");
+    const statusEl = document.getElementById("api-status");
+
+    document.getElementById("api-send").addEventListener("click", () => {
+      const method = methodEl.value;
+      const url = urlEl.value.trim();
+      let body = null;
+      const needsBody = method === "POST" || method === "PUT";
+      if (needsBody) {
+        try { body = JSON.parse(bodyEl.value || "{}"); }
+        catch (e) {
+          statusEl.innerHTML = '<span class="status-pill" style="background:rgba(255,107,107,.2);color:#ff6b6b;">400 Bad JSON</span>';
+          resEl.textContent = "Your request body isn't valid JSON.";
+          reqEl.textContent = method + " " + url;
+          return;
+        }
+      }
+      reqEl.textContent = method + " " + url + (needsBody ? "\n\n" + JSON.stringify(body, null, 2) : "");
+      const r = handle(method, url, body);
+      const ok = r.status >= 200 && r.status < 300;
+      const color = ok ? "rgba(56,211,159,.2);color:#38d39f" : r.status < 500 ? "rgba(255,206,92,.2);color:#ffce5c" : "rgba(255,107,107,.2);color:#ff6b6b";
+      statusEl.innerHTML = '<span class="status-pill" style="background:' + color + ';">' + r.status + " " + r.statusText + "</span>";
+      resEl.textContent = r.json === null ? "(no content)" : JSON.stringify(r.json, null, 2);
+    });
+  })();
+</script>
+</body>
+</html>

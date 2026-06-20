@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 12: Image Generation — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="4">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch12-image-generation.html" class="current">Part 4: Generative AI</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Generative AI</a> / <span class="current">Image Generation</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 12 · Part 4 of 7 · Generative AI —</div>
+
+  <h1 class="page-title">Generating Images: <em>Diffusion</em></h1>
+  <p class="page-subtitle">Take random noise. Slowly remove it, guided by a text description. After 30 steps, an image appears. That's it. That's how Midjourney, DALL-E, and Stable Diffusion work.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#kid">Kid Translation: Sculpting Out of Static</a></li>
+      <li><a href="#core-idea">The Core Idea: Reverse the Noising</a></li>
+      <li><a href="#how-it-works">How a Diffusion Model Works in 4 Steps</a></li>
+      <li><a href="#latent">Latent Diffusion: The Speedup That Changed Everything</a></li>
+      <li><a href="#text-to-image">How Text Becomes an Image: CLIP &amp; Conditioning</a></li>
+      <li><a href="#models">The Big Image Models</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="kid">Kid Translation: Sculpting Out of Static</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Imagine you have a TV stuck on the no-signal static — pure visual noise. Now imagine a magical sculptor who can <em>slowly remove</em> noise, a little at a time. After one pass, you can vaguely see something. After 10 passes, fuzzy shapes. After 30, a clear picture of "an astronaut riding a horse on Mars."</p>
+    <p>The sculptor's superpower: they were trained on millions of images, each shown to them with progressively more noise added. They learned exactly how noise hides images. So now, given any noise, they can run that knowledge in <em>reverse</em> and pull an image out of it.</p>
+    <p>That's diffusion. Add noise during training (easy — just sprinkle it on). Learn to undo each noise step. At generation time, start from pure noise and run the model backward, with a text prompt telling it what to "find" in the noise.</p>
+  </div>
+
+  <h2 id="core-idea">The Core Idea: Reverse the Noising</h2>
+
+  <p>The training process is genius in its simplicity. Take a real image. Add a tiny bit of random Gaussian noise. The model's job: predict what noise was just added, so we can subtract it back out.</p>
+
+  <p>Repeat with bigger and bigger noise levels until the image is pure static. Each level is a separate training example. After training, the model has a deep understanding of "what noise looks like at every level of corruption" — and equivalently, "how to remove a bit of noise to make any image more like a real image."</p>
+
+  <figure>
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr12a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+        </marker>
+        <pattern id="noise1" patternUnits="userSpaceOnUse" width="3" height="3"><rect width="3" height="3" fill="#888"/><circle cx="0" cy="0" r="1" fill="#222"/><circle cx="2" cy="2" r="0.5" fill="#fff"/></pattern>
+        <pattern id="noise2" patternUnits="userSpaceOnUse" width="3" height="3"><rect width="3" height="3" fill="#aaa"/><circle cx="1" cy="1" r="0.7" fill="#444"/></pattern>
+      </defs>
+
+      <!-- Direction label -->
+      <text x="350" y="25" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#6b6b6b" letter-spacing="1.5">TRAINING: ADD NOISE LEFT → RIGHT. GENERATION: REMOVE NOISE RIGHT → LEFT.</text>
+
+      <!-- Step 0: Real image -->
+      <rect x="30" y="60" width="100" height="100" rx="4" fill="#ffd9c4"/>
+      <circle cx="80" cy="100" r="22" fill="#f5b685"/>
+      <circle cx="70" cy="93" r="3" fill="#1a1a1a"/>
+      <circle cx="90" cy="93" r="3" fill="#1a1a1a"/>
+      <path d="M 70 110 Q 80 118 90 110" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+      <rect x="55" y="120" width="50" height="30" fill="#7d9bbd"/>
+      <text x="80" y="180" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b6b6b">t=0</text>
+      <text x="80" y="195" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">Real image</text>
+
+      <line x1="135" y1="110" x2="170" y2="110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr12a)"/>
+
+      <!-- Step 1: Slight noise -->
+      <rect x="170" y="60" width="100" height="100" rx="4" fill="#e6d8c0"/>
+      <circle cx="220" cy="100" r="22" fill="#dfc5a4" opacity="0.85"/>
+      <circle cx="210" cy="93" r="3" fill="#444"/>
+      <circle cx="230" cy="93" r="3" fill="#444"/>
+      <path d="M 210 110 Q 220 118 230 110" fill="none" stroke="#444" stroke-width="2"/>
+      <rect x="195" y="120" width="50" height="30" fill="#a4b3c4" opacity="0.85"/>
+      <rect x="170" y="60" width="100" height="100" rx="4" fill="url(#noise2)" opacity="0.25"/>
+      <text x="220" y="180" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b6b6b">t=10</text>
+      <text x="220" y="195" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">Light noise</text>
+
+      <line x1="275" y1="110" x2="310" y2="110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr12a)"/>
+
+      <!-- Step 2: Medium noise -->
+      <rect x="310" y="60" width="100" height="100" rx="4" fill="#bbb"/>
+      <rect x="310" y="60" width="100" height="100" rx="4" fill="url(#noise2)" opacity="0.65"/>
+      <circle cx="360" cy="100" r="22" fill="#bda897" opacity="0.4"/>
+      <text x="360" y="180" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b6b6b">t=20</text>
+      <text x="360" y="195" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">Heavy noise</text>
+
+      <line x1="415" y1="110" x2="450" y2="110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr12a)"/>
+
+      <!-- Step 3: pure static -->
+      <rect x="450" y="60" width="100" height="100" rx="4" fill="#aaa"/>
+      <rect x="450" y="60" width="100" height="100" rx="4" fill="url(#noise1)"/>
+      <text x="500" y="180" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b6b6b">t=30</text>
+      <text x="500" y="195" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">Pure noise</text>
+
+      <!-- Reverse direction label -->
+      <line x1="540" y1="230" x2="100" y2="230" stroke="#b54a3b" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arr12b)"/>
+      <defs><marker id="arr12b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b54a3b"/></marker></defs>
+      <text x="320" y="252" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-style="italic" fill="#8b3a2e">Generation: model removes noise step by step, guided by a text prompt</text>
+    </svg>
+    <p class="diagram-caption">The forward process (add noise) is the training data. The reverse process (remove noise) is what the model learns. Generation = run reverse, starting from random.</p>
+  </figure>
+
+  <h2 id="how-it-works">How a Diffusion Model Works in 4 Steps</h2>
+
+  <ol class="steps">
+    <li><strong>Start with random noise.</strong> A grid of random pixel values, same shape as the image you want to generate.</li>
+    <li><strong>Predict the noise.</strong> Feed the noisy image and the text prompt into the model. The model predicts "here's what noise to remove from this image at this step."</li>
+    <li><strong>Subtract a fraction of the predicted noise.</strong> The image becomes slightly less noisy and slightly more like a real image matching the prompt.</li>
+    <li><strong>Repeat 20–50 times.</strong> Each step is a "denoising" pass. Final result: a clean image.</li>
+  </ol>
+
+  <p>Each step the model is asking "what real image is hiding in this noise that matches the prompt?" After 30 such guesses, refining each time, an image emerges.</p>
+
+  <h2 id="latent">Latent Diffusion: The Speedup That Changed Everything</h2>
+
+  <p>Pixel-space diffusion is slow — running denoising on a 1024×1024 image means processing a million-dimensional vector each step. The breakthrough that made image generation practical was <strong>latent diffusion</strong>.</p>
+
+  <p>Idea: instead of denoising in pixel space, denoise in a much smaller "latent space" learned by an autoencoder.</p>
+
+  <ol class="steps">
+    <li><strong>Train a separate autoencoder</strong> that compresses 1024×1024 images into a 64×64 latent representation, and decompresses back to images.</li>
+    <li><strong>Run diffusion in the latent space</strong> — much faster, since 64×64 is 256× smaller than 1024×1024.</li>
+    <li><strong>Decode the final latent into a pixel image.</strong></li>
+  </ol>
+
+  <p>This is what powered <strong>Stable Diffusion</strong> when it released in 2022 — the first open-weight, runs-on-your-laptop image generator. Stable Diffusion's open release democratized image AI overnight, kicked off thousands of forks and models, and forced commercial competitors to dramatically improve.</p>
+
+  <h2 id="text-to-image">How Text Becomes an Image: CLIP &amp; Conditioning</h2>
+
+  <p>For diffusion to be guided by text, the model needs to understand what your prompt <em>means</em>. This is where <strong>CLIP</strong> (or similar text encoders) come in.</p>
+
+  <p>CLIP, developed by OpenAI in 2021, was trained on 400 million image-caption pairs from the internet. It learns a shared embedding space for images and text — meaning the vector for the photo of a cat sits near the vector for the caption "a cat."</p>
+
+  <p>In a diffusion model, your text prompt is encoded into a CLIP embedding. That embedding is fed into the denoising network as <em>conditioning</em> — at every step, it nudges the prediction toward "what kind of noise pattern would lead to an image matching this caption?"</p>
+
+  <p>This is also where you'll hear about <strong>classifier-free guidance (CFG)</strong>: a trick where the model runs both with and without conditioning, and the difference is amplified. Higher CFG = more strict adherence to the prompt (sometimes too strict). Lower CFG = more creative freedom (sometimes ignores the prompt).</p>
+
+  <h2 id="models">The Big Image Models</h2>
+
+  <table class="compare-table">
+    <thead><tr><th>Model</th><th>Maker</th><th>Notable</th></tr></thead>
+    <tbody>
+      <tr><td><strong>DALL-E 3</strong></td><td>OpenAI</td><td>Strong prompt adherence; integrated into ChatGPT.</td></tr>
+      <tr><td><strong>Midjourney</strong></td><td>Midjourney</td><td>Most aesthetic by default; preferred by artists. Discord-based UI.</td></tr>
+      <tr><td><strong>Stable Diffusion / SDXL / SD3</strong></td><td>Stability AI</td><td>Open weights. Foundation of the entire local-image-AI ecosystem.</td></tr>
+      <tr><td><strong>Flux</strong> (.1, .2)</td><td>Black Forest Labs</td><td>2024–25 open-weight model with state-of-the-art quality. Often beats commercial models.</td></tr>
+      <tr><td><strong>Imagen</strong></td><td>Google</td><td>Frontier-quality, especially photorealism.</td></tr>
+      <tr><td><strong>Firefly</strong></td><td>Adobe</td><td>Trained only on licensed/owned data; commercial-safe outputs.</td></tr>
+      <tr><td><strong>Ideogram</strong></td><td>Ideogram AI</td><td>Excellent text rendering inside images (a long-standing weak point).</td></tr>
+    </tbody>
+  </table>
+
+  <p>Beyond pure text-to-image, the field has expanded fast: <strong>inpainting</strong> (edit a region of an existing image), <strong>outpainting</strong> (extend an image), <strong>ControlNet</strong> (guide generation with edge maps, poses, depth maps), <strong>LoRA fine-tunes</strong> (cheaply adapt a base model to a specific style or subject).</p>
+
+  <div class="callout-warn">
+    <div class="callout-label">⚠ The hard parts diffusion still struggles with</div>
+    <p>Hands and fingers (notoriously). Coherent text inside the image (improving fast). Multi-subject scenes with specific spatial relationships ("a red ball to the left of a blue cube on top of a green table"). Counting (asking for "exactly 4 people" often gives 3 or 5).</p>
+  </div>
+
+  <div class="key-point">
+    Diffusion is profound: the model learns the universe of possible images by learning to undo noise. Generation is just running that knowledge in reverse, conditioned on what you want to see.
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · How to sound fluent</div>
+    <p>"<strong>Latent diffusion model (LDM)</strong>" — what most modern image models are. "<strong>U-Net</strong>" — the specific neural net architecture used inside diffusion's denoising step.</p>
+    <p>"<strong>CFG scale</strong>" or "<strong>guidance scale</strong>" — controls how strictly the output follows the prompt. 7 is typical; lower = more creative, higher = more literal.</p>
+    <p>"<strong>Sampler</strong>" — the algorithm used to step through the denoising. DDIM, DPM++, Euler — different speed/quality tradeoffs. Most users never touch these.</p>
+    <p>"<strong>ControlNet</strong>" — auxiliary networks that condition diffusion on additional inputs (edge maps, poses, depth). The Photoshop-superpower extension to text-to-image.</p>
+    <p>"<strong>LoRA</strong>" — small fine-tunes that adapt a base diffusion model to a specific style, character, or domain. Tens of thousands of community LoRAs exist for Stable Diffusion.</p>
+    <p>"<strong>Img2img</strong>" — using an existing image as a starting point instead of pure noise. The basis of style transfer and editing.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself · Answer out loud</div>
+    <ol>
+      <li>What's the simple intuition behind how diffusion models work?
+        <details><summary>Answer</summary><p>They're trained to remove a small amount of noise from images. To generate, start from pure noise and run the model many times in sequence — each step, the image becomes slightly more like a real one matching your prompt.</p></details>
+      </li>
+      <li>What problem does latent diffusion solve?
+        <details><summary>Answer</summary><p>Speed and memory. Running diffusion on full-resolution pixels is expensive. Latent diffusion runs in a smaller, learned latent space and decodes to pixels at the end — typically 50–100× faster.</p></details>
+      </li>
+      <li>What's CLIP's role in text-to-image generation?
+        <details><summary>Answer</summary><p>It encodes text and images into a shared embedding space. The text prompt's CLIP embedding becomes the conditioning signal that steers the denoising at each step.</p></details>
+      </li>
+      <li>What does increasing CFG (classifier-free guidance) do?
+        <details><summary>Answer</summary><p>It strengthens how strictly the output follows the prompt. Too high = oversaturated, distorted images. Too low = ignores prompts. The default of ~7 is usually good.</p></details>
+      </li>
+      <li>Why is Stable Diffusion historically important even if it's not the best model anymore?
+        <details><summary>Answer</summary><p>It was the first high-quality image model with open weights — meaning anyone could run it locally, fine-tune it, build on it. That sparked the entire ecosystem of community models, ControlNet, LoRAs, and personalized image AI.</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <h3>Recommended next reading</h3>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Jay Alammar: "The Illustrated Stable Diffusion"</strong> · jalammar.github.io · Free · Visual walkthrough of how diffusion works end-to-end.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Lilian Weng: "What are Diffusion Models?"</strong> · lilianweng.github.io · Free · The technical reference; rigorous and thorough.</span>
+      </li>
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"Denoising Diffusion Probabilistic Models"</strong> by Ho et al. (2020) — the foundational diffusion paper. ~25 pages. Math-heavy but worth the skim.</span>
+      </li>
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"High-Resolution Image Synthesis with Latent Diffusion Models"</strong> by Rombach et al. (2022) — the Stable Diffusion paper.</span>
+      </li>
+      <li>
+        <span class="ref-type video">Video</span>
+        <span class="ref-detail"><strong>Computerphile: "How AI Image Generators Work (Stable Diffusion / DALL-E)"</strong> · YouTube · ~17 min · Clear introductory walkthrough.</span>
+      </li>
+      <li>
+        <span class="ref-type tool">Tool</span>
+        <span class="ref-detail"><strong>Hugging Face Diffusers library</strong> · github.com/huggingface/diffusers · Free · Run open diffusion models in 3 lines of Python. The standard library.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch11-reasoning-models.html">← Previous: Reasoning Models</a>
+    <div class="nav-spacer"></div>
+    <a href="ch13-video-audio.html">Next: Video &amp; Audio →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 12 · Part 4 · Generative AI · Chapter 12 of 24</div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 2: How Machines Learn — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="1">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch02-how-machines-learn.html" class="current">Part 1: Foundations</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Foundations</a> / <span class="current">How Machines Learn</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 02 · Part 1 of 7 · Foundations —</div>
+
+  <h1 class="page-title">How Machines <em>Learn</em></h1>
+  <p class="page-subtitle">The big idea: instead of writing rules, we show examples. The machine figures out the pattern.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#analogy">Analogy: Learning to Throw a Basketball</a></li>
+      <li><a href="#core-loop">The Core Learning Loop</a></li>
+      <li><a href="#three-styles">Three Styles of Learning</a></li>
+      <li><a href="#supervised">Supervised Learning (with examples)</a></li>
+      <li><a href="#unsupervised">Unsupervised Learning (find patterns yourself)</a></li>
+      <li><a href="#reinforcement">Reinforcement Learning (learn by doing)</a></li>
+      <li><a href="#training-vs-inference">Training vs Inference</a></li>
+      <li><a href="#overfitting">Overfitting: When AI Memorizes Instead of Learns</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="analogy">Analogy: Learning to Throw a Basketball</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Imagine you're learning to shoot baskets. Nobody can hand you a perfect throwing formula — there's no equation that says "lift arm 45.7 degrees, push with 12.3 newtons of force." So how do you learn?</p>
+    <p>You <strong>try</strong>. You miss. You see <em>how</em> you missed. You adjust. You try again. Slowly, your brain figures out the pattern: "less arm angle when I'm closer, more when I'm farther; bend my knees more if my arms are tired."</p>
+    <p>Nobody told you these rules. You <em>discovered</em> them by trying many times and noticing what worked. That's machine learning — but it's the machine, not you, doing the trying-and-adjusting.</p>
+  </div>
+
+  <p>The ancient way of programming was: <strong>tell the computer exactly what to do</strong>. The new way is: <strong>show the computer examples and let it figure out the rules</strong>. This shift — from explicit rules to learned patterns — is what makes modern AI work.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ar3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+        </marker>
+      </defs>
+
+      <!-- Old way -->
+      <rect x="30" y="30" width="290" height="220" fill="#fff7ed" stroke="#c4651f" stroke-width="2" rx="6"/>
+      <text x="175" y="55" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#c4651f">OLD WAY · TRADITIONAL CODE</text>
+
+      <rect x="60" y="80" width="100" height="40" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" rx="3"/>
+      <text x="110" y="105" text-anchor="middle" font-family="Newsreader, serif" font-size="13" fill="#1a1a1a">Rules</text>
+
+      <rect x="190" y="80" width="100" height="40" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" rx="3"/>
+      <text x="240" y="105" text-anchor="middle" font-family="Newsreader, serif" font-size="13" fill="#1a1a1a">Data</text>
+
+      <text x="175" y="155" text-anchor="middle" font-family="Newsreader, serif" font-size="22" font-weight="700" fill="#c4651f">↓</text>
+
+      <rect x="115" y="170" width="120" height="40" fill="#1a1a1a" rx="3"/>
+      <text x="175" y="195" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700" fill="white">Answers</text>
+
+      <text x="175" y="234" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">Programmer writes the rules.</text>
+
+      <!-- New way -->
+      <rect x="380" y="30" width="290" height="220" fill="#e8f0f7" stroke="#2d6a8e" stroke-width="2" rx="6"/>
+      <text x="525" y="55" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#2d6a8e">NEW WAY · MACHINE LEARNING</text>
+
+      <rect x="410" y="80" width="100" height="40" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" rx="3"/>
+      <text x="460" y="105" text-anchor="middle" font-family="Newsreader, serif" font-size="13" fill="#1a1a1a">Data</text>
+
+      <rect x="540" y="80" width="100" height="40" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" rx="3"/>
+      <text x="590" y="105" text-anchor="middle" font-family="Newsreader, serif" font-size="13" fill="#1a1a1a">Answers</text>
+
+      <text x="525" y="155" text-anchor="middle" font-family="Newsreader, serif" font-size="22" font-weight="700" fill="#2d6a8e">↓</text>
+
+      <rect x="465" y="170" width="120" height="40" fill="#2d6a8e" rx="3"/>
+      <text x="525" y="195" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700" fill="white">Rules</text>
+
+      <text x="525" y="234" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">Machine discovers the rules.</text>
+    </svg>
+    <div class="diagram-caption">The conceptual flip behind machine learning. We feed the system data + answers; it produces rules. Then we use those rules on new data.</div>
+  </div>
+
+  <h2 id="core-loop">The Core Learning Loop</h2>
+
+  <p>Every machine learning system, from a simple spam filter to GPT-5, works on the same basic loop. It looks complicated only because there are billions of tiny adjustments happening at once. Let's strip it back to the bones.</p>
+
+  <ol class="steps">
+    <li><strong>Make a Guess</strong>The machine starts dumb. It has random "settings" (called <em>weights</em> or <em>parameters</em>). When given input, it produces nonsense output.</li>
+    <li><strong>Compare to the Right Answer</strong>We know what the answer <em>should</em> be (because we labeled the training data). We measure how wrong the guess was — this number is called the <strong>loss</strong>.</li>
+    <li><strong>Adjust the Settings</strong>The machine tweaks its internal weights slightly in the direction that would have made the loss smaller. This step uses calculus (don't worry — Chapter 5 covers it kid-style).</li>
+    <li><strong>Repeat Millions of Times</strong>Loop steps 1–3 with different examples. After enough rounds, the weights settle into a configuration that makes good guesses on data it has never seen before.</li>
+  </ol>
+
+  <div class="diagram">
+    <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ar4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2d6a8e"/>
+        </marker>
+      </defs>
+
+      <!-- Title -->
+      <text x="350" y="30" text-anchor="middle" font-family="Newsreader, serif" font-size="14" font-weight="700" fill="#1a1a1a">The Training Loop</text>
+
+      <!-- Box: Training Data -->
+      <rect x="20" y="130" width="120" height="60" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" rx="4"/>
+      <text x="80" y="155" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700" fill="#1a1a1a">Training Data</text>
+      <text x="80" y="172" text-anchor="middle" font-family="Newsreader, serif" font-size="10" font-style="italic" fill="#6b6b6b">input + correct answer</text>
+
+      <!-- Arrow to Model -->
+      <line x1="140" y1="160" x2="195" y2="160" stroke="#2d6a8e" stroke-width="2" marker-end="url(#ar4)"/>
+
+      <!-- Box: Model (guess) -->
+      <rect x="200" y="130" width="120" height="60" fill="#e8f0f7" stroke="#2d6a8e" stroke-width="2" rx="4"/>
+      <text x="260" y="153" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700" fill="#1a1a1a">Model</text>
+      <text x="260" y="168" text-anchor="middle" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">(makes a guess)</text>
+      <text x="260" y="183" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#2d6a8e">weights: w₁, w₂…</text>
+
+      <!-- Arrow to Loss -->
+      <line x1="320" y1="160" x2="375" y2="160" stroke="#2d6a8e" stroke-width="2" marker-end="url(#ar4)"/>
+
+      <!-- Box: Loss -->
+      <rect x="380" y="130" width="120" height="60" fill="#fff7ed" stroke="#c4651f" stroke-width="2" rx="4"/>
+      <text x="440" y="153" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700" fill="#1a1a1a">Loss</text>
+      <text x="440" y="168" text-anchor="middle" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">(how wrong?)</text>
+      <text x="440" y="183" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#c4651f">e.g. 0.84</text>
+
+      <!-- Arrow to Adjust -->
+      <line x1="500" y1="160" x2="555" y2="160" stroke="#2d6a8e" stroke-width="2" marker-end="url(#ar4)"/>
+
+      <!-- Box: Adjust -->
+      <rect x="560" y="130" width="120" height="60" fill="#f0e8f7" stroke="#5b3a8b" stroke-width="2" rx="4"/>
+      <text x="620" y="153" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700" fill="#1a1a1a">Adjust Weights</text>
+      <text x="620" y="170" text-anchor="middle" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">(gradient descent)</text>
+      <text x="620" y="184" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#5b3a8b">tweak w₁, w₂…</text>
+
+      <!-- Loop back arrow -->
+      <path d="M 620 190 Q 620 250, 350 250 Q 80 250, 80 190" fill="none" stroke="#2d6a8e" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#ar4)"/>
+      <text x="350" y="275" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#2d6a8e">REPEAT MILLIONS OF TIMES</text>
+      <text x="350" y="293" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#6b6b6b">Each pass through all the data is called an "epoch"</text>
+    </svg>
+    <div class="diagram-caption">The training loop. This is the heart of every machine learning system, big or small.</div>
+  </div>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Picture a kid learning to spell "cat":</p>
+    <p>Day 1: They write "kxt" — wrong. (Big loss.) The teacher gently corrects them. Their brain remembers a tiny bit better.</p>
+    <p>Day 2: They write "kat" — closer! (Smaller loss.) Brain adjusts again.</p>
+    <p>Day 5: They write "cat." Correct! (Loss = 0.) Brain locks it in.</p>
+    <p>That's exactly what a neural network does, except instead of "remembering better," it changes <em>numbers</em> inside itself called weights. And instead of one kid learning one word, it's millions of weights learning millions of patterns at the same time.</p>
+  </div>
+
+  <h2 id="three-styles">Three Styles of Learning</h2>
+
+  <p>Not all learning is the same. In ML there are three big families, each suited to a different kind of problem.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg">
+      <!-- Supervised -->
+      <rect x="20" y="40" width="210" height="290" fill="#e8f0f7" stroke="#2d6a8e" stroke-width="2" rx="6"/>
+      <text x="125" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#2d6a8e">STYLE 1</text>
+      <text x="125" y="92" text-anchor="middle" font-family="Newsreader, serif" font-size="18" font-weight="700" fill="#1a1a1a">Supervised</text>
+      <text x="125" y="110" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">"learn from examples</text>
+      <text x="125" y="125" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">with answer keys"</text>
+
+      <text x="35" y="155" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">Show the machine:</text>
+      <text x="35" y="173" font-family="JetBrains Mono, monospace" font-size="11" fill="#1a4a68">• 🐈 → "cat"</text>
+      <text x="35" y="191" font-family="JetBrains Mono, monospace" font-size="11" fill="#1a4a68">• 🐕 → "dog"</text>
+      <text x="35" y="209" font-family="JetBrains Mono, monospace" font-size="11" fill="#1a4a68">• 🐈 → "cat"</text>
+      <text x="35" y="227" font-family="JetBrains Mono, monospace" font-size="11" fill="#1a4a68">• 🐕 → "dog"</text>
+
+      <text x="35" y="258" font-family="Newsreader, serif" font-size="11" font-weight="700" fill="#1a1a1a">Used for:</text>
+      <text x="35" y="276" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">classification,</text>
+      <text x="35" y="291" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">prediction, OCR,</text>
+      <text x="35" y="306" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">spam detection</text>
+
+      <!-- Unsupervised -->
+      <rect x="245" y="40" width="210" height="290" fill="#f0fdf4" stroke="#2d8a5e" stroke-width="2" rx="6"/>
+      <text x="350" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#2d8a5e">STYLE 2</text>
+      <text x="350" y="92" text-anchor="middle" font-family="Newsreader, serif" font-size="18" font-weight="700" fill="#1a1a1a">Unsupervised</text>
+      <text x="350" y="110" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">"find patterns yourself,</text>
+      <text x="350" y="125" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">no labels given"</text>
+
+      <text x="260" y="155" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">Show the machine:</text>
+      <text x="260" y="173" font-family="JetBrains Mono, monospace" font-size="11" fill="#0d4a26">• 🐈 🐈 🐕 🐕</text>
+      <text x="260" y="191" font-family="JetBrains Mono, monospace" font-size="11" fill="#0d4a26">• 🐕 🐈 🐈 🐕</text>
+      <text x="260" y="209" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">"figure out the groups"</text>
+
+      <text x="260" y="240" font-family="Newsreader, serif" font-size="11" font-weight="700" fill="#1a1a1a">Output:</text>
+      <text x="260" y="258" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">"I see 2 clusters."</text>
+
+      <text x="260" y="280" font-family="Newsreader, serif" font-size="11" font-weight="700" fill="#1a1a1a">Used for:</text>
+      <text x="260" y="298" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">customer segments,</text>
+      <text x="260" y="313" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">anomaly detection</text>
+
+      <!-- Reinforcement -->
+      <rect x="470" y="40" width="210" height="290" fill="#fff7ed" stroke="#c4651f" stroke-width="2" rx="6"/>
+      <text x="575" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#c4651f">STYLE 3</text>
+      <text x="575" y="92" text-anchor="middle" font-family="Newsreader, serif" font-size="18" font-weight="700" fill="#1a1a1a">Reinforcement</text>
+      <text x="575" y="110" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">"try things; get rewarded</text>
+      <text x="575" y="125" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">or punished"</text>
+
+      <text x="485" y="155" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">The machine acts:</text>
+      <text x="485" y="173" font-family="JetBrains Mono, monospace" font-size="11" fill="#7a3815">• move left → +1</text>
+      <text x="485" y="191" font-family="JetBrains Mono, monospace" font-size="11" fill="#7a3815">• move up → -1</text>
+      <text x="485" y="209" font-family="JetBrains Mono, monospace" font-size="11" fill="#7a3815">• jump → +5</text>
+
+      <text x="485" y="240" font-family="Newsreader, serif" font-size="11" font-weight="700" fill="#1a1a1a">Goal:</text>
+      <text x="485" y="258" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">maximize reward.</text>
+
+      <text x="485" y="280" font-family="Newsreader, serif" font-size="11" font-weight="700" fill="#1a1a1a">Used for:</text>
+      <text x="485" y="298" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">games (AlphaGo),</text>
+      <text x="485" y="313" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">robotics, RLHF</text>
+    </svg>
+    <div class="diagram-caption">The three classical styles of machine learning. Modern AI (LLMs) blends all three across different training stages.</div>
+  </div>
+
+  <h2 id="supervised">Supervised Learning</h2>
+
+  <p>The most common style. The word "supervised" just means: <strong>someone supervised by labeling the training data</strong>. The machine sees both inputs and the right answers, and learns the mapping.</p>
+
+  <div class="example">
+    <div class="example-label">Real example: Gmail spam filter</div>
+    <p>Google has billions of emails labeled by users as "spam" or "not spam" (every time you click that "report spam" button, you're supervising). They feed all of these into a model. The model learns the patterns — language, sender behavior, link patterns — that distinguish spam from real mail.</p>
+    <p>When a new email arrives, the model classifies it. You never wrote a single rule. The machine inferred them all.</p>
+  </div>
+
+  <div class="example">
+    <div class="example-label">Real example: Predicting house prices</div>
+    <p>You have a spreadsheet of 50,000 houses with square footage, neighborhood, age, number of bedrooms — and the price they sold for. The price is the "label." Train a supervised model on this, and you can now predict the price of a house that hasn't sold yet.</p>
+  </div>
+
+  <h3>Two flavors of supervised learning</h3>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Flavor</th>
+        <th>Output type</th>
+        <th>Example</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Classification</strong></td>
+        <td>A category (spam / not-spam, cat / dog / horse)</td>
+        <td>"Is this email spam?"</td>
+      </tr>
+      <tr>
+        <td><strong>Regression</strong></td>
+        <td>A number (a price, a temperature, a count)</td>
+        <td>"What price will this house sell for?"</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="unsupervised">Unsupervised Learning</h2>
+
+  <p>Sometimes you don't have labels. You just have a pile of data, and you want the machine to find structure in it. This is unsupervised learning.</p>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Imagine you dump out a giant box of LEGO and ask the machine: "sort these into piles." Nobody told it the categories — color? size? shape? It has to <em>discover</em> that LEGO comes in groups, and figure out which groups make sense.</p>
+    <p>It might split them by color. Or by shape. Or by something weird like "pieces with bumps on top vs flat ones." The machine gives you back groups you didn't ask for — and sometimes those groups reveal something interesting.</p>
+  </div>
+
+  <div class="example">
+    <div class="example-label">Real example: Spotify's "Daily Mix" playlists</div>
+    <p>Spotify groups your listening history into clusters of similar music. They never told the algorithm "this is jazz, this is hip-hop." The algorithm noticed that some songs cluster together based on listening patterns — and called those clusters "Daily Mix 1, 2, 3, 4."</p>
+  </div>
+
+  <div class="example">
+    <div class="example-label">Real example: Credit card fraud detection</div>
+    <p>Banks don't have a label that says "this transaction is fraud" until <em>after</em> the fraud happens. Instead they use unsupervised learning to find <em>anomalies</em> — transactions that don't fit any typical cluster. Those get flagged for review.</p>
+  </div>
+
+  <h2 id="reinforcement">Reinforcement Learning</h2>
+
+  <p>This is the most interesting style — and the one most like how kids actually learn. Instead of being given examples, the machine gets to <em>act</em> in an environment, and gets <strong>rewards</strong> for doing well or <strong>punishments</strong> for doing poorly. Over time, it learns which actions lead to rewards.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ar5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#c4651f"/>
+        </marker>
+      </defs>
+
+      <!-- Agent -->
+      <circle cx="180" cy="140" r="60" fill="#fff7ed" stroke="#c4651f" stroke-width="2"/>
+      <text x="180" y="135" text-anchor="middle" font-family="Newsreader, serif" font-size="16" font-weight="700" fill="#1a1a1a">Agent</text>
+      <text x="180" y="155" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#6b6b6b">(the learner)</text>
+
+      <!-- Environment -->
+      <rect x="430" y="80" width="200" height="120" fill="#f0fdf4" stroke="#2d8a5e" stroke-width="2" rx="6"/>
+      <text x="530" y="120" text-anchor="middle" font-family="Newsreader, serif" font-size="16" font-weight="700" fill="#1a1a1a">Environment</text>
+      <text x="530" y="140" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#6b6b6b">(the world / game)</text>
+      <text x="530" y="170" text-anchor="middle" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">Maze, chess board,</text>
+      <text x="530" y="184" text-anchor="middle" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">video game, real world</text>
+
+      <!-- Action arrow -->
+      <path d="M 240 110 Q 350 80, 430 110" fill="none" stroke="#c4651f" stroke-width="2" marker-end="url(#ar5)"/>
+      <text x="335" y="78" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#c4651f">ACTION</text>
+      <text x="335" y="93" text-anchor="middle" font-family="Newsreader, serif" font-size="10" font-style="italic" fill="#6b6b6b">"move left"</text>
+
+      <!-- Reward + state arrow -->
+      <path d="M 430 170 Q 350 200, 240 170" fill="none" stroke="#2d8a5e" stroke-width="2" marker-end="url(#ar5)"/>
+      <text x="335" y="218" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#2d8a5e">REWARD + NEW STATE</text>
+      <text x="335" y="233" text-anchor="middle" font-family="Newsreader, serif" font-size="10" font-style="italic" fill="#6b6b6b">"+1 point, you're now at (3,2)"</text>
+
+      <text x="350" y="265" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">The agent learns: which actions, in which states, lead to the most total reward over time.</text>
+    </svg>
+    <div class="diagram-caption">The reinforcement learning loop. Agent acts → environment responds with reward and new state → agent updates strategy → repeat.</div>
+  </div>
+
+  <div class="example">
+    <div class="example-label">Real example: AlphaGo beating the world champion</div>
+    <p>Google DeepMind's AlphaGo learned the board game Go by playing millions of games against itself. Each game ended in a win or loss — that's the reward. There were no human-labeled examples of "good moves." The machine discovered, through self-play, strategies that no human had ever thought of. In 2016 it beat Lee Sedol, one of the best human players ever.</p>
+  </div>
+
+  <div class="example">
+    <div class="example-label">Real example: Training Claude or ChatGPT to be helpful</div>
+    <p>Modern LLMs use a special variant called <strong>RLHF — Reinforcement Learning from Human Feedback</strong>. Humans rate which of two AI responses is better. The model learns to produce responses humans prefer. We'll cover this in detail in Chapter 10.</p>
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · Industry vocabulary</div>
+    <p><strong>Labels</strong> — the "right answers" attached to training data. <strong>Labeled data</strong> is expensive (humans have to label it); <strong>unlabeled data</strong> is cheap (the internet is full of it).</p>
+    <p><strong>Loss function</strong> — the math that measures "how wrong" a guess is. Common ones: <strong>cross-entropy</strong> (for classification), <strong>MSE</strong> / mean-squared-error (for regression).</p>
+    <p><strong>Gradient descent</strong> — the technique for "rolling downhill" on the loss to find better weights. <strong>Backpropagation</strong> ("backprop") is how we calculate which way is downhill in a multi-layer network.</p>
+    <p><strong>Epoch</strong> — one full pass through the training data. Models typically train for tens to hundreds of epochs.</p>
+    <p><strong>RLHF</strong> — Reinforcement Learning from Human Feedback. The technique that made ChatGPT actually helpful instead of just a fancy autocomplete.</p>
+  </div>
+
+  <h2 id="training-vs-inference">Training vs Inference</h2>
+
+  <p>This distinction comes up constantly in AI conversations. Two completely different phases of an AI's life:</p>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Training</th>
+        <th>Inference</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>What's happening</strong></td>
+        <td>The model is <em>learning</em> from data. Weights are being adjusted.</td>
+        <td>The model is <em>using</em> what it learned. Weights are frozen.</td>
+      </tr>
+      <tr>
+        <td><strong>When</strong></td>
+        <td>Once, before deployment. Takes weeks to months for big models.</td>
+        <td>Every time you use the model. Takes milliseconds to seconds.</td>
+      </tr>
+      <tr>
+        <td><strong>Cost</strong></td>
+        <td>Massive. GPT-4 reportedly cost $100M+ to train.</td>
+        <td>Per-query, much smaller — but adds up across millions of users.</td>
+      </tr>
+      <tr>
+        <td><strong>Hardware</strong></td>
+        <td>Thousands of GPUs running in parallel for weeks.</td>
+        <td>One or a few GPUs per request.</td>
+      </tr>
+      <tr>
+        <td><strong>Analogy</strong></td>
+        <td>Going to school for 12 years.</td>
+        <td>Using what you learned to answer one question.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    Once an AI model is trained, it's frozen. When you chat with ChatGPT, you're doing inference — you are not teaching it anything. The model you're talking to has already been trained and shipped.
+  </div>
+
+  <h2 id="overfitting">Overfitting: When AI Memorizes Instead of Learns</h2>
+
+  <p>One of the most important concepts in machine learning. When a model "overfits," it has memorized the training data so perfectly that it fails on anything new.</p>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Imagine a kid studying for a math test by memorizing the exact answers to the practice questions: "Question 3 is 47. Question 7 is 12." On the practice quiz they get a perfect score!</p>
+    <p>Then the real test arrives — different numbers. They have no idea what to do. They never actually learned <em>multiplication</em> — they just learned the answers.</p>
+    <p>That's overfitting. The model "got the practice quiz right" but didn't learn the underlying skill.</p>
+  </div>
+
+  <div class="diagram">
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+      <!-- 3 panels: underfit, good, overfit -->
+
+      <!-- Underfit -->
+      <rect x="20" y="30" width="200" height="180" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5" rx="4"/>
+      <text x="120" y="50" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700" fill="#c2410c">Underfit</text>
+      <text x="120" y="65" text-anchor="middle" font-family="Newsreader, serif" font-size="10" font-style="italic" fill="#6b6b6b">too simple — misses the pattern</text>
+      <!-- scatter -->
+      <circle cx="50" cy="180" r="3" fill="#1a1a1a"/>
+      <circle cx="70" cy="170" r="3" fill="#1a1a1a"/>
+      <circle cx="90" cy="155" r="3" fill="#1a1a1a"/>
+      <circle cx="110" cy="135" r="3" fill="#1a1a1a"/>
+      <circle cx="130" cy="120" r="3" fill="#1a1a1a"/>
+      <circle cx="150" cy="100" r="3" fill="#1a1a1a"/>
+      <circle cx="170" cy="95" r="3" fill="#1a1a1a"/>
+      <circle cx="190" cy="85" r="3" fill="#1a1a1a"/>
+      <!-- straight line (too simple) -->
+      <line x1="40" y1="190" x2="200" y2="80" stroke="#c2410c" stroke-width="2"/>
+      <text x="120" y="235" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#c2410c">High training error</text>
+      <text x="120" y="250" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#c2410c">High test error</text>
+
+      <!-- Good fit -->
+      <rect x="240" y="30" width="200" height="180" fill="#ffffff" stroke="#2d8a5e" stroke-width="2" rx="4"/>
+      <text x="340" y="50" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700" fill="#2d8a5e">Just Right</text>
+      <text x="340" y="65" text-anchor="middle" font-family="Newsreader, serif" font-size="10" font-style="italic" fill="#6b6b6b">captures the real pattern</text>
+      <!-- scatter -->
+      <circle cx="270" cy="180" r="3" fill="#1a1a1a"/>
+      <circle cx="290" cy="170" r="3" fill="#1a1a1a"/>
+      <circle cx="310" cy="155" r="3" fill="#1a1a1a"/>
+      <circle cx="330" cy="135" r="3" fill="#1a1a1a"/>
+      <circle cx="350" cy="120" r="3" fill="#1a1a1a"/>
+      <circle cx="370" cy="100" r="3" fill="#1a1a1a"/>
+      <circle cx="390" cy="95" r="3" fill="#1a1a1a"/>
+      <circle cx="410" cy="85" r="3" fill="#1a1a1a"/>
+      <!-- smooth curve -->
+      <path d="M 260 195 Q 340 130, 420 80" fill="none" stroke="#2d8a5e" stroke-width="2"/>
+      <text x="340" y="235" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#2d8a5e">Low training error</text>
+      <text x="340" y="250" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#2d8a5e">Low test error</text>
+
+      <!-- Overfit -->
+      <rect x="460" y="30" width="220" height="180" fill="#ffffff" stroke="#5b3a8b" stroke-width="2" rx="4"/>
+      <text x="570" y="50" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700" fill="#5b3a8b">Overfit</text>
+      <text x="570" y="65" text-anchor="middle" font-family="Newsreader, serif" font-size="10" font-style="italic" fill="#6b6b6b">memorized noise — not pattern</text>
+      <!-- scatter -->
+      <circle cx="490" cy="180" r="3" fill="#1a1a1a"/>
+      <circle cx="510" cy="170" r="3" fill="#1a1a1a"/>
+      <circle cx="530" cy="155" r="3" fill="#1a1a1a"/>
+      <circle cx="550" cy="135" r="3" fill="#1a1a1a"/>
+      <circle cx="570" cy="120" r="3" fill="#1a1a1a"/>
+      <circle cx="590" cy="100" r="3" fill="#1a1a1a"/>
+      <circle cx="610" cy="95" r="3" fill="#1a1a1a"/>
+      <circle cx="630" cy="85" r="3" fill="#1a1a1a"/>
+      <!-- wiggly line through every point -->
+      <path d="M 480 190 Q 490 175, 510 175 Q 525 145, 530 158 Q 540 130, 550 138 Q 560 110, 570 123 Q 580 95, 590 103 Q 600 90, 610 98 Q 620 80, 640 80" fill="none" stroke="#5b3a8b" stroke-width="2"/>
+      <text x="570" y="235" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b3a8b">Low training error</text>
+      <text x="570" y="250" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b3a8b">HIGH test error</text>
+    </svg>
+    <div class="diagram-caption">The three states of fit. The middle one is the goal. Overfitting is sneaky — it looks great on training data, then fails in the real world.</div>
+  </div>
+
+  <h3>How do we detect overfitting?</h3>
+
+  <p>We split the data into <strong>three</strong> sets:</p>
+
+  <ul>
+    <li><strong>Training set</strong> (~70% of data) — the model learns from this.</li>
+    <li><strong>Validation set</strong> (~15%) — the model is tested on this <em>during</em> training to tune things.</li>
+    <li><strong>Test set</strong> (~15%) — the model is evaluated on this <em>after</em> training. Never seen before.</li>
+  </ul>
+
+  <p>If the model scores 99% on the training set but 60% on the test set, it overfit. If it scores 80% on both — even though that's lower — it actually <em>learned</em>.</p>
+
+  <div class="callout-tip">
+    <div class="callout-label">★ Key insight</div>
+    <p>"Generalization" is the holy grail of ML — performing well on data you've never seen. A model that perfectly memorizes the training data but fails on new data has zero practical value.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself</div>
+    <ol>
+      <li>What's the four-step training loop? Describe it without looking back.</li>
+      <li>What's the difference between supervised, unsupervised, and reinforcement learning? Give one real-world example of each.</li>
+      <li>What does it mean for a model to "overfit"? Why is it dangerous?</li>
+      <li>What's the difference between training and inference? Which one happens when you chat with ChatGPT?</li>
+      <li>Your friend says, "I'm going to use ML to find unusual patterns in our website's traffic logs — but we don't have labels." Which style of learning should they use?</li>
+    </ol>
+    <details>
+      <summary>Show answers</summary>
+      <ol>
+        <li>(1) Make a guess; (2) compare to right answer (compute loss); (3) adjust weights toward less wrong; (4) repeat millions of times.</li>
+        <li>Supervised: labeled data (Gmail spam filter). Unsupervised: no labels, find patterns (Spotify Daily Mixes, fraud anomaly detection). Reinforcement: act + get reward (AlphaGo, RLHF).</li>
+        <li>Overfit = model memorizes training data instead of learning the underlying pattern. Dangerous because it scores great on training data but fails on real-world data.</li>
+        <li>Training = learning, weights changing, expensive, happens once. Inference = using, weights frozen, fast, happens every query. Chatting with ChatGPT = inference.</li>
+        <li>Unsupervised learning, specifically anomaly detection — they want patterns/clusters without having labels.</li>
+      </ol>
+    </details>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <div class="references-label">📚 To go deeper on this chapter's ideas</div>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type book">Book</span>
+        <span class="ref-detail"><strong>"The Hundred-Page Machine Learning Book"</strong> by Andriy Burkov — read <em>chapters 1–3 (pp. 1–45)</em>. The fastest, clearest tour of ML basics in print.</span>
+      </li>
+      <li>
+        <span class="ref-type book">Book</span>
+        <span class="ref-detail"><strong>"Hands-On Machine Learning"</strong> by Aurélien Géron — read <em>Chapter 1 (pp. 1–32)</em>. Excellent, practical introduction. The whole book is gold if you want to actually build ML systems.</span>
+      </li>
+      <li>
+        <span class="ref-type video">Video</span>
+        <span class="ref-detail"><strong>"Machine Learning Explained in 100 Seconds"</strong> by Fireship · YouTube · ~2 min · A quick warm-up if you want a fast refresher anytime.</span>
+      </li>
+      <li>
+        <span class="ref-type video">Video</span>
+        <span class="ref-detail"><strong>"Gradient Descent, How Neural Networks Learn"</strong> by 3Blue1Brown · YouTube · ~21 min · Deep, beautiful visual explanation of the training loop.</span>
+      </li>
+      <li>
+        <span class="ref-type course">Course</span>
+        <span class="ref-detail"><strong>"Machine Learning Specialization"</strong> by Andrew Ng on Coursera · 3 courses · ~3 months · The classic. If you want to go from this chapter to building real ML systems, this is the path.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>"A Visual Introduction to Machine Learning"</strong> by R2D3 · r2d3.us · Free · Beautiful interactive scrollable explanation of how a decision tree learns. Best 10 minutes you'll spend.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch01-what-is-ai.html">← Previous: What Is AI?</a>
+    <div class="nav-spacer"></div>
+    <a href="ch03-neural-networks.html">Next: Neural Networks →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Part 1 · Foundations · Chapter 2 of 24</div>
+</footer>
+
+</body>
+</html>

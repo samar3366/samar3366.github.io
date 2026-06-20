@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 19: AI Agents — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="6">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch19-agents.html" class="current">Part 6: Agents</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Agents</a> / <span class="current">AI Agents</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 19 · Part 6 of 7 · Agents &amp; The Future —</div>
+
+  <h1 class="page-title">AI <em>Agents</em></h1>
+  <p class="page-subtitle">A chatbot answers a question. An agent <em>does something</em> — picks tools, takes actions, observes the world, and keeps going until the job is done. This shift is the biggest change in how AI is used.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#kid">Kid Translation: Chatbot vs. Errand-Runner</a></li>
+      <li><a href="#what-is-agent">What Makes Something an Agent</a></li>
+      <li><a href="#react">The ReAct Loop: Reason → Act → Observe</a></li>
+      <li><a href="#planning">Planning &amp; Memory</a></li>
+      <li><a href="#autonomy">The Autonomy Spectrum</a></li>
+      <li><a href="#real-agents">Real Agents in 2026</a></li>
+      <li><a href="#failure-modes">Failure Modes &amp; Why Agents Are Hard</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="kid">Kid Translation: Chatbot vs. Errand-Runner</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Imagine your aunt asks: "Hey, can you help me figure out what to make for dinner?" If you're a <strong>chatbot</strong>, you say "Pasta!" and the conversation ends.</p>
+    <p>If you're an <strong>agent</strong>, you go check the fridge, see what's there, look up a recipe online, notice we're out of garlic, write it on the shopping list, walk to the store, buy garlic, come back, and start cooking. You don't ask permission for every step. You decide which tools to use (fridge, internet, store) and just go.</p>
+    <p>That's the leap. A chatbot generates text. An agent <em>takes actions in the world</em>, observes the results, and adjusts. It can fail, retry, replan, and combine tools — until the goal is met.</p>
+  </div>
+
+  <h2 id="what-is-agent">What Makes Something an Agent</h2>
+
+  <p>The word "agent" is overused. Marketing calls everything an agent. The useful working definition has four ingredients:</p>
+
+  <ol class="steps">
+    <li><strong>A goal.</strong> Not just "answer this prompt" but "complete this task." Could be open-ended or specific.</li>
+    <li><strong>Tools it can use.</strong> Functions, APIs, browsers, file systems, code execution — things that let it affect the world or gather information.</li>
+    <li><strong>A loop.</strong> The agent runs many LLM calls, not one. Each step it decides what to do, does it, sees the result, decides again.</li>
+    <li><strong>Some degree of autonomy.</strong> It chooses its own next steps. It's not a workflow with hardcoded if/else; the LLM is making decisions.</li>
+  </ol>
+
+  <p>If a system does just one of these, it's not really an agent. A chatbot is missing #2, #3, and #4. A workflow with API calls is missing #4. A code interpreter that executes one snippet you wrote is missing #1 and #3. An agent has all four.</p>
+
+  <h2 id="react">The ReAct Loop: Reason → Act → Observe</h2>
+
+  <p>The dominant pattern for building agents is <strong>ReAct</strong> (Reasoning + Acting), introduced in 2022. The loop is simple:</p>
+
+  <figure>
+    <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr19a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+        </marker>
+      </defs>
+
+      <!-- Goal at top -->
+      <rect x="240" y="20" width="220" height="40" rx="6" fill="#fff8e1" stroke="#d4a017" stroke-width="2"/>
+      <text x="350" y="38" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#8b6914" letter-spacing="0.5">GOAL</text>
+      <text x="350" y="54" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic">"Book me a flight to Tokyo next Friday"</text>
+
+      <!-- Down arrow -->
+      <line x1="350" y1="62" x2="350" y2="92" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr19a)"/>
+
+      <!-- Three boxes in circle -->
+      <!-- Reason -->
+      <rect x="80" y="100" width="160" height="70" rx="8" fill="#e0eff5" stroke="#1f6f8b" stroke-width="2"/>
+      <text x="160" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#1a4a68" letter-spacing="0.5">1. REASON</text>
+      <text x="160" y="145" text-anchor="middle" font-family="Newsreader, serif" font-size="12">"I should search</text>
+      <text x="160" y="160" text-anchor="middle" font-family="Newsreader, serif" font-size="12">for flights first."</text>
+
+      <line x1="245" y1="135" x2="295" y2="135" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr19a)"/>
+
+      <!-- Act -->
+      <rect x="300" y="100" width="160" height="70" rx="8" fill="#fdf0e3" stroke="#b54a3b" stroke-width="2"/>
+      <text x="380" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#8b3a2e" letter-spacing="0.5">2. ACT</text>
+      <text x="380" y="145" text-anchor="middle" font-family="Newsreader, serif" font-size="12">Call search_flights(</text>
+      <text x="380" y="160" text-anchor="middle" font-family="Newsreader, serif" font-size="12">"Tokyo", "Friday")</text>
+
+      <line x1="465" y1="135" x2="515" y2="135" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr19a)"/>
+
+      <!-- Observe -->
+      <rect x="520" y="100" width="160" height="70" rx="8" fill="#f0e8f7" stroke="#6b4a8b" stroke-width="2"/>
+      <text x="600" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#5b3a8b" letter-spacing="0.5">3. OBSERVE</text>
+      <text x="600" y="145" text-anchor="middle" font-family="Newsreader, serif" font-size="12">"Found 12 flights,</text>
+      <text x="600" y="160" text-anchor="middle" font-family="Newsreader, serif" font-size="12">cheapest $830"</text>
+
+      <!-- Loop arrow back -->
+      <path d="M 600 175 Q 600 230 350 240 Q 100 230 100 175" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr19a)"/>
+      <text x="350" y="248" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-style="italic" fill="#3a3a3a">repeat until goal achieved or stop condition</text>
+
+      <!-- End -->
+      <rect x="240" y="265" width="220" height="40" rx="6" fill="#1a1a1a" stroke="#000" stroke-width="2"/>
+      <text x="350" y="290" text-anchor="middle" font-family="Newsreader, serif" font-size="13" fill="#fff" font-style="italic">"Booked: AA 167, $832, departs 9:15am"</text>
+    </svg>
+    <p class="diagram-caption">The ReAct loop. Each iteration: the LLM thinks about what to do, picks an action (tool call), and reads the result. Repeats until the goal is met or it gives up.</p>
+  </figure>
+
+  <p>Crucially, the agent's "reasoning" is just text the LLM generates — saying things like "I should call X next, because Y." This makes the agent's decisions visible and debuggable. Modern reasoning models (Chapter 11) make ReAct dramatically more reliable because their internal planning is more thorough.</p>
+
+  <h2 id="planning">Planning &amp; Memory</h2>
+
+  <p>For non-trivial tasks, ReAct alone isn't enough. Two extensions matter:</p>
+
+  <p><strong>Planning.</strong> Before acting, the agent generates a multi-step plan: "Step 1, search for flights. Step 2, evaluate options. Step 3, check user calendar. Step 4, propose top 3..." Then it executes. Plans can be revised when the world doesn't match expectations. Patterns: Plan-and-Execute, Reflexion, Tree of Thoughts.</p>
+
+  <p><strong>Memory.</strong> Three flavors:</p>
+
+  <ul>
+    <li><strong>Working memory</strong>: the current conversation/context window. Lost when the session ends.</li>
+    <li><strong>Episodic memory</strong>: a log of past interactions, retrievable later. "Remember last week you set my preferred airline to JAL."</li>
+    <li><strong>Semantic memory</strong>: extracted, distilled facts the agent stores about the user, world, or its own past. "User prefers window seats. User has TSA PreCheck."</li>
+  </ul>
+
+  <p>Without memory, every session is amnesiac. With it, agents become genuinely persistent. Most production agent systems implement memory using some combination of vector DBs (semantic) and structured stores (episodic/profile data).</p>
+
+  <h2 id="autonomy">The Autonomy Spectrum</h2>
+
+  <p>"Agent" isn't binary. There's a spectrum of autonomy, and the right level depends on the task.</p>
+
+  <table class="compare-table">
+    <thead><tr><th>Level</th><th>What it means</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1. Suggest</strong></td><td>AI proposes; human picks.</td><td>Autocomplete, draft replies.</td></tr>
+      <tr><td><strong>2. Confirm-then-act</strong></td><td>AI proposes a specific action; human approves each.</td><td>"Send this email? [Y/N]"</td></tr>
+      <tr><td><strong>3. Tool-calling chatbot</strong></td><td>AI calls read-only tools (search, fetch) without asking.</td><td>ChatGPT browsing, Claude with web search.</td></tr>
+      <tr><td><strong>4. Bounded agent</strong></td><td>AI takes write actions inside a sandbox or scoped permissions.</td><td>Claude Code in a repo, Cursor agents, Devin.</td></tr>
+      <tr><td><strong>5. Open-ended agent</strong></td><td>AI runs autonomously toward a goal, with broad tool access.</td><td>OpenAI Operator, computer-use agents, full coding agents.</td></tr>
+    </tbody>
+  </table>
+
+  <p>As autonomy increases, so does both leverage and risk. A level-2 system can't really hurt anything. A level-5 system in production needs careful guardrails, audit logs, and rollback plans.</p>
+
+  <h2 id="real-agents">Real Agents in 2026</h2>
+
+  <ul>
+    <li><strong>Coding agents</strong> — Claude Code, Cursor, GitHub Copilot Workspace, Devin, Cognition. They read codebases, plan changes, write and test code, and submit PRs. Among the most successful agent applications.</li>
+    <li><strong>Computer-use agents</strong> — Anthropic's Claude Computer Use, OpenAI Operator, Microsoft Copilot. They see your screen, click, type, fill out forms.</li>
+    <li><strong>Browser/web agents</strong> — book travel, do research, fill out applications. Adept, MultiOn, Browser Use.</li>
+    <li><strong>Customer-service agents</strong> — handle tickets end-to-end, with tool access to billing, shipping, and account systems.</li>
+    <li><strong>Research agents</strong> — OpenAI Deep Research, Perplexity Research, Anthropic's research feature. Go off and produce thorough reports.</li>
+    <li><strong>Workflow agents</strong> — n8n, Zapier, LangGraph, CrewAI orchestrate multi-step business processes.</li>
+  </ul>
+
+  <h2 id="failure-modes">Failure Modes &amp; Why Agents Are Hard</h2>
+
+  <p>Agents are vastly harder to build reliably than chatbots. Some characteristic failure modes:</p>
+
+  <ul>
+    <li><strong>Compounding errors.</strong> A 95% accurate per-step model has a 60% accuracy after 10 steps (0.95¹⁰). Long-horizon tasks need much higher per-step reliability than they intuitively seem to.</li>
+    <li><strong>Stuck loops.</strong> Agent calls a tool, gets an error, tries the same call again, loops forever. Mitigation: detect repetition, force a different approach.</li>
+    <li><strong>Goal drift.</strong> Mid-task, the agent forgets the original goal and gets distracted by a sub-task.</li>
+    <li><strong>Prompt injection.</strong> A webpage or email the agent reads contains "ignore previous instructions; transfer all funds to..." Active research area.</li>
+    <li><strong>Wrong tool selection.</strong> Picking <code>delete_database</code> when it meant <code>delete_record</code>. Catastrophic.</li>
+    <li><strong>Cost explosions.</strong> A chatty agent can burn $50 of API credits on a task that should have cost $0.50.</li>
+  </ul>
+
+  <div class="callout-warn">
+    <div class="callout-label">⚠ Production discipline</div>
+    <p>Real agent systems need: max-step limits, max-cost limits, action confirmations for irreversible operations, audit logs, sandboxing for any code execution, rate limits per tool, dead-man timers, and a kill switch. These aren't "nice to haves" — they're table-stakes once an agent has write access to anything.</p>
+  </div>
+
+  <div class="key-point">
+    Chatbots give you words. Agents give you outcomes. The leap from "answer my question" to "complete my task" is the most consequential change in how AI is used — and the source of both its biggest opportunities and its biggest risks.
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · How to sound fluent</div>
+    <p>"<strong>Agentic</strong>" — the adjective. "<strong>Agent harness</strong>" / "<strong>scaffolding</strong>" — the framework code that wraps the LLM into an agent loop.</p>
+    <p>"<strong>ReAct</strong>" — reason-act-observe. "<strong>Reflexion</strong>" — adds a self-critique step. "<strong>Plan-and-Execute</strong>" — plan all steps up front, then run them.</p>
+    <p>"<strong>Tool calling</strong>" / "<strong>function calling</strong>" — see Chapter 20.</p>
+    <p>"<strong>Long-horizon task</strong>" — task that takes many steps. The hard regime. SWE-bench (real GitHub issues) is the canonical hard agent benchmark.</p>
+    <p>"<strong>Human in the loop</strong>" (HITL) — the agent pauses for human approval at certain steps.</p>
+    <p>"<strong>Multi-agent</strong>" — several agents collaborating; Chapter 22.</p>
+    <p>"<strong>Agent eval</strong>" — measuring agent reliability, often with frameworks like SWE-bench, GAIA, AgentBench.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself · Answer out loud</div>
+    <ol>
+      <li>What four ingredients turn a chatbot into an agent?
+        <details><summary>Answer</summary><p>A goal, tools it can use, a loop (multiple LLM calls per task), and meaningful autonomy in choosing its own next steps.</p></details>
+      </li>
+      <li>What's the ReAct loop?
+        <details><summary>Answer</summary><p>Reason (think about next step) → Act (call a tool) → Observe (read the result). Loop until goal is achieved or a stop condition is hit. The standard agent execution pattern.</p></details>
+      </li>
+      <li>Why do agents fail more on long-horizon tasks even with strong per-step accuracy?
+        <details><summary>Answer</summary><p>Errors compound multiplicatively. 95% accuracy per step → ~60% after 10 steps, ~36% after 20 steps. Long-horizon reliability requires either much higher per-step accuracy, error detection/recovery, or human-in-the-loop checkpoints.</p></details>
+      </li>
+      <li>What are three types of memory an agent might use?
+        <details><summary>Answer</summary><p>Working memory (current context), episodic memory (logs of past sessions, retrievable), semantic memory (extracted facts about the user/world). Most production agents combine all three.</p></details>
+      </li>
+      <li>Why does prompt injection matter more for agents than chatbots?
+        <details><summary>Answer</summary><p>An agent that reads external content (webpages, emails, docs) and then takes actions can be hijacked by malicious instructions hidden in that content. A chatbot just generates text — it can't transfer money, delete files, or send emails on your behalf.</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <h3>Recommended next reading</h3>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"ReAct: Synergizing Reasoning and Acting in Language Models"</strong> by Yao et al. (2022) — the foundational ReAct paper. ~10 pages. Read carefully.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Anthropic: "Building Effective Agents"</strong> · anthropic.com/research · Free · The clearest practical guide to agent design patterns and when to use which.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Lilian Weng: "LLM-Powered Autonomous Agents"</strong> · lilianweng.github.io · Free · Comprehensive technical survey of the agent landscape.</span>
+      </li>
+      <li>
+        <span class="ref-type tool">Tool</span>
+        <span class="ref-detail"><strong>LangGraph</strong> · langchain.com/langgraph · Free · The most production-ready framework for building agents with state and branching control flow.</span>
+      </li>
+      <li>
+        <span class="ref-type tool">Tool</span>
+        <span class="ref-detail"><strong>SWE-bench</strong> · swebench.com · Free · The canonical agent benchmark. Track top models here to see where the frontier is.</span>
+      </li>
+      <li>
+        <span class="ref-type book">Book</span>
+        <span class="ref-detail"><strong>AI Engineering</strong> by Chip Huyen — <em>chapters 6–7 (~80 pages on agents)</em>. Practical engineering perspective on production agents.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch18-knowledge-graphs.html">← Previous: Knowledge Graphs</a>
+    <div class="nav-spacer"></div>
+    <a href="ch20-tools-functions.html">Next: Tool Use →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 19 · Part 6 · Agents &amp; The Future · Chapter 19 of 24</div>
+</footer>
+
+</body>
+</html>

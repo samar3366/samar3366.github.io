@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JavaScript — From Zero to Fluent | DevLaunch Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand"><span class="logo">⚡</span> DevLaunch Academy</a>
+    <nav class="topnav">
+      <a href="index.html">Home</a>
+      <a href="01-foundations.html">Foundations</a>
+      <a href="02-javascript.html" class="active">JavaScript</a>
+      <a href="03-react.html">React</a>
+      <a href="04-node.html">Node</a>
+      <a href="05-rest-apis.html">REST</a>
+      <a href="06-database.html">MSSQL</a>
+      <a href="07-capstone.html">Capstone</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <button class="menu-toggle" style="margin:18px 0;">☰ Sections</button>
+  <div class="layout">
+    <aside class="sidebar">
+      <h4>On this page</h4>
+      <a href="#run">How to use the editors</a>
+      <a href="#vars">① Variables</a>
+      <a href="#types">② Data types</a>
+      <a href="#operators">③ Operators</a>
+      <a href="#truthy">④ Truthy &amp; falsy</a>
+      <a href="#conditions">⑤ If / else / ternary / switch</a>
+      <a href="#functions">⑥ Functions</a>
+      <a href="#scope">⑦ Scope &amp; hoisting</a>
+      <a href="#closures">⑧ Closures</a>
+      <a href="#hof">⑨ Higher-order functions</a>
+      <a href="#arrays">⑩ Arrays</a>
+      <a href="#strings">⑪ String methods</a>
+      <a href="#numbers">⑫ Numbers, Math &amp; Dates</a>
+      <a href="#objects">⑬ Objects</a>
+      <a href="#loops">⑭ Loops</a>
+      <a href="#arraymethods">⑮ map / filter / reduce</a>
+      <a href="#morearrays">⑯ More array methods</a>
+      <a href="#params">⑰ Default &amp; rest params</a>
+      <a href="#optional">⑱ Optional chaining &amp; ??</a>
+      <a href="#setsmaps">⑲ Sets &amp; Maps</a>
+      <a href="#immutability">⑳ Immutability</a>
+      <a href="#this">㉑ The <code>this</code> keyword</a>
+      <a href="#dom">㉒ The DOM</a>
+      <a href="#promises">㉓ Promises</a>
+      <a href="#async">㉔ Async &amp; await</a>
+      <a href="#errors">㉕ Error handling</a>
+      <a href="#advanced">㉖ Advanced essentials</a>
+      <a href="#modules">㉗ Modules (import/export)</a>
+      <a href="#quiz">Quiz</a>
+      <a href="#takeaways">Key takeaways</a>
+    </aside>
+
+    <div class="content">
+      <p class="muted" style="margin:0;">Module 1 · <span class="chip basic">Basics</span> <span class="chip inter">Intermediate</span> <span class="chip adv">Advanced</span></p>
+      <h1 style="margin-top:6px;">📜 JavaScript: From Zero to Fluent</h1>
+      <p class="lead" style="color:var(--text-soft);font-size:1.12rem;">
+        JavaScript is the engine of the entire course. Master it here and React, Node, and database code
+        will all feel familiar. Every code box below is <strong>live</strong> — edit it and run it.
+      </p>
+
+      <section id="run" class="section">
+        <div class="callout tip"><span class="ci">▶️</span><p><strong>These editors are real.</strong> Click inside any blue box, change the code, and press the green <strong>Run</strong> button (or <span class="kbd">Ctrl</span>+<span class="kbd">Enter</span>). Output from <code>console.log(...)</code> appears below. Hit <strong>Reset</strong> to restore the original.</p></div>
+      </section>
+
+      <!-- VARIABLES -->
+      <section id="vars" class="section">
+        <h2>① Variables — boxes that hold values <span class="chip basic">Basics</span></h2>
+        <p>A <strong>variable</strong> is a labelled box you store a value in so you can use it later. Imagine a row of lockers: each locker has a name written on the front (the variable name) and something inside it (the value). When you need that something again, you don't have to remember where it physically is — you just say its name and JavaScript fetches it for you.</p>
+        <p>In modern JavaScript you create variables with two keywords: <code>let</code> (a box whose contents you can swap out later) and <code>const</code> (a box that's sealed once you put something in — you can't reassign it). There's an older keyword, <code>var</code>, that you'll see in old tutorials; we'll explain later why we avoid it.</p>
+        <p><strong>Why it matters:</strong> almost every line of real code reads from or writes to a variable. Getting comfortable here makes everything else click. <strong>Why <code>const</code> by default?</strong> Most values in a program never need to change, and using <code>const</code> tells everyone reading your code "this won't move", which prevents a whole category of accidental bugs. Reach for <code>let</code> only when you genuinely need to reassign the value (a running total, a counter, a loop index).</p>
+
+        <figure class="diagram">
+          <svg viewBox="0 0 720 150" role="img" aria-label="A variable is a labelled box holding a value">
+            <rect x="60" y="50" width="160" height="70" rx="10" fill="#1b2030" stroke="#6c8cff" stroke-width="2"/>
+            <text x="140" y="40" text-anchor="middle" fill="#aab2c5" font-size="13">label (name)</text>
+            <text x="140" y="80" text-anchor="middle" fill="#ffce5c" font-size="15" font-family="monospace">age</text>
+            <text x="140" y="105" text-anchor="middle" fill="#9ee493" font-size="20" font-family="monospace">25</text>
+            <text x="360" y="80" text-anchor="middle" fill="#fff" font-size="22" font-family="monospace">let age = 25;</text>
+            <text x="360" y="110" text-anchor="middle" fill="#707a92" font-size="12">keyword · name · = · value</text>
+            <rect x="540" y="50" width="140" height="70" rx="10" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="610" y="40" text-anchor="middle" fill="#aab2c5" font-size="13">const = locked</text>
+            <text x="610" y="90" text-anchor="middle" fill="#9ee493" font-size="15" font-family="monospace">PI = 3.14</text>
+          </svg>
+          <figcaption>A variable stores a value under a name. Use <code>const</code> by default; switch to <code>let</code> only when the value needs to change.</figcaption>
+        </figure>
+
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">variables.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">// const = a value that won't be reassigned
+const name = "Aisha";
+
+// let = a value that can change later
+let score = 10;
+score = score + 5;   // now 15
+
+console.log("Player:", name);
+console.log("Score:", score);
+
+// Try it: add a variable `level` and log it!
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>Naming rules:</strong> no spaces, start with a letter (or <code>_</code>/<code>$</code>), and use <code>camelCase</code> for multi-word names (<code>firstName</code>, <code>totalPrice</code>). Names are case-sensitive: <code>score</code> ≠ <code>Score</code>.</p></div>
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>Common beginner mistake:</strong> trying to reassign a <code>const</code>. Writing <code>const x = 1; x = 2;</code> throws <code>TypeError: Assignment to constant variable</code>. If a value needs to change, declare it with <code>let</code> instead. (Note: with objects and arrays, <code>const</code> stops you reassigning the <em>box</em>, but you can still change what's <em>inside</em> — more on that in the Immutability section.)</p></div>
+      </section>
+
+      <!-- DATA TYPES -->
+      <section id="types" class="section">
+        <h2>② Data types — the kinds of values <span class="chip basic">Basics</span></h2>
+        <p>Every value in JavaScript has a <strong>type</strong> — a category that tells the language what kind of thing it is and what you can do with it. You can add two numbers, but "adding" two booleans makes no sense. JavaScript figures out the type automatically from how you write the value (you never declare it), which is why it's called a <em>dynamically typed</em> language. These five types cover almost everything you'll do:</p>
+        <table>
+          <thead><tr><th>Type</th><th>Example</th><th>Used for</th></tr></thead>
+          <tbody>
+            <tr><td><strong>String</strong></td><td><code>"hello"</code></td><td>Text (always in quotes)</td></tr>
+            <tr><td><strong>Number</strong></td><td><code>42</code>, <code>3.14</code></td><td>Any number (no quotes)</td></tr>
+            <tr><td><strong>Boolean</strong></td><td><code>true</code> / <code>false</code></td><td>Yes/no, on/off decisions</td></tr>
+            <tr><td><strong>Array</strong></td><td><code>[1, 2, 3]</code></td><td>An ordered list of values</td></tr>
+            <tr><td><strong>Object</strong></td><td><code>{ name: "Sam" }</code></td><td>A labelled bundle of values</td></tr>
+          </tbody>
+        </table>
+        <p>Two more special values round things out: <code>null</code> (an intentional "nothing here" that you set on purpose) and <code>undefined</code> (JavaScript's way of saying "this was never given a value"). You'll meet them constantly — for example, a variable you declared but didn't assign is <code>undefined</code>, and a missing object property is <code>undefined</code> too.</p>
+        <div class="callout info"><span class="ci">💡</span><p><strong>Arrays and objects are technically both "objects"</strong> under the hood — so <code>typeof [1,2,3]</code> surprisingly returns <code>"object"</code>, not <code>"array"</code>. That's a famous quirk. To check specifically for an array, use <code>Array.isArray(value)</code> instead of <code>typeof</code>.</p></div>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">types.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const city = "Hyderabad";   // string
+const temp = 34.5;          // number
+const isHot = temp > 30;    // boolean (true!)
+
+// `typeof` tells you a value's type
+console.log(typeof city);   // "string"
+console.log(typeof temp);   // "number"
+console.log(typeof isHot);  // "boolean"
+console.log(isHot ? "Wear shorts" : "Bring a jacket");
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+
+        <h3>Template strings — the modern way to build text</h3>
+        <p>Use backticks <code>`</code> and <code>${ }</code> to drop variables straight into text. You'll use this constantly.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">templates.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const name = "Ravi";
+const age = 28;
+
+// Old, clumsy way:
+console.log("Hi " + name + ", you are " + age);
+
+// Modern way — backticks + ${ }:
+console.log(`Hi ${name}, you are ${age}`);
+console.log(`Next year you'll be ${age + 1}`);
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+      </section>
+
+      <!-- OPERATORS -->
+      <section id="operators" class="section">
+        <h2>③ Operators — doing things with values <span class="chip basic">Basics</span></h2>
+        <p>An <strong>operator</strong> is a symbol that combines values to produce a new value. You already know most of them from maths class (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>). JavaScript adds a few that are worth meeting early: <code>%</code> (the "remainder" or modulo operator) and the comparison and logic operators that power every decision your program makes.</p>
+        <p>The <code>%</code> operator gives you the <em>remainder</em> after dividing. <code>10 % 3</code> is <code>1</code> because 3 goes into 10 three times with 1 left over. It looks niche but it's incredibly handy: <code>n % 2 === 0</code> tells you whether <code>n</code> is even, and remainder is how you wrap values around (like clock hours or alternating row colours).</p>
+        <table>
+          <thead><tr><th>Group</th><th>Operators</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td>Math</td><td><code>+ - * / %</code></td><td><code>10 % 3</code> → <code>1</code> (remainder)</td></tr>
+            <tr><td>Compare</td><td><code>=== !== &gt; &lt; &gt;= &lt;=</code></td><td><code>5 === 5</code> → <code>true</code></td></tr>
+            <tr><td>Logic</td><td><code>&amp;&amp;</code> (and), <code>||</code> (or), <code>!</code> (not)</td><td><code>true &amp;&amp; false</code> → <code>false</code></td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>Always compare with <code>===</code> (three equals), not <code>==</code>.</strong> <code>===</code> checks value <em>and</em> type and avoids surprising bugs. <code>5 === "5"</code> is <code>false</code> (number vs string) — which is what you want.</p></div>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">operators.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">console.log(10 + 5);      // 15
+console.log(10 % 3);      // 1  (remainder — great for "is it even?")
+console.log(8 % 2 === 0); // true → 8 is even
+
+const age = 20;
+const hasTicket = true;
+console.log(age >= 18 && hasTicket); // both true → allowed in
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout info"><span class="ci">💡</span><p><strong>The logic operators are "short-circuit":</strong> <code>&amp;&amp;</code> stops at the first falsy value, and <code>||</code> stops at the first truthy one. That's not just an optimisation — it's a technique. <code>const port = userPort || 3000</code> means "use <code>userPort</code> if it has a value, otherwise fall back to 3000". You'll see this pattern in real Node and React code all the time.</p></div>
+      </section>
+
+      <!-- TRUTHY / FALSY -->
+      <section id="truthy" class="section">
+        <h2>④ Truthy &amp; falsy — values that act like yes/no <span class="chip basic">Basics</span> <span class="chip inter">Intermediate</span></h2>
+        <p>Here's something that surprises every beginner: when you put a <em>non-boolean</em> value inside an <code>if</code>, JavaScript still decides "is this true or false?". It does this by sorting every value into one of two buckets — <strong>truthy</strong> (behaves like <code>true</code>) or <strong>falsy</strong> (behaves like <code>false</code>). This is why you can write <code>if (name)</code> to mean "if name has something in it".</p>
+        <p>The trick is that the falsy list is <em>short</em> — only these <strong>eight</strong> values are falsy, and <strong>everything else is truthy</strong>:</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 200" role="img" aria-label="The falsy values versus everything else being truthy">
+            <rect x="30" y="30" width="320" height="150" rx="12" fill="#2a1717" stroke="#ff6b6b" stroke-width="2"/>
+            <text x="190" y="55" text-anchor="middle" fill="#ff8a88" font-size="15">FALSY (acts like false)</text>
+            <text x="190" y="85" text-anchor="middle" fill="#fff" font-size="14" font-family="monospace">false &nbsp; 0 &nbsp; -0 &nbsp; 0n</text>
+            <text x="190" y="112" text-anchor="middle" fill="#fff" font-size="14" font-family="monospace">"" &nbsp; null</text>
+            <text x="190" y="139" text-anchor="middle" fill="#fff" font-size="14" font-family="monospace">undefined &nbsp; NaN</text>
+            <text x="190" y="166" text-anchor="middle" fill="#aab2c5" font-size="12">just these eight — memorise them!</text>
+            <rect x="380" y="30" width="320" height="150" rx="12" fill="#13261c" stroke="#38d39f" stroke-width="2"/>
+            <text x="540" y="55" text-anchor="middle" fill="#9ee493" font-size="15">TRUTHY (acts like true)</text>
+            <text x="540" y="90" text-anchor="middle" fill="#fff" font-size="13" font-family="monospace">"hello" &nbsp; "0" &nbsp; "false"</text>
+            <text x="540" y="115" text-anchor="middle" fill="#fff" font-size="13" font-family="monospace">42 &nbsp; -1 &nbsp; [] &nbsp; {}</text>
+            <text x="540" y="155" text-anchor="middle" fill="#aab2c5" font-size="12">everything not in the falsy box</text>
+          </svg>
+          <figcaption>Watch out: an empty array <code>[]</code> and empty object <code>{}</code> are <strong>truthy</strong>, and the string <code>"0"</code> is truthy too (it's not empty!).</figcaption>
+        </figure>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">truthy-falsy.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">// Boolean() forces a value into its true/false bucket:
+console.log(Boolean(""));        // false (empty string)
+console.log(Boolean("hi"));      // true
+console.log(Boolean(0));         // false
+console.log(Boolean(42));        // true
+console.log(Boolean(null));      // false
+console.log(Boolean([]));        // true  (empty array is truthy!)
+
+// This is why a simple `if (value)` works as a "has something?" check:
+const username = "";
+if (username) {
+  console.log("Welcome, " + username);
+} else {
+  console.log("Please log in");   // this runs — "" is falsy
+}
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>This shows up everywhere later: in React you'll write <code>{items.length &amp;&amp; &lt;List/&gt;}</code> to show a list only when it has items, and in Node you'll guard against missing data with <code>if (!user) return</code>. Knowing the falsy list saves you from confusing bugs.</p></div>
+      </section>
+
+      <!-- CONDITIONS -->
+      <section id="conditions" class="section">
+        <h2>⑤ Making decisions — if / else, ternary, switch <span class="chip basic">Basics</span></h2>
+        <p>So far our code runs top to bottom, doing the same thing every time. Real programs need to <strong>react</strong>: show an error if a password is too short, give a discount if the cart is over ₹1000, greet a user by name only if they're logged in. That branching — choosing a path based on a condition — is what <code>if</code>/<code>else</code> is for. This is where programs start to feel "smart".</p>
+        <p>The shape is always the same: <code>if (condition) { ... }</code>. The condition is anything that evaluates to truthy or falsy (which you just learned!). If it's truthy, the block in <code>{ }</code> runs; otherwise it's skipped. Add <code>else if</code> to test more conditions in order, and a final <code>else</code> as the catch-all "none of the above".</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 700 180" role="img" aria-label="If else flow chart">
+            <rect x="280" y="20" width="140" height="44" rx="8" fill="#1b2030" stroke="#6c8cff" stroke-width="2"/>
+            <text x="350" y="47" text-anchor="middle" fill="#fff" font-size="13">score &gt;= 50 ?</text>
+            <path d="M280,42 L150,110" stroke="#38d39f" stroke-width="2" fill="none" marker-end="url(#y)"/>
+            <text x="195" y="80" fill="#9ee493" font-size="12">true</text>
+            <path d="M420,42 L550,110" stroke="#ff6b6b" stroke-width="2" fill="none" marker-end="url(#n)"/>
+            <text x="495" y="80" fill="#ff8a88" font-size="12">false</text>
+            <rect x="70" y="110" width="160" height="44" rx="8" fill="#13261c" stroke="#38d39f" stroke-width="2"/>
+            <text x="150" y="137" text-anchor="middle" fill="#9ee493" font-size="13">"You passed 🎉"</text>
+            <rect x="470" y="110" width="160" height="44" rx="8" fill="#2a1717" stroke="#ff6b6b" stroke-width="2"/>
+            <text x="550" y="137" text-anchor="middle" fill="#ff8a88" font-size="13">"Try again"</text>
+            <defs>
+              <marker id="y" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#38d39f"/></marker>
+              <marker id="n" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#ff6b6b"/></marker>
+            </defs>
+          </svg>
+          <figcaption>An <code>if</code> statement picks a path based on whether a condition is <code>true</code>.</figcaption>
+        </figure>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">conditions.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const score = 72;   // ← change me and re-run!
+
+if (score >= 90) {
+  console.log("Grade: A 🌟");
+} else if (score >= 50) {
+  console.log("Grade: Pass ✅");
+} else {
+  console.log("Grade: Try again 🔁");
+}
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="challenge">
+          <h4>🧪 Try it yourself</h4>
+          <p>Change <code>score</code> to <code>95</code> and run. Then to <code>30</code>. Watch the message change. Can you add a <code>"Grade: Distinction 🏆"</code> branch for scores of 95+? (Hint: it needs to come <em>before</em> the <code>>= 90</code> check, since <code>if</code>/<code>else if</code> stops at the first match.)</p>
+        </div>
+
+        <h3>The ternary operator — a one-line if/else</h3>
+        <p>When an <code>if</code>/<code>else</code> just picks between two values, there's a compact shorthand called the <strong>ternary operator</strong>. The shape is <code>condition ? valueIfTrue : valueIfFalse</code>. Read the <code>?</code> as "then" and the <code>:</code> as "otherwise". You'll see this constantly in React for showing one thing or another.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">ternary.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const age = 17;
+
+// Long way:
+let message;
+if (age >= 18) {
+  message = "Adult";
+} else {
+  message = "Minor";
+}
+
+// Same thing, one line with a ternary:
+const status = age >= 18 ? "Adult" : "Minor";
+
+console.log(message);
+console.log(status);
+
+// Great inside template strings, too:
+const items = 0;
+console.log(`You have ${items} item${items === 1 ? "" : "s"}`);
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p>Ternaries are lovely for short choices but get hard to read when nested. If you find yourself writing <code>a ? b : c ? d : e</code>, switch back to <code>if</code>/<code>else if</code> — clarity beats cleverness.</p></div>
+
+        <h3>switch — choosing among many fixed options</h3>
+        <p>When you're checking one value against many specific possibilities (a day of the week, a status code, a menu choice), a chain of <code>else if</code>s gets repetitive. A <code>switch</code> statement reads more cleanly. Each <code>case</code> compares with <code>===</code>; <code>break</code> stops it from "falling through" into the next case; and <code>default</code> is the catch-all.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">switch.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const role = "editor";   // ← try "admin" or "guest"
+
+switch (role) {
+  case "admin":
+    console.log("Full access granted");
+    break;
+  case "editor":
+    console.log("Can edit content");
+    break;
+  case "guest":
+    console.log("Read-only access");
+    break;
+  default:
+    console.log("Unknown role");
+}
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>Don't forget <code>break</code>!</strong> Without it, execution "falls through" and keeps running the next cases too — a classic bug. (Occasionally that's intentional, but as a beginner, always add <code>break</code>.)</p></div>
+      </section>
+
+      <!-- FUNCTIONS -->
+      <section id="functions" class="section">
+        <h2>⑥ Functions — reusable blocks of code <span class="chip basic">Basics</span> <span class="chip inter">Intermediate</span></h2>
+        <p>A <strong>function</strong> is a named recipe — a chunk of code you write once and reuse as many times as you like. You <strong>define</strong> it once, then <strong>call</strong> it (run it) whenever you need it, possibly with different inputs each time. This is the single most important idea for keeping code organised: instead of copying and pasting the same ten lines in five places, you wrap them in a function and call it five times. Fix a bug once, and it's fixed everywhere.</p>
+        <p>Functions can take <strong>inputs</strong> (called <em>parameters</em> when you define them, <em>arguments</em> when you pass them in) and hand back an <strong>output</strong> using the <code>return</code> keyword. The moment a <code>return</code> runs, the function stops and gives that value back to whoever called it. A function with no <code>return</code> hands back <code>undefined</code>.</p>
+        <p><strong>Why it matters:</strong> React components <em>are</em> functions. Node route handlers <em>are</em> functions. Every <code>.map()</code> and <code>.filter()</code> takes a function. If you're fluent with functions, the rest of this course is mostly learning <em>where</em> to put them.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 130" role="img" aria-label="A function takes inputs and returns an output">
+            <text x="60" y="70" fill="#ffce5c" font-size="15" font-family="monospace" text-anchor="middle">3, 4</text>
+            <text x="60" y="95" fill="#707a92" font-size="11" text-anchor="middle">inputs</text>
+            <path d="M110,65 L210,65" stroke="#6c8cff" stroke-width="2" marker-end="url(#fi)"/>
+            <rect x="220" y="35" width="260" height="60" rx="12" fill="#1b2030" stroke="#61dafb" stroke-width="2"/>
+            <text x="350" y="62" text-anchor="middle" fill="#fff" font-size="14" font-family="monospace">add(a, b)</text>
+            <text x="350" y="82" text-anchor="middle" fill="#aab2c5" font-size="12">return a + b</text>
+            <path d="M490,65 L590,65" stroke="#38d39f" stroke-width="2" marker-end="url(#fo)"/>
+            <text x="650" y="70" fill="#9ee493" font-size="15" font-family="monospace" text-anchor="middle">7</text>
+            <text x="650" y="95" fill="#707a92" font-size="11" text-anchor="middle">output</text>
+            <defs>
+              <marker id="fi" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6c8cff"/></marker>
+              <marker id="fo" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#38d39f"/></marker>
+            </defs>
+          </svg>
+          <figcaption>Think of a function as a machine: feed it inputs, get an output back.</figcaption>
+        </figure>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">functions.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">// Classic function declaration
+function add(a, b) {
+  return a + b;
+}
+
+// Modern "arrow function" — same thing, shorter. You'll see this everywhere.
+const greet = (name) => {
+  return `Hello, ${name}!`;
+};
+
+// Even shorter when it's just one expression:
+const double = (n) => n * 2;
+
+console.log(add(3, 4));       // 7
+console.log(greet("Maya"));   // Hello, Maya!
+console.log(double(21));      // 42
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p><strong>Arrow functions</strong> (<code>const f = (x) =&gt; ...</code>) are the modern style and what React uses constantly. Get comfortable reading them now.</p></div>
+        <div class="challenge">
+          <h4>🧪 Try it yourself</h4>
+          <p>Write a function <code>multiply(a, b)</code> that returns <code>a * b</code>, then log <code>multiply(6, 7)</code>. Add it to the editor above and run.</p>
+        </div>
+      </section>
+
+      <!-- SCOPE & HOISTING -->
+      <section id="scope" class="section">
+        <h2>⑦ Scope &amp; hoisting — where variables live <span class="chip inter">Intermediate</span></h2>
+        <p><strong>Scope</strong> answers the question: "from <em>where</em> in my code can I see this variable?" Think of it like rooms in a house. Something on the kitchen table (a global variable) can be seen from anywhere. Something inside a closed drawer (a variable inside a function) can only be seen from inside that drawer. Trying to read it from another room gives you an error — the variable simply doesn't exist out there.</p>
+        <p>There are three levels of scope to know:</p>
+        <table>
+          <thead><tr><th>Scope</th><th>Where it's visible</th><th>Created by</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Global</strong></td><td>Everywhere in the file</td><td>Declared at the top level</td></tr>
+            <tr><td><strong>Function</strong></td><td>Only inside that function</td><td>Declared inside a function</td></tr>
+            <tr><td><strong>Block</strong></td><td>Only inside the nearest <code>{ }</code></td><td><code>let</code>/<code>const</code> inside any <code>{ }</code></td></tr>
+          </tbody>
+        </table>
+        <figure class="diagram">
+          <svg viewBox="0 0 700 230" role="img" aria-label="Nested scopes shown as boxes inside boxes">
+            <rect x="20" y="20" width="660" height="195" rx="12" fill="#161b29" stroke="#6c8cff" stroke-width="2"/>
+            <text x="40" y="45" fill="#8aa2ff" font-size="13" font-family="monospace">global scope</text>
+            <text x="40" y="68" fill="#9ee493" font-size="13" font-family="monospace">const appName = "Tasks"</text>
+            <rect x="50" y="85" width="610" height="115" rx="10" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="70" y="108" fill="#7fe0b6" font-size="13" font-family="monospace">function scope (inside login)</text>
+            <text x="70" y="131" fill="#9ee493" font-size="13" font-family="monospace">const user = "Ana"   // sees appName too</text>
+            <rect x="80" y="148" width="560" height="42" rx="8" fill="#241b33" stroke="#ff7eb6" stroke-width="2"/>
+            <text x="100" y="172" fill="#ffa8d4" font-size="12" font-family="monospace">block scope (inside if) — let token = ... only lives here</text>
+          </svg>
+          <figcaption>Inner scopes can see outward (the function sees <code>appName</code>), but outer scopes can't peek inward.</figcaption>
+        </figure>
+        <p>The big practical point: <code>let</code> and <code>const</code> are <strong>block-scoped</strong>, meaning they only exist inside the nearest pair of curly braces <code>{ }</code> — an <code>if</code> block, a <code>for</code> loop body, any block. The old <code>var</code> keyword is <strong>function-scoped</strong>, which leaks variables out of blocks and causes surprising bugs. That's the main reason we never use <code>var</code> today.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">scope.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const appName = "TaskApp";   // global — visible everywhere
+
+function greet() {
+  const user = "Sam";        // only visible inside greet()
+  console.log(appName + " welcomes " + user);
+
+  if (true) {
+    let secret = "hidden";   // block-scoped to this if
+    console.log("inside if:", secret);
+  }
+  // console.log(secret); // would ERROR — secret doesn't exist here
+}
+
+greet();
+// console.log(user); // would ERROR — user is trapped inside greet()
+console.log("Outside, we can still see:", appName);
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>The classic <code>var</code> loop bug:</strong> with <code>var i</code> in a loop that schedules callbacks, every callback ends up sharing the <em>same</em> <code>i</code> and prints the final value. With <code>let i</code>, each loop turn gets its own fresh <code>i</code> and it works as expected. One more reason to always use <code>let</code>/<code>const</code>.</p></div>
+
+        <h3>Hoisting — a gentle heads-up</h3>
+        <p>JavaScript does a quick "scan" of your code before running it, and during that scan it notices your function and variable declarations. The effect is that <strong>function declarations</strong> (<code>function foo() {}</code>) can be called even on a line <em>above</em> where they're written — they're "hoisted" to the top. Handy, but not something to rely on. Variables declared with <code>let</code>/<code>const</code> are <em>not</em> usable before their line; trying gives a clear error. The simple rule that keeps you out of trouble: <strong>declare things before you use them, top to bottom.</strong></p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">hoisting.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">// This works — function declarations are "hoisted":
+console.log(sayHi("Lee"));
+
+function sayHi(name) {
+  return "Hi, " + name;
+}
+
+// But arrow functions stored in const are NOT hoisted.
+// Calling sayBye here (above its definition) would error.
+const sayBye = (name) => "Bye, " + name;
+console.log(sayBye("Lee"));   // works — we're below it now
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+      </section>
+
+      <!-- CLOSURES -->
+      <section id="closures" class="section">
+        <h2>⑧ Closures — functions that remember <span class="chip adv">Advanced</span></h2>
+        <p>This one sounds scary but the idea is simple and you've half-seen it already. A <strong>closure</strong> happens when a function "remembers" the variables from the scope where it was created, even after that outer scope has finished running. The inner function keeps a private link to those variables.</p>
+        <p>Why care? Closures let you create <strong>private state</strong> — values that only one function can touch. The classic demo is a "counter maker": a function that builds and returns another function, where each returned counter has its own private <code>count</code> that nobody else can reach or corrupt.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">closures.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">function makeCounter() {
+  let count = 0;                  // private — lives in the closure
+  return function () {
+    count = count + 1;            // remembers & updates its own count
+    return count;
+  };
+}
+
+const clickCount = makeCounter();
+console.log(clickCount());   // 1
+console.log(clickCount());   // 2
+console.log(clickCount());   // 3
+
+// A second counter has its OWN separate count:
+const scrollCount = makeCounter();
+console.log(scrollCount());  // 1  (not 4!)
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>Closures are the secret behind React's <code>useState</code> hook and countless Node patterns. Each call to <code>makeCounter()</code> creating its own independent <code>count</code> is <em>exactly</em> how React components keep their state separate. You don't need to master closures today — just recognise the pattern when you meet it again.</p></div>
+        <div class="challenge">
+          <h4>🧪 Try it yourself</h4>
+          <p>Modify <code>makeCounter</code> to accept a starting number, e.g. <code>makeCounter(10)</code>, so the first call returns 11. (Hint: replace <code>let count = 0</code> with a parameter.)</p>
+        </div>
+      </section>
+
+      <!-- HIGHER-ORDER FUNCTIONS -->
+      <section id="hof" class="section">
+        <h2>⑨ Higher-order functions &amp; callbacks <span class="chip inter">Intermediate</span></h2>
+        <p>In JavaScript, functions are <strong>values</strong> — just like numbers and strings. That means you can store a function in a variable, put it in an array, and (the powerful part) <strong>pass a function into another function</strong> as an argument. A function that takes another function as input, or returns one as output, is called a <strong>higher-order function</strong>. The function you pass in is called a <strong>callback</strong>, because the outer function "calls it back" at the right moment.</p>
+        <p>This feels abstract until you see it: <code>.map()</code>, <code>.filter()</code>, <code>.forEach()</code>, <code>addEventListener</code>, <code>setTimeout</code> — they're <em>all</em> higher-order functions. You give them a callback and they decide when to run it (for each item, on each click, after a delay).</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">higher-order.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">// `repeat` takes a number AND a function (the callback).
+function repeat(times, action) {
+  for (let i = 1; i <= times; i++) {
+    action(i);            // call the callback, passing the current number
+  }
+}
+
+// We pass a function in as the second argument:
+repeat(3, (n) => console.log("Hello #" + n));
+
+// The callback can be anything we like:
+let total = 0;
+repeat(5, (n) => { total = total + n; });
+console.log("Sum 1..5 =", total);   // 15
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout info"><span class="ci">💡</span><p>Passing behaviour around as a value is what makes <code>map</code>/<code>filter</code>/<code>reduce</code> (coming up) so flexible — you supply the "what to do with each item" part, and the method handles the looping. It's also the entire basis of event handling in React: <code>onClick={handleClick}</code> passes your function for React to call back later.</p></div>
+      </section>
+
+      <!-- ARRAYS -->
+      <section id="arrays" class="section">
+        <h2>⑩ Arrays — lists of things <span class="chip basic">Basics</span></h2>
+        <p>An <strong>array</strong> is an ordered list of values, written between square brackets: <code>["a", "b", "c"]</code>. Use an array whenever you have "many of the same kind of thing" — a list of names, scores, products, messages. Each item has a position called its <strong>index</strong>, and here's the part that trips up everyone at first: indexes start at <strong>0</strong>, not 1. So the first item is at index <code>0</code>, the second at index <code>1</code>, and the last is at index <code>length - 1</code>.</p>
+        <p>Arrays come with built-in helpers (called <em>methods</em>) you call with a dot: <code>.push()</code> adds to the end, <code>.pop()</code> removes the last, <code>.length</code> tells you the count, <code>.includes()</code> checks for membership. We'll meet the really powerful ones — <code>map</code>, <code>filter</code>, <code>reduce</code>, <code>find</code>, <code>sort</code> — shortly.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 640 120" role="img" aria-label="Array indexes start at zero">
+            <g font-family="monospace">
+              <rect x="40" y="40" width="110" height="50" fill="#1b2030" stroke="#6c8cff"/><text x="95" y="72" text-anchor="middle" fill="#9ee493" font-size="15">"🍎"</text><text x="95" y="30" text-anchor="middle" fill="#707a92" font-size="13">index 0</text>
+              <rect x="150" y="40" width="110" height="50" fill="#1b2030" stroke="#6c8cff"/><text x="205" y="72" text-anchor="middle" fill="#9ee493" font-size="15">"🍌"</text><text x="205" y="30" text-anchor="middle" fill="#707a92" font-size="13">index 1</text>
+              <rect x="260" y="40" width="110" height="50" fill="#1b2030" stroke="#6c8cff"/><text x="315" y="72" text-anchor="middle" fill="#9ee493" font-size="15">"🍇"</text><text x="315" y="30" text-anchor="middle" fill="#707a92" font-size="13">index 2</text>
+              <text x="470" y="72" fill="#aab2c5" font-size="14">fruits[1] → "🍌"</text>
+            </g>
+          </svg>
+          <figcaption><code>fruits[0]</code> is the first item. The count of items is <code>fruits.length</code>.</figcaption>
+        </figure>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">arrays.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const fruits = ["apple", "banana", "grape"];
+
+console.log(fruits[0]);        // "apple" (first!)
+console.log(fruits.length);    // 3
+
+fruits.push("mango");          // add to the end
+console.log(fruits);           // [...,"mango"]
+
+fruits.pop();                  // remove the last
+console.log(fruits.includes("banana")); // true
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+      </section>
+
+      <!-- STRING METHODS -->
+      <section id="strings" class="section">
+        <h2>⑪ String methods — working with text <span class="chip basic">Basics</span> <span class="chip inter">Intermediate</span></h2>
+        <p>Text is everywhere in apps — usernames, search boxes, file paths, messages. Strings come with a generous toolbox of <strong>methods</strong> for inspecting and transforming them. A key idea: string methods <strong>never change the original</strong> string (strings are "immutable"); they always return a <em>new</em> string. So you capture the result: <code>const shout = name.toUpperCase()</code>.</p>
+        <table>
+          <thead><tr><th>Method</th><th>What it does</th><th>Example → result</th></tr></thead>
+          <tbody>
+            <tr><td><code>.length</code></td><td>Number of characters (a property, no parentheses)</td><td><code>"hello".length</code> → <code>5</code></td></tr>
+            <tr><td><code>.toUpperCase()</code> / <code>.toLowerCase()</code></td><td>Change case</td><td><code>"Hi".toUpperCase()</code> → <code>"HI"</code></td></tr>
+            <tr><td><code>.includes()</code></td><td>Is a substring present? (true/false)</td><td><code>"hello".includes("ell")</code> → <code>true</code></td></tr>
+            <tr><td><code>.indexOf()</code></td><td>Position of a substring, or <code>-1</code></td><td><code>"hello".indexOf("l")</code> → <code>2</code></td></tr>
+            <tr><td><code>.slice(start, end)</code></td><td>Cut out a piece</td><td><code>"hello".slice(0, 3)</code> → <code>"hel"</code></td></tr>
+            <tr><td><code>.split()</code></td><td>Break into an array</td><td><code>"a,b,c".split(",")</code> → <code>["a","b","c"]</code></td></tr>
+            <tr><td><code>.replace()</code></td><td>Swap text for other text</td><td><code>"cat".replace("c","b")</code> → <code>"bat"</code></td></tr>
+            <tr><td><code>.trim()</code></td><td>Remove surrounding whitespace</td><td><code>"  hi  ".trim()</code> → <code>"hi"</code></td></tr>
+            <tr><td><code>.repeat()</code></td><td>Repeat the string N times</td><td><code>"ab".repeat(3)</code> → <code>"ababab"</code></td></tr>
+            <tr><td><code>.padStart()</code></td><td>Pad to a length from the left</td><td><code>"5".padStart(3,"0")</code> → <code>"005"</code></td></tr>
+            <tr><td><code>.startsWith()</code></td><td>Does it begin with this? (true/false)</td><td><code>"hello".startsWith("he")</code> → <code>true</code></td></tr>
+          </tbody>
+        </table>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">strings.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const raw = "   Hello, World!   ";
+
+console.log(raw.trim());                  // "Hello, World!"
+console.log(raw.trim().toUpperCase());    // chain methods!
+console.log(raw.trim().length);           // 13
+console.log(raw.includes("World"));       // true
+console.log(raw.trim().slice(0, 5));      // "Hello"
+console.log(raw.trim().replace("World", "JS")); // "Hello, JS!"
+
+// split turns text into an array — super common:
+const csv = "apple,banana,grape";
+const list = csv.split(",");
+console.log(list);            // ["apple","banana","grape"]
+console.log(list.length);    // 3
+
+// padStart is handy for formatting:
+console.log("7".padStart(2, "0"));   // "07"  (like a clock)
+console.log("=".repeat(10));          // "=========="
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout info"><span class="ci">💡</span><p><strong>Method chaining</strong> — calling one method on the result of another, like <code>raw.trim().toUpperCase()</code> — works because each method returns a new string. You'll chain array methods the same way (<code>list.filter(...).map(...)</code>).</p></div>
+        <div class="challenge">
+          <h4>🧪 Try it yourself</h4>
+          <p>Given <code>const email = "  Sam@Mail.com  "</code>, produce a clean, lowercase email with no surrounding spaces. (Hint: <code>.trim()</code> then <code>.toLowerCase()</code>.) Then check if it <code>.includes("@")</code>.</p>
+        </div>
+      </section>
+
+      <!-- NUMBERS, MATH & DATES -->
+      <section id="numbers" class="section">
+        <h2>⑫ Numbers, Math &amp; Dates <span class="chip basic">Basics</span> <span class="chip inter">Intermediate</span></h2>
+        <p>JavaScript has just one number type for both whole numbers and decimals. Most of the time you just do arithmetic, but a few helpers come up constantly: converting text to numbers, rounding, and generating random values.</p>
+
+        <h3>Turning text into numbers</h3>
+        <p>Input from forms and URLs arrives as <em>strings</em> — <code>"42"</code>, not <code>42</code>. Before you can do maths you convert it. <code>Number()</code> converts the whole string; <code>parseInt()</code> reads a leading whole number; <code>parseFloat()</code> reads a leading decimal. If a value can't be converted you get <code>NaN</code> ("Not a Number"), which you test for with <code>isNaN()</code>.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">number-parsing.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">console.log("5" + 1);              // "51"  (string concat — gotcha!)
+console.log(Number("5") + 1);      // 6     (converted first)
+
+console.log(parseInt("42px"));     // 42   (reads leading int)
+console.log(parseFloat("3.14kg")); // 3.14
+console.log(Number("hello"));      // NaN
+console.log(isNaN(Number("hello"))); // true
+
+// toFixed formats to N decimal places (returns a STRING):
+const price = 19.5;
+console.log(price.toFixed(2));     // "19.50"
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p>The <code>+</code> operator does <em>double duty</em>: it adds numbers but <em>joins</em> strings. So <code>"5" + 1</code> is <code>"51"</code>, not <code>6</code>. Always convert form/URL values with <code>Number()</code> before doing maths on them.</p></div>
+
+        <h3>The Math object</h3>
+        <p><code>Math</code> is a built-in toolbox of number helpers. You don't create it — you just call its methods.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">math.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">console.log(Math.round(4.5));    // 5
+console.log(Math.floor(4.9));    // 4  (always down)
+console.log(Math.ceil(4.1));     // 5  (always up)
+console.log(Math.max(3, 9, 1));  // 9
+console.log(Math.min(3, 9, 1));  // 1
+
+// Random number from 0 (inclusive) to 1 (exclusive):
+console.log(Math.random());
+
+// A common recipe: random whole number 1..6 (a dice roll):
+const roll = Math.floor(Math.random() * 6) + 1;
+console.log("You rolled a " + roll);
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+
+        <h3>Dates — a quick look</h3>
+        <p>A <code>Date</code> represents a moment in time. You'll mostly create one and read parts out of it, or convert it to a standard string for storage/APIs.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">dates.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const now = new Date();          // this very moment
+console.log("Year:", now.getFullYear());
+console.log("Month (0-11):", now.getMonth());  // Jan is 0!
+console.log("Day of month:", now.getDate());
+
+// ISO format — the standard string used by APIs & databases:
+console.log("ISO:", now.toISOString());
+
+// You can build a specific date too:
+const launch = new Date("2025-01-15");
+console.log(launch.getFullYear());   // 2025
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>Months are zero-based</strong> in JavaScript dates: January is <code>0</code>, December is <code>11</code>. Days of the month, though, start at 1. Mixing these up is a very common bug.</p></div>
+      </section>
+
+      <!-- OBJECTS -->
+      <section id="objects" class="section">
+        <h2>⑬ Objects — labelled bundles of data <span class="chip basic">Basics</span> <span class="chip inter">Intermediate</span></h2>
+        <p>An <strong>object</strong> groups related values under names (called <strong>keys</strong> or <strong>properties</strong>). If an array is a numbered list, an object is a labelled form: instead of <code>item[0]</code> you write <code>user.name</code>. This is how real-world "things" — a user, a product, a task — are represented in code, because real things have named attributes, not numbered positions.</p>
+        <p>You read a property with <strong>dot notation</strong> (<code>user.name</code>) or, when the key is dynamic or has special characters, <strong>bracket notation</strong> (<code>user["name"]</code>). You can add or change a property at any time just by assigning to it: <code>user.city = "Pune"</code>. Asking for a property that doesn't exist gives you <code>undefined</code> rather than an error.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">objects.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const user = {
+  name: "Priya",
+  age: 30,
+  isAdmin: false,
+  hobbies: ["reading", "chess"],
+};
+
+// Read properties with dot notation:
+console.log(user.name);          // "Priya"
+console.log(user.hobbies[1]);    // "chess"
+
+// Change / add properties:
+user.age = 31;
+user.city = "Pune";
+console.log(user);
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout info"><span class="ci">💡</span><p><strong>Arrays of objects</strong> are the bread and butter of real apps — a list of users, a list of products, a list of tasks. You'll see this exact shape come back from databases and APIs: <code>[{...}, {...}, {...}]</code>.</p></div>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">array-of-objects.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const tasks = [
+  { id: 1, title: "Learn JS", done: true },
+  { id: 2, title: "Learn React", done: false },
+  { id: 3, title: "Build app", done: false },
+];
+
+console.log(`There are ${tasks.length} tasks`);
+console.log("First task:", tasks[0].title);
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+      </section>
+
+      <!-- LOOPS -->
+      <section id="loops" class="section">
+        <h2>⑭ Loops — doing something for each item <span class="chip basic">Basics</span></h2>
+        <p>A loop repeats code so you don't have to copy-paste it. The most readable for walking a list is <code>for...of</code>, which hands you each item in turn. The classic <code>for (let i = 0; i &lt; n; i++)</code> loop is more manual but gives you the index <code>i</code> and full control — use it when you need a counter or want to skip/step. There's also <code>for...in</code> for looping over an object's keys.</p>
+        <p>Two keywords steer a loop: <code>break</code> stops it entirely, and <code>continue</code> skips to the next turn. And remember the array methods <code>map</code>/<code>filter</code>/<code>forEach</code> coming up next — in modern code they often replace hand-written loops entirely.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">loops.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const names = ["Sam", "Lee", "Ola"];
+
+// for...of: run once per item
+for (const name of names) {
+  console.log(`Welcome, ${name}!`);
+}
+
+// classic for loop: when you need the index / a count
+for (let i = 1; i <= 3; i++) {
+  console.log(`Count: ${i}`);
+}
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+      </section>
+
+      <!-- ARRAY METHODS -->
+      <section id="arraymethods" class="section">
+        <h2>⑮ map, filter, reduce — the power tools <span class="chip inter">Intermediate</span> <span class="chip adv">Advanced</span></h2>
+        <p>These three array methods are <em>the</em> most-used tools in modern JavaScript and React. Each one takes a <strong>callback</strong> (a function — remember higher-order functions?) that it runs on every item. The magic is that they don't change the original array; they build and return a <strong>new</strong> one (or, for <code>reduce</code>, a single value). That "don't mutate, return new" style is exactly what React wants. Learn these well — you'll use <code>map</code> in almost every React component to turn an array of data into an array of UI elements.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 220" role="img" aria-label="map filter and reduce illustrated">
+            <text x="20" y="40" fill="#6c8cff" font-size="13" font-family="monospace">map  [1,2,3]</text>
+            <text x="20" y="62" fill="#aab2c5" font-size="12">transform each → same length</text>
+            <text x="300" y="40" fill="#9ee493" font-size="13" font-family="monospace">→ [2,4,6]</text>
+            <line x1="20" y1="80" x2="700" y2="80" stroke="#2c3447"/>
+            <text x="20" y="115" fill="#38d39f" font-size="13" font-family="monospace">filter  [1,2,3,4]</text>
+            <text x="20" y="137" fill="#aab2c5" font-size="12">keep those that pass → shorter</text>
+            <text x="300" y="115" fill="#9ee493" font-size="13" font-family="monospace">→ [2,4]</text>
+            <line x1="20" y1="155" x2="700" y2="155" stroke="#2c3447"/>
+            <text x="20" y="190" fill="#ff7eb6" font-size="13" font-family="monospace">reduce  [1,2,3,4]</text>
+            <text x="20" y="212" fill="#aab2c5" font-size="12">boil down to one value</text>
+            <text x="300" y="190" fill="#9ee493" font-size="13" font-family="monospace">→ 10</text>
+          </svg>
+          <figcaption><strong>map</strong> keeps the length and changes each item; <strong>filter</strong> keeps some items unchanged; <strong>reduce</strong> combines everything into one result.</figcaption>
+        </figure>
+        <table>
+          <thead><tr><th>Method</th><th>What it does</th><th>Returns</th></tr></thead>
+          <tbody>
+            <tr><td><code>.map()</code></td><td>Transform every item</td><td>A new array, same length</td></tr>
+            <tr><td><code>.filter()</code></td><td>Keep only items that pass a test</td><td>A new, shorter array</td></tr>
+            <tr><td><code>.reduce()</code></td><td>Boil the whole list down to one value</td><td>A single value (e.g. a sum)</td></tr>
+          </tbody>
+        </table>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">map-filter-reduce.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const nums = [1, 2, 3, 4, 5, 6];
+
+// map: double each number
+const doubled = nums.map((n) => n * 2);
+console.log("doubled:", doubled);   // [2,4,6,8,10,12]
+
+// filter: keep only even numbers
+const evens = nums.filter((n) => n % 2 === 0);
+console.log("evens:", evens);       // [2,4,6]
+
+// reduce: add them all up (0 is the starting total)
+const total = nums.reduce((sum, n) => sum + n, 0);
+console.log("total:", total);       // 21
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">real-world.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const products = [
+  { name: "Pen", price: 20 },
+  { name: "Notebook", price: 60 },
+  { name: "Bag", price: 500 },
+];
+
+// Get just the names:
+console.log(products.map((p) => p.name));
+
+// Only items under 100:
+console.log(products.filter((p) => p.price < 100).map(p => p.name));
+
+// Total cart price:
+const cartTotal = products.reduce((sum, p) => sum + p.price, 0);
+console.log("Cart total: ₹" + cartTotal);
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="challenge">
+          <h4>🧪 Try it yourself</h4>
+          <p>Using the <code>products</code> array above, use <code>.map()</code> to create a new array where every price is <strong>doubled</strong>. (Hint: <code>{ name: p.name, price: p.price * 2 }</code>.)</p>
+        </div>
+      </section>
+
+      <!-- MORE ARRAY METHODS -->
+      <section id="morearrays" class="section">
+        <h2>⑯ More array methods you'll reach for <span class="chip inter">Intermediate</span></h2>
+        <p>Beyond the big three, a handful of array methods come up daily. Here's the quick reference, then a live playground.</p>
+        <table>
+          <thead><tr><th>Method</th><th>What it does</th><th>Returns</th></tr></thead>
+          <tbody>
+            <tr><td><code>.find()</code></td><td>First item that passes a test</td><td>The item (or <code>undefined</code>)</td></tr>
+            <tr><td><code>.findIndex()</code></td><td>Position of the first match</td><td>Index (or <code>-1</code>)</td></tr>
+            <tr><td><code>.some()</code></td><td>Does <em>any</em> item pass?</td><td><code>true</code>/<code>false</code></td></tr>
+            <tr><td><code>.every()</code></td><td>Do <em>all</em> items pass?</td><td><code>true</code>/<code>false</code></td></tr>
+            <tr><td><code>.indexOf()</code></td><td>Position of an exact value</td><td>Index (or <code>-1</code>)</td></tr>
+            <tr><td><code>.sort()</code></td><td>Reorder items (mutates! see warning)</td><td>The same array, sorted</td></tr>
+            <tr><td><code>.slice(a,b)</code></td><td>Copy a portion — no mutation</td><td>A new array</td></tr>
+            <tr><td><code>.splice(i,n)</code></td><td>Remove/insert in place — <em>mutates</em></td><td>The removed items</td></tr>
+            <tr><td><code>.concat()</code> / <code>.join()</code></td><td>Combine arrays / glue into a string</td><td>New array / a string</td></tr>
+            <tr><td><code>.flat()</code></td><td>Flatten nested arrays one level</td><td>A new array</td></tr>
+          </tbody>
+        </table>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">more-arrays.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const users = [
+  { id: 1, name: "Ana", age: 30 },
+  { id: 2, name: "Ben", age: 17 },
+  { id: 3, name: "Cara", age: 25 },
+];
+
+// find: get the first match (great for "look up by id")
+console.log(users.find((u) => u.id === 2));      // Ben's object
+console.log(users.findIndex((u) => u.id === 3)); // 2
+
+// some / every: quick yes/no over the whole list
+console.log(users.some((u) => u.age < 18));      // true (Ben)
+console.log(users.every((u) => u.age >= 18));    // false
+
+// join + map: build a sentence
+const names = users.map((u) => u.name).join(", ");
+console.log("Members: " + names);                // "Ana, Ben, Cara"
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+
+        <h3>Sorting — and the classic numeric gotcha</h3>
+        <p>Here's one that bites almost everyone. By default, <code>.sort()</code> converts items to <em>strings</em> and sorts alphabetically. That means <code>[10, 2, 1].sort()</code> gives <code>[1, 10, 2]</code> — because the string <code>"10"</code> comes before <code>"2"</code>! To sort numbers correctly you must pass a <strong>compare function</strong>: <code>(a, b) =&gt; a - b</code> for ascending. A negative result means "a comes first", positive means "b comes first".</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">sorting.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const nums = [10, 2, 1, 25, 7];
+
+// WRONG — sorts as strings:
+console.log([...nums].sort());            // [1, 10, 2, 25, 7]
+
+// RIGHT — numeric ascending:
+console.log([...nums].sort((a, b) => a - b)); // [1, 2, 7, 10, 25]
+
+// Descending — just flip it:
+console.log([...nums].sort((a, b) => b - a)); // [25, 10, 7, 2, 1]
+
+// Sort objects by a field:
+const people = [{ n: "Zoe", age: 40 }, { n: "Al", age: 22 }];
+console.log(people.sort((a, b) => a.age - b.age));
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p><code>.sort()</code> and <code>.splice()</code> <strong>change the original array in place</strong>. That's why above we sort a <em>copy</em> made with <code>[...nums]</code>. <code>.slice()</code> and <code>.concat()</code>, by contrast, leave the original alone and return a new array — safer, and the style React prefers.</p></div>
+      </section>
+
+      <!-- DEFAULT & REST PARAMS -->
+      <section id="params" class="section">
+        <h2>⑰ Default &amp; rest parameters <span class="chip inter">Intermediate</span></h2>
+        <p>Two small but constant features for writing flexible functions.</p>
+        <p><strong>Default parameters</strong> let you give a parameter a fallback value for when the caller doesn't supply one. Without it, a missing argument is <code>undefined</code> and can cause bugs; with it, you get a sensible default.</p>
+        <p><strong>Rest parameters</strong> (<code>...args</code>) do the opposite — they let a function accept <em>any number</em> of arguments and bundle them into an array. (The <code>...</code> is the same syntax as spread, but here it <em>gathers</em> instead of <em>spreading</em>.)</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">params.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">// Default parameter: greeting falls back to "Hello"
+function greet(name, greeting = "Hello") {
+  return greeting + ", " + name + "!";
+}
+console.log(greet("Sam"));            // "Hello, Sam!"
+console.log(greet("Sam", "Welcome")); // "Welcome, Sam!"
+
+// Rest parameter: gather all numbers into an array
+function sum(...numbers) {
+  return numbers.reduce((total, n) => total + n, 0);
+}
+console.log(sum(1, 2));          // 3
+console.log(sum(1, 2, 3, 4, 5)); // 15
+console.log(sum());             // 0
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+      </section>
+
+      <!-- OPTIONAL CHAINING & NULLISH -->
+      <section id="optional" class="section">
+        <h2>⑱ Optional chaining <code>?.</code> &amp; nullish <code>??</code> <span class="chip inter">Intermediate</span> <span class="chip adv">Advanced</span></h2>
+        <p>These two tiny operators solve a huge real-world pain: dealing with data that <em>might</em> be missing. When you fetch a user from an API, maybe their <code>address</code> didn't come back. Reading <code>user.address.city</code> would then crash with <em>"Cannot read properties of undefined"</em> — one of the most common errors beginners hit.</p>
+        <p><strong>Optional chaining</strong> <code>?.</code> says "if the thing before me is <code>null</code> or <code>undefined</code>, stop and give back <code>undefined</code> instead of crashing." So <code>user?.address?.city</code> safely returns <code>undefined</code> when anything along the path is missing.</p>
+        <p><strong>Nullish coalescing</strong> <code>??</code> means "use the left side, unless it's <code>null</code> or <code>undefined</code> — then use the right." It's like <code>||</code> but <em>only</em> falls back on null/undefined, not on every falsy value. That difference matters: with <code>||</code>, a valid <code>0</code> or <code>""</code> would wrongly trigger the fallback; with <code>??</code> it won't.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">optional-nullish.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const user = {
+  name: "Mara",
+  address: { city: "Goa" },
+  // note: no `phone` property
+};
+
+// Safe deep access — no crash if a piece is missing:
+console.log(user?.address?.city);   // "Goa"
+console.log(user?.contact?.email);  // undefined (no crash!)
+
+// Nullish coalescing: provide a fallback
+const phone = user.phone ?? "no phone on file";
+console.log(phone);                 // "no phone on file"
+
+// Why ?? beats || here: 0 is a VALID value
+const count = 0;
+console.log(count || 5);   // 5  (|| wrongly replaces 0)
+console.log(count ?? 5);   // 0  (?? keeps the real 0)
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>You'll use <code>?.</code> and <code>??</code> <em>constantly</em> in React and Node, because data from APIs and databases is often partial. They turn "my app crashed" into "my app showed a sensible default."</p></div>
+      </section>
+
+      <!-- SETS & MAPS -->
+      <section id="setsmaps" class="section">
+        <h2>⑲ Sets &amp; Maps — specialised collections <span class="chip inter">Intermediate</span></h2>
+        <p>Arrays and objects cover most needs, but two other collections are worth knowing for the jobs they do better.</p>
+        <p>A <strong>Set</strong> is a list that automatically keeps only <em>unique</em> values — duplicates are ignored. The instant use: removing duplicates from an array. Wrap an array in <code>new Set(...)</code> and spread it back out.</p>
+        <p>A <strong>Map</strong> is like an object (key → value pairs) but its keys can be <em>any</em> type (not just strings), it remembers insertion order, and it has a clean <code>.size</code> plus <code>.get()</code>/<code>.set()</code>/<code>.has()</code> methods. Reach for a Map when you're building a lookup table or counting things.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">sets-maps.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">// Set: unique values only
+const tags = ["js", "react", "js", "node", "react"];
+const unique = [...new Set(tags)];
+console.log(unique);            // ["js","react","node"]
+console.log(new Set(tags).size); // 3
+
+// Map: a clean key/value store
+const scores = new Map();
+scores.set("Ana", 90);
+scores.set("Ben", 75);
+console.log(scores.get("Ana"));  // 90
+console.log(scores.has("Ben"));  // true
+console.log(scores.size);        // 2
+
+for (const [name, score] of scores) {
+  console.log(name + ": " + score);
+}
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout info"><span class="ci">💡</span><p><strong>When to use which:</strong> need uniqueness? Set. Need a flexible key/value lookup with non-string keys or frequent add/remove? Map. Otherwise, plain arrays and objects are still your default.</p></div>
+      </section>
+
+      <!-- IMMUTABILITY -->
+      <section id="immutability" class="section">
+        <h2>⑳ Immutability — why we avoid mutating <span class="chip inter">Intermediate</span> <span class="chip adv">Advanced</span></h2>
+        <p>To <strong>mutate</strong> means to change something in place. <code>arr.push(x)</code> mutates the array; <code>user.age = 31</code> mutates the object. It feels natural, but in modern apps — especially React — we deliberately <em>avoid</em> mutating shared data. Instead we make a <strong>copy with the change applied</strong>, leaving the original untouched.</p>
+        <p><strong>Why?</strong> Two reasons. First, when several parts of your code share the same object, one piece mutating it can mysteriously break another (a "spooky action at a distance" bug). Second, React decides whether to re-render by checking if an object/array is a <em>new</em> one — if you mutate in place, it's still the same reference, and the screen won't update. So the rule becomes: <strong>don't change it, replace it.</strong></p>
+        <p>Your tools for copying-with-changes are ones you already met: <strong>spread</strong> (<code>{...obj}</code>, <code>[...arr]</code>) and <strong>map/filter</strong> (which always return new arrays).</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">immutability.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const user = { name: "Ivy", age: 30 };
+
+// ❌ Mutating (avoid in React):
+// user.age = 31;
+
+// ✅ Copy with the change — original stays intact:
+const older = { ...user, age: 31 };
+console.log(user);   // { name: "Ivy", age: 30 }  (unchanged)
+console.log(older);  // { name: "Ivy", age: 31 }
+
+const todos = ["learn", "build"];
+
+// ✅ Add without mutating:
+const more = [...todos, "ship"];
+console.log(todos);  // ["learn","build"]  (unchanged)
+console.log(more);   // ["learn","build","ship"]
+
+// ✅ Remove without mutating (filter returns a new array):
+const fewer = more.filter((t) => t !== "build");
+console.log(fewer);  // ["learn","ship"]
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>This is one of the most important habits for React. "Never mutate state — return a new copy" will make total sense once you're updating <code>useState</code> values. You're building the muscle memory now.</p></div>
+        <div class="challenge">
+          <h4>🧪 Try it yourself</h4>
+          <p>Given <code>const cart = [{ id: 1, qty: 1 }]</code>, produce a <em>new</em> array that adds <code>{ id: 2, qty: 3 }</code> without mutating <code>cart</code>. Then log both to prove the original is unchanged.</p>
+        </div>
+      </section>
+
+      <!-- THIS -->
+      <section id="this" class="section">
+        <h2>㉑ The <code>this</code> keyword — a gentle intro <span class="chip adv">Advanced</span></h2>
+        <p><code>this</code> is JavaScript's most confusing keyword, so we'll keep it light. In plain terms, <code>this</code> refers to "the object the current function is attached to" — but crucially, <strong>what <code>this</code> points to depends on <em>how the function is called</em>, not where it's written.</strong> Inside an object method, <code>this</code> usually means "the object this method belongs to."</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">this-keyword.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const account = {
+  owner: "Riya",
+  balance: 100,
+  describe: function () {
+    // `this` refers to the `account` object:
+    return this.owner + " has ₹" + this.balance;
+  },
+};
+
+console.log(account.describe());   // "Riya has ₹100"
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p><strong>Arrow functions are different — and that's a feature.</strong> An arrow function does <em>not</em> get its own <code>this</code>; it borrows <code>this</code> from the surrounding code. This is exactly why React and modern code favour arrow functions for callbacks: they don't surprise you by changing what <code>this</code> means. As a beginner, the takeaway is simple — use arrow functions and you'll rarely fight with <code>this</code>.</p></div>
+      </section>
+
+      <!-- DOM -->
+      <section id="dom" class="section">
+        <h2>㉒ The DOM — JavaScript controlling the page <span class="chip inter">Intermediate</span></h2>
+        <p>The <strong>DOM</strong> (Document Object Model) is JavaScript's live connection to the HTML on screen. With it, JS can read the page, change text, respond to clicks, and add/remove elements. React is built on top of this idea — so understanding it helps a lot.</p>
+        <p>The two moves you'll see everywhere:</p>
+        <div class="code-wrap">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">dom-basics.js (runs in a real browser page)</span>
+            <span class="actions"><button class="copy">Copy</button></span>
+          </div>
+<pre><code class="js">// 1. Find an element on the page
+const btn = document.querySelector("#myButton");
+const title = document.querySelector("h1");
+
+// 2. Change it
+title.textContent = "Updated by JavaScript!";
+
+// 3. React to a click ("event listener")
+btn.addEventListener("click", () => {
+  alert("You clicked the button!");
+});</code></pre>
+        </div>
+        <p>Below is a tiny <strong>live, real DOM demo</strong> — not a console example, but actual interactive HTML. Click the button:</p>
+        <div class="card" style="text-align:center;">
+          <h3 id="dom-demo-title" style="margin-top:0;">Clicks: 0</h3>
+          <button id="dom-demo-btn" class="btn btn-primary">Click me!</button>
+          <button id="dom-demo-reset" class="btn btn-ghost">Reset</button>
+          <p class="muted" style="margin-top:14px;">This is JavaScript updating the page in real time, just like the code above.</p>
+        </div>
+        <script>
+          (function () {
+            let n = 0;
+            const t = document.getElementById("dom-demo-title");
+            document.getElementById("dom-demo-btn").addEventListener("click", () => { n++; t.textContent = "Clicks: " + n; });
+            document.getElementById("dom-demo-reset").addEventListener("click", () => { n = 0; t.textContent = "Clicks: 0"; });
+          })();
+        </script>
+        <div class="callout info"><span class="ci">💡</span><p>You'll rarely touch the DOM by hand once you know React — React updates the page for you. But this is what's happening under the hood every time the screen changes.</p></div>
+      </section>
+
+      <!-- PROMISES -->
+      <section id="promises" class="section">
+        <h2>㉓ Promises — a value that arrives later <span class="chip inter">Intermediate</span> <span class="chip adv">Advanced</span></h2>
+        <p>Before <code>async</code>/<code>await</code>, you need to meet the thing they're built on: the <strong>Promise</strong>. A Promise is an object that represents a value that <em>isn't ready yet</em> but will be — like a restaurant buzzer. When you order food, you don't stand frozen at the counter; you get a buzzer (the Promise) and go sit down. The buzzer eventually does one of two things: lights up "your food is ready" (the Promise <strong>resolves</strong> with a value) or "sorry, we're out" (the Promise <strong>rejects</strong> with an error).</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 180" role="img" aria-label="A promise resolves or rejects">
+            <rect x="270" y="20" width="180" height="44" rx="10" fill="#1b2030" stroke="#6c8cff" stroke-width="2"/>
+            <text x="360" y="47" text-anchor="middle" fill="#cfe3ff" font-size="14" font-family="monospace">Promise (pending)</text>
+            <path d="M300,64 L160,118" stroke="#38d39f" stroke-width="2" fill="none" marker-end="url(#pok)"/>
+            <path d="M420,64 L560,118" stroke="#ff6b6b" stroke-width="2" fill="none" marker-end="url(#perr)"/>
+            <rect x="50" y="118" width="220" height="48" rx="10" fill="#13261c" stroke="#38d39f" stroke-width="2"/>
+            <text x="160" y="140" text-anchor="middle" fill="#9ee493" font-size="13">resolved ✓</text>
+            <text x="160" y="158" text-anchor="middle" fill="#aab2c5" font-size="11" font-family="monospace">.then(data =&gt; ...)</text>
+            <rect x="450" y="118" width="220" height="48" rx="10" fill="#2a1717" stroke="#ff6b6b" stroke-width="2"/>
+            <text x="560" y="140" text-anchor="middle" fill="#ff8a88" font-size="13">rejected ✗</text>
+            <text x="560" y="158" text-anchor="middle" fill="#aab2c5" font-size="11" font-family="monospace">.catch(err =&gt; ...)</text>
+            <defs>
+              <marker id="pok" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#38d39f"/></marker>
+              <marker id="perr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#ff6b6b"/></marker>
+            </defs>
+          </svg>
+          <figcaption>A Promise starts "pending", then either <strong>resolves</strong> (handled by <code>.then()</code>) or <strong>rejects</strong> (handled by <code>.catch()</code>).</figcaption>
+        </figure>
+        <p>You attach handlers with <code>.then()</code> (runs when it resolves, receiving the value) and <code>.catch()</code> (runs if it rejects, receiving the error). Many built-in things hand you Promises already — most famously <code>fetch()</code> for calling APIs.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">promises.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">// A promise that resolves after a short wait:
+function getNumber() {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(42), 500);
+  });
+}
+
+getNumber()
+  .then((value) => {
+    console.log("Got:", value);   // runs when it resolves
+    return value * 2;
+  })
+  .then((doubled) => console.log("Doubled:", doubled))
+  .catch((err) => console.log("Failed:", err.message));
+
+console.log("This logs first — the promise is still pending!");
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout info"><span class="ci">💡</span><p><strong><code>Promise.all([...])</code></strong> lets you fire several promises at once and wait for them <em>all</em> to finish — perfect for loading multiple things in parallel. It resolves to an array of all the results, or rejects if any single one fails.</p></div>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">promise-all.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const wait = (value, ms) =>
+  new Promise((resolve) => setTimeout(() => resolve(value), ms));
+
+// Run three "downloads" in parallel, wait for all:
+Promise.all([wait("🍎", 300), wait("🍌", 200), wait("🍇", 400)])
+  .then((results) => console.log("All done:", results))
+  .catch((err) => console.log("One failed:", err.message));
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p><code>.then()</code> chains work, but they get nested and hard to read for multi-step flows. That's exactly the problem <code>async</code>/<code>await</code> (next section) solves — it's just a nicer way to write the very same Promises.</p></div>
+      </section>
+
+      <!-- ASYNC -->
+      <section id="async" class="section">
+        <h2>㉔ Async &amp; await — Promises made readable <span class="chip inter">Intermediate</span> <span class="chip adv">Advanced</span></h2>
+        <p>Some tasks take time: fetching data from a server, reading a file, querying a database. JavaScript doesn't freeze while it waits — it carries on, then comes back when the result is ready. This is <strong>asynchronous</strong> code, and it's everywhere in real apps. <code>async</code>/<code>await</code> is modern syntax that lets you work with the Promises you just learned, but write them in a clean top-to-bottom style that <em>reads</em> like ordinary step-by-step code.</p>
+        <p>Two keywords: mark a function <code>async</code> to use <code>await</code> inside it. Then <code>await somePromise</code> means "pause right here until this Promise resolves, then give me its value." Under the hood it's the same Promise from the previous section — <code>await</code> is just unwrapping it for you.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 760 150" role="img" aria-label="Async timeline">
+            <line x1="40" y1="75" x2="720" y2="75" stroke="#2c3447" stroke-width="2"/>
+            <circle cx="120" cy="75" r="8" fill="#6c8cff"/><text x="120" y="55" text-anchor="middle" fill="#aab2c5" font-size="12">call fetch()</text>
+            <rect x="200" y="60" width="240" height="30" rx="6" fill="#23304d" stroke="#6c8cff"/><text x="320" y="80" text-anchor="middle" fill="#cfe3ff" font-size="12">waiting for server… (UI stays responsive)</text>
+            <circle cx="500" cy="75" r="8" fill="#38d39f"/><text x="500" y="55" text-anchor="middle" fill="#9ee493" font-size="12">data arrives</text>
+            <text x="620" y="80" fill="#fff" font-size="12">→ use the data</text>
+          </svg>
+          <figcaption><code>await</code> means "pause this function until the result is ready" — without freezing the rest of the app.</figcaption>
+        </figure>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">async.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">// A fake "server call" that takes 1 second, then returns data.
+function fetchUser() {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve({ name: "Nadia", role: "admin" }), 1000);
+  });
+}
+
+// `async` lets us use `await` inside.
+async function showUser() {
+  console.log("Fetching user…");
+  const user = await fetchUser();   // pause here ~1s
+  console.log("Got it:", user.name, "(" + user.role + ")");
+}
+
+showUser();
+console.log("This line runs immediately, before the user arrives!");
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>Notice the order in the output: "This line runs immediately…" appears <em>before</em> "Got it". That's async in action — JS didn't wait around. You'll use this exact pattern to fetch data in React (Module 2) and query the database in Node (Module 3 &amp; 5). When something might fail, wrap the <code>await</code> in a <code>try/catch</code> — exactly the error handling we cover next.</p></div>
+      </section>
+
+      <!-- ERROR HANDLING -->
+      <section id="errors" class="section">
+        <h2>㉕ Error handling — failing gracefully <span class="chip inter">Intermediate</span> <span class="chip adv">Advanced</span></h2>
+        <p>Things go wrong: a server is down, input is malformed, a file is missing. Without handling, an error <strong>crashes</strong> the running code. The job of error handling is to catch the problem, respond sensibly (show a message, use a default, log it), and keep the app alive.</p>
+        <p>When something goes wrong, JavaScript creates an <strong>Error object</strong> — it has a <code>.name</code> (like <code>"TypeError"</code>) and a <code>.message</code> describing the problem. You can <strong>throw</strong> your own errors too, with <code>throw new Error("...")</code>, to signal "this situation is invalid — stop and handle it." You catch all this with <code>try</code> / <code>catch</code>, and an optional <code>finally</code> block runs no matter what (success or failure) — perfect for cleanup.</p>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">error-handling.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">function withdraw(balance, amount) {
+  // throw our own error when the situation is invalid:
+  if (amount > balance) {
+    throw new Error("Insufficient funds");
+  }
+  return balance - amount;
+}
+
+try {
+  console.log("New balance:", withdraw(100, 30));   // works → 70
+  console.log("New balance:", withdraw(100, 500));  // throws!
+  console.log("This line never runs");
+} catch (err) {
+  console.log("Caught:", err.name, "-", err.message);
+} finally {
+  console.log("Done (this always runs)");
+}
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">async-try-catch.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">// Simulate a server call that might fail:
+function fetchData(shouldFail) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (shouldFail) reject(new Error("Server unavailable"));
+      else resolve({ ok: true });
+    }, 300);
+  });
+}
+
+async function load() {
+  try {
+    const data = await fetchData(true);   // ← change to false
+    console.log("Loaded:", data);
+  } catch (err) {
+    console.log("Could not load:", err.message);
+  }
+}
+
+load();
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>This <code>try { await ... } catch (err) { ... }</code> pattern is exactly how you'll handle failed API calls and database queries in React and Node. Always assume network calls can fail and wrap them.</p></div>
+        <div class="quiz">
+          <div class="q">What does the <code>finally</code> block do?</div>
+          <div class="opt" data-correct="false">Runs only when there's an error</div>
+          <div class="opt" data-correct="false">Runs only when there's no error</div>
+          <div class="opt" data-correct="true">Runs no matter what — after success or failure</div>
+          <div class="explain">✅ <code>finally</code> always runs, which makes it ideal for cleanup like closing a connection or hiding a loading spinner.</div>
+        </div>
+      </section>
+
+      <!-- ADVANCED -->
+      <section id="advanced" class="section">
+        <h2>㉖ Advanced essentials you'll actually use <span class="chip adv">Advanced</span></h2>
+        <p>A few modern features that show up constantly in React and Node code. You don't need to memorise them — just recognise them.</p>
+
+        <h3>Destructuring — pull values out by name</h3>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">destructuring.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const user = { name: "Omar", age: 40, city: "Cairo" };
+
+// Instead of user.name, user.age... pull them out at once:
+const { name, city } = user;
+console.log(name, "lives in", city);
+
+// Works on arrays too (by position):
+const [first, second] = ["gold", "silver", "bronze"];
+console.log(first, second); // gold silver
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+
+        <h3>Spread — copy &amp; combine</h3>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">spread.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">const base = { name: "Ada", role: "user" };
+
+// `...base` copies all its properties; then we override role.
+const admin = { ...base, role: "admin" };
+console.log(admin); // { name: "Ada", role: "admin" }
+
+// Combine arrays:
+const a = [1, 2], b = [3, 4];
+console.log([...a, ...b]); // [1,2,3,4]
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout info"><span class="ci">💡</span><p>Spread (<code>{ ...old, changed: value }</code>) is <em>the</em> way you'll update state in React without mutating the original — a core pattern. You just met it here first.</p></div>
+
+        <h3>try / catch — handling errors gracefully</h3>
+        <div class="code-wrap live">
+          <div class="code-head">
+            <span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span>
+            <span class="label">try-catch.js</span>
+            <span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span>
+          </div>
+          <textarea class="editor" spellcheck="false">function riskyParse(text) {
+  try {
+    const data = JSON.parse(text);   // may throw if text is bad
+    console.log("Parsed:", data);
+  } catch (err) {
+    console.error("Could not parse:", err.message);
+  }
+}
+
+riskyParse('{"ok": true}');   // works
+riskyParse('not json!!');     // caught — app doesn't crash
+</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+      </section>
+
+      <!-- MODULES -->
+      <section id="modules" class="section">
+        <h2>㉗ Modules — splitting code across files <span class="chip inter">Intermediate</span></h2>
+        <p>Real projects aren't one giant file — they're many small files, each focused on one job. <strong>Modules</strong> are how files share code: one file <code>export</code>s the things it wants to make available, and another file <code>import</code>s them. This keeps code organised and reusable.</p>
+        <p>There are two flavours of export. A <strong>named export</strong> exposes specific things by name (you import them inside <code>{ }</code>). A <strong>default export</strong> marks the one main thing a file provides (you import it with any name you like, no braces). Because these examples span multiple files, they're shown as static code rather than runnable here.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">math.js — exporting</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">// Named exports — expose specific values by name
+export const PI = 3.14159;
+export function add(a, b) {
+  return a + b;
+}
+
+// Default export — the file's main thing (only one allowed)
+export default function multiply(a, b) {
+  return a * b;
+}</code></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">app.js — importing</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">// Default import (any name) + named imports (in braces)
+import multiply, { PI, add } from "./math.js";
+
+console.log(add(2, 3));     // 5
+console.log(multiply(4, 5)); // 20
+console.log(PI);            // 3.14159</code></pre>
+        </div>
+        <div class="callout info"><span class="ci">💡</span><p>This is the same <code>import</code>/<code>export</code> syntax you'll use in every React component file and most Node code. Node also has an older style (<code>require()</code> / <code>module.exports</code>) — we cover both, and when to use each, in the <a href="04-node.html">Node module</a>.</p></div>
+      </section>
+
+      <!-- QUIZ -->
+      <section id="quiz" class="section">
+        <h2>Quiz — check your understanding</h2>
+        <div class="quiz">
+          <div class="q">1. What is the value of <code>fruits[0]</code> for <code>const fruits = ["a", "b", "c"]</code>?</div>
+          <div class="opt" data-correct="true">"a"</div>
+          <div class="opt" data-correct="false">"b"</div>
+          <div class="opt" data-correct="false">An error</div>
+          <div class="explain">✅ Array indexes start at 0, so <code>fruits[0]</code> is the first item, <code>"a"</code>.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">2. Which method creates a new array containing only items that pass a test?</div>
+          <div class="opt" data-correct="false">.map()</div>
+          <div class="opt" data-correct="true">.filter()</div>
+          <div class="opt" data-correct="false">.reduce()</div>
+          <div class="explain">✅ <code>.filter()</code> keeps items that return <code>true</code>. <code>.map()</code> transforms every item; <code>.reduce()</code> boils the list down to one value.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">3. What does <code>await</code> do?</div>
+          <div class="opt" data-correct="false">Stops the entire program forever</div>
+          <div class="opt" data-correct="true">Pauses the function until a result is ready, without freezing the app</div>
+          <div class="opt" data-correct="false">Makes code run faster</div>
+          <div class="explain">✅ <code>await</code> waits for an async result (like a server response) inside an <code>async</code> function, while the rest of the app keeps running.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">4. Why should you use <code>===</code> instead of <code>==</code>?</div>
+          <div class="opt" data-correct="true">It compares value <em>and</em> type, avoiding surprising bugs</div>
+          <div class="opt" data-correct="false">It's faster to type</div>
+          <div class="opt" data-correct="false">There's no difference</div>
+          <div class="explain">✅ <code>===</code> is strict equality — no surprising type conversions. <code>0 == ""</code> is <code>true</code> (yikes!), but <code>0 === ""</code> is <code>false</code>.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">5. Which of these is <strong>falsy</strong>?</div>
+          <div class="opt" data-correct="false"><code>"0"</code> (string zero)</div>
+          <div class="opt" data-correct="false"><code>[]</code> (empty array)</div>
+          <div class="opt" data-correct="true"><code>""</code> (empty string)</div>
+          <div class="explain">✅ The empty string <code>""</code> is falsy. Tricky ones: <code>"0"</code> and <code>[]</code> are both <em>truthy</em> — only empty strings, <code>0</code>, <code>null</code>, <code>undefined</code>, <code>NaN</code>, and <code>false</code> are falsy.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">6. What does <code>[10, 2, 1].sort()</code> return (no compare function)?</div>
+          <div class="opt" data-correct="false"><code>[1, 2, 10]</code></div>
+          <div class="opt" data-correct="true"><code>[1, 10, 2]</code></div>
+          <div class="opt" data-correct="false">An error</div>
+          <div class="explain">✅ Default <code>.sort()</code> compares items as <em>strings</em>, so <code>"10"</code> sorts before <code>"2"</code>. For numbers, pass a compare function: <code>.sort((a, b) =&gt; a - b)</code>.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">7. <code>const u = {}; console.log(u?.profile?.city)</code> prints what?</div>
+          <div class="opt" data-correct="false">A crash / TypeError</div>
+          <div class="opt" data-correct="true"><code>undefined</code></div>
+          <div class="opt" data-correct="false"><code>null</code></div>
+          <div class="explain">✅ Optional chaining <code>?.</code> stops safely and returns <code>undefined</code> instead of crashing when part of the path is missing. Without <code>?.</code>, <code>u.profile.city</code> would throw.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">8. To update an object in React-friendly style, you should…</div>
+          <div class="opt" data-correct="false">Mutate it directly: <code>user.age = 31</code></div>
+          <div class="opt" data-correct="true">Make a copy with the change: <code>{ ...user, age: 31 }</code></div>
+          <div class="opt" data-correct="false">Delete it and start over</div>
+          <div class="explain">✅ Prefer immutability — copy with spread and apply the change. This avoids spooky shared-state bugs and lets React detect the change and re-render.</div>
+        </div>
+      </section>
+
+      <section id="takeaways" class="section">
+        <h2>Key takeaways</h2>
+        <div class="card">
+          <ul>
+            <li>Store values in <strong>variables</strong> (<code>const</code> by default, <code>let</code> when it changes); <code>let</code>/<code>const</code> are <strong>block-scoped</strong> — never use <code>var</code>.</li>
+            <li>The core types: <strong>string, number, boolean, array, object</strong>, plus <code>null</code>/<code>undefined</code>. Build text with template strings <code>`${...}`</code>.</li>
+            <li>Know the short <strong>falsy</strong> list (<code>false, 0, "", null, undefined, NaN</code>) — everything else is truthy. Compare with <code>===</code>.</li>
+            <li>Decide with <code>if</code>/<code>else</code>, the <strong>ternary</strong> <code>cond ? a : b</code>, and <code>switch</code>.</li>
+            <li><strong>Functions</strong> package reusable logic; arrow functions <code>(x) =&gt; ...</code> are the modern style and don't bind their own <code>this</code>.</li>
+            <li><strong>Higher-order functions</strong> take callbacks; <strong>closures</strong> let functions remember private state.</li>
+            <li>Master <strong>string</strong> methods (<code>slice</code>, <code>split</code>, <code>includes</code>, <code>trim</code>…) and <strong>Math</strong>/<code>Number()</code> for converting and rounding.</li>
+            <li><strong>Arrays of objects</strong> model real data; <code>map</code> / <code>filter</code> / <code>reduce</code> / <code>find</code> / <code>sort</code> are your daily power tools (remember the numeric-sort gotcha).</li>
+            <li>Use <strong>default &amp; rest params</strong>, <strong>optional chaining</strong> <code>?.</code> and <strong>nullish</strong> <code>??</code> to handle missing data safely.</li>
+            <li>Prefer <strong>immutability</strong> — copy with spread/<code>map</code> instead of mutating; it's a core React habit.</li>
+            <li><strong>Promises</strong> (<code>.then()</code>/<code>.catch()</code>/<code>Promise.all</code>) and <strong>async / await</strong> handle anything that takes time; wrap them in <code>try/catch</code>.</li>
+            <li>Recognise <strong>destructuring</strong>, <strong>spread</strong>, and <strong>import/export</strong> — they're everywhere in React and Node.</li>
+          </ul>
+          <label class="complete-toggle"><input type="checkbox" data-module="javascript" /> Mark this module complete</label>
+        </div>
+      </section>
+
+      <div class="pager">
+        <a href="01-foundations.html" class="prev"><div class="dir">← Previous</div><div class="ttl">0 · Foundations</div></a>
+        <a href="03-react.html" class="next"><div class="dir">Next →</div><div class="ttl">2 · React</div></a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>DevLaunch Academy · Module 1 of 6</p>
+  <div class="signature" aria-label="Author signature">
+    <span class="sig-br">/**</span>
+    <span class="sig-line"><span class="sig-tag">* @author</span>&nbsp; Sumanth Reddy Pathi</span>
+    <span class="sig-line"><span class="sig-tag">* @role</span>&nbsp;&nbsp;&nbsp; Software Engineer · 7+ yrs — Web · AI &amp; MedTech</span>
+    <span class="sig-line"><span class="sig-tag">* @company</span> Compliance Group</span>
+    <span class="sig-br">*/<span class="sig-caret">&nbsp;▌</span></span>
+  </div>
+</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>

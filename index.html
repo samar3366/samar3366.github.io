@@ -4,60 +4,494 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sumanth Reddy</title>
+    <title>Sumanth Reddy — Senior Software Engineer &amp; AI Engineer</title>
+    <meta
+      name="description"
+      content="Sumanth Reddy Pathi — Senior Software Engineer and AI Engineer building enterprise platforms, Generative AI systems, and full-stack web applications."
+    />
+    <meta name="theme-color" content="#0a0e16" />
+    <meta property="og:title" content="Sumanth Reddy — Senior Software Engineer & AI Engineer" />
+    <meta
+      property="og:description"
+      content="Full-stack engineering, Generative AI, and solution architecture for enterprise platforms."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://samar3366.github.io/" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Set theme before paint to avoid a flash of the wrong mode -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("theme");
+          if (t !== "light" && t !== "dark") {
+            t = window.matchMedia("(prefers-color-scheme: light)").matches
+              ? "light"
+              : "dark";
+          }
+          document.documentElement.setAttribute("data-theme", t);
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <header>
-      <div class="title">
-        <div class="first-name">&#60;Sumanth Reddy&#62;</div>
-        <div class="last-name">&#60;/Pathi&#62;</div>
+    <!-- Navigation -->
+    <nav class="nav" id="nav">
+      <a class="nav__brand" href="#top">
+        <span class="tok-punc">&lt;</span><span class="tok-tag">Sumanth</span
+        ><span class="tok-punc">/&gt;</span>
+      </a>
+      <div class="nav__right">
+        <ul class="nav__links" id="navLinks">
+          <li><a href="#about"><span class="nav__num">01.</span> about</a></li>
+          <li><a href="#skills"><span class="nav__num">02.</span> skills</a></li>
+          <li><a href="#experience"><span class="nav__num">03.</span> experience</a></li>
+          <li><a href="#work"><span class="nav__num">04.</span> work</a></li>
+          <li><a href="#courses"><span class="nav__num">05.</span> courses</a></li>
+          <li>
+            <a class="nav__cta" href="#contact">contact()</a>
+          </li>
+        </ul>
+        <button
+          class="theme-toggle"
+          id="themeToggle"
+          type="button"
+          aria-label="Switch color theme"
+          aria-pressed="false"
+          title="Switch theme"
+        >
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+        <button class="nav__toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
-    </header>
-    <div class="body">
-      <div class="container-about">
-        <div class="about-section">
-          <div class="title">
-            c:\profile> I am a full-stack developer specialized in developing
-            front-end and back-end of complex scalable webapps. I am also
-            interested in developing new services (or) templates which is most
-            commonly used by developers.
+    </nav>
+
+    <main id="top">
+      <!-- Hero -->
+      <header class="hero">
+        <div class="hero__inner">
+          <p class="hero__intro reveal">$ whoami</p>
+          <h1 class="hero__name reveal">Sumanth Reddy.</h1>
+          <h2 class="hero__tagline reveal">
+            I build <span class="grad">AI-powered enterprise platforms</span>.
+          </h2>
+          <p class="hero__desc reveal">
+            Senior software engineer with ~7 years of experience across full-stack
+            development, Generative AI, and solution architecture. I take products from
+            concept to deployment — translating messy business problems into scalable,
+            intelligent systems.
+          </p>
+          <div class="hero__actions reveal">
+            <a class="btn btn--primary" href="#work">View my work</a>
+            <a class="btn btn--ghost" href="#contact">Get in touch</a>
+          </div>
+          <ul class="hero__stats reveal">
+            <li><strong>7+</strong><span>years building software</span></li>
+            <li><strong>QMS / DMS / TMS</strong><span>enterprise platforms shipped</span></li>
+            <li><strong>LLMs &amp; RAG</strong><span>in production</span></li>
+          </ul>
+        </div>
+
+        <div class="hero__terminal reveal" aria-hidden="true">
+          <div class="terminal">
+            <div class="terminal__bar">
+              <span class="dot dot--red"></span>
+              <span class="dot dot--amber"></span>
+              <span class="dot dot--green"></span>
+              <span class="terminal__title">sumanth — ~/profile</span>
+            </div>
+            <pre class="terminal__body"><code><span class="tok-key">const</span> <span class="tok-var">engineer</span> <span class="tok-op">=</span> {
+  <span class="tok-prop">name</span>: <span class="tok-str">"Sumanth Reddy Pathi"</span>,
+  <span class="tok-prop">role</span>: <span class="tok-str">"Senior SWE / AI Engineer"</span>,
+  <span class="tok-prop">based</span>: <span class="tok-str">"Hyderabad, India"</span>,
+  <span class="tok-prop">focus</span>: [<span class="tok-str">"GenAI"</span>, <span class="tok-str">"Full-Stack"</span>, <span class="tok-str">"Architecture"</span>],
+  <span class="tok-prop">stack</span>: {
+    <span class="tok-prop">ai</span>: [<span class="tok-str">"LLMs"</span>, <span class="tok-str">"RAG"</span>, <span class="tok-str">"Agents"</span>, <span class="tok-str">"vLLM"</span>],
+    <span class="tok-prop">backend</span>: [<span class="tok-str">"Python"</span>, <span class="tok-str">"Node.js"</span>, <span class="tok-str">"TS"</span>],
+    <span class="tok-prop">frontend</span>: [<span class="tok-str">"React"</span>, <span class="tok-str">"TypeScript"</span>],
+    <span class="tok-prop">cloud</span>: [<span class="tok-str">"Azure"</span>, <span class="tok-str">"Docker"</span>, <span class="tok-str">"AKS"</span>],
+  },
+  <span class="tok-prop">shipping</span>: <span class="tok-bool">true</span>,
+};</code></pre>
           </div>
         </div>
-        <div class="contact-section">
-          <code>
-            var contactDetails = {<br />
-            &emsp;mobile: "8008089900",<br />
-            &emsp;email: "sumanthreddypathi3366@gmail.com",<br />
-            &emsp;address: "Hyderabad, Telangana",<br />
-            &emsp;github: "<a
-              href="https://github.com/samar3366"
-              target="_blank"
-              >www.github.com/samar3366"</a
-            ><br />
-            &emsp;linkedin: "<a
-              href="https://www.linkedin.com/in/sum-123"
-              target="_blank"
-              >www.linkedin.com/in/sum-123"</a
-            ><br />
-            }
-          </code>
+      </header>
+
+      <!-- About -->
+      <section class="section" id="about">
+        <h2 class="section__title"><span class="section__num">01.</span> about<span class="caret">()</span></h2>
+        <div class="about">
+          <div class="about__text">
+            <p>
+              I operate at the intersection of <strong>enterprise software</strong>,
+              <strong>Generative AI</strong>, data engineering, and product development —
+              usually leading initiatives end to end, from the first whiteboard sketch to a
+              deployed, customer-facing system.
+            </p>
+            <p>
+              Over the last several years at
+              <a href="#experience" class="inline-link">Compliance Group</a>, I've helped build and
+              modernize Quality, Document, and Training Management platforms for regulated
+              industries — and more recently led the push to embed AI copilots, RAG-based
+              knowledge systems, and agentic workflows directly into those products.
+            </p>
+            <p>
+              I think less like a pure developer and more like a
+              <strong>technical product lead</strong>: weighing business impact, shaping
+              features, and balancing technical feasibility against real customer value.
+            </p>
+            <p class="about__lead-in">A few things I care about:</p>
+            <ul class="about__list">
+              <li>End-to-end ownership — requirements through deployment</li>
+              <li>Bringing AI into enterprise software, responsibly</li>
+              <li>Systems thinking: platforms, pipelines &amp; reusable frameworks</li>
+              <li>Learning fast across AI, cloud, product &amp; compliance</li>
+            </ul>
+          </div>
+          <aside class="about__card">
+            <div class="about__card-head">
+              <span class="dot dot--red"></span>
+              <span class="dot dot--amber"></span>
+              <span class="dot dot--green"></span>
+              <span class="about__card-title">focus-areas.md</span>
+            </div>
+            <ul class="about__chips">
+              <li># Generative AI</li>
+              <li># Solution Architecture</li>
+              <li># Enterprise SaaS</li>
+              <li># Compliance &amp; QMS</li>
+              <li># Knowledge Systems</li>
+              <li># Technical Leadership</li>
+            </ul>
+            <p class="about__note">
+              <span class="tok-comment">// ISO 42001 · document lifecycle · audit &amp; validation</span>
+            </p>
+          </aside>
         </div>
-      </div>
-    </div>
-    <footer>
-      <div class="title">Reach me via:</div>
-      <div class="connect-with">
-        <a href="https://www.linkedin.com/in/sum-123" target="_blank">
+      </section>
+
+      <!-- Skills -->
+      <section class="section" id="skills">
+        <h2 class="section__title"><span class="section__num">02.</span> skills<span class="caret">()</span></h2>
+        <p class="section__lead">
+          The toolkit I reach for — grouped roughly by how I use it day to day.
+        </p>
+        <div class="skills">
+          <article class="skill-card">
+            <h3>AI &amp; Generative AI</h3>
+            <ul>
+              <li>Large Language Models (LLMs)</li>
+              <li>Agentic AI Systems</li>
+              <li>Retrieval-Augmented Generation</li>
+              <li>Fine-tuning &amp; Prompt Engineering</li>
+              <li>Vector Search &amp; Semantic Retrieval</li>
+              <li>Enterprise AI Integration</li>
+            </ul>
+          </article>
+          <article class="skill-card">
+            <h3>Backend</h3>
+            <ul>
+              <li>Python · Node.js · TypeScript</li>
+              <li>Flask · Express.js</li>
+              <li>REST API Design</li>
+              <li>Microservices Architecture</li>
+              <li>Background Job Processing</li>
+            </ul>
+          </article>
+          <article class="skill-card">
+            <h3>Frontend</h3>
+            <ul>
+              <li>React · TypeScript</li>
+              <li>React Bootstrap</li>
+              <li>CKEditor · Monaco Editor</li>
+              <li>Modern Web App Development</li>
+            </ul>
+          </article>
+          <article class="skill-card">
+            <h3>Data &amp; Databases</h3>
+            <ul>
+              <li>Microsoft SQL Server</li>
+              <li>Neo4j Graph Database</li>
+              <li>Redis · ChromaDB</li>
+              <li>Vector Databases</li>
+              <li>Data Modeling &amp; ETL</li>
+            </ul>
+          </article>
+          <article class="skill-card">
+            <h3>Cloud &amp; Infra</h3>
+            <ul>
+              <li>Microsoft Azure</li>
+              <li>Azure OpenAI · Blob Storage</li>
+              <li>Azure Kubernetes Service</li>
+              <li>Docker &amp; Containerization</li>
+              <li>CI/CD Concepts</li>
+            </ul>
+          </article>
+          <article class="skill-card">
+            <h3>AI Infrastructure</h3>
+            <ul>
+              <li>vLLM · LLM Serving</li>
+              <li>GPU Optimization</li>
+              <li>Model Deployment</li>
+              <li>Embedding Models</li>
+              <li>Vector Indexing</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <!-- Experience -->
+      <section class="section" id="experience">
+        <h2 class="section__title"><span class="section__num">03.</span> experience<span class="caret">()</span></h2>
+        <ol class="timeline">
+          <li class="timeline__item">
+            <div class="timeline__marker"></div>
+            <div class="timeline__content">
+              <div class="timeline__top">
+                <h3>Software Engineer <span class="timeline__at">@ Compliance Group</span></h3>
+                <span class="timeline__date">Mar 2020 — Present</span>
+              </div>
+              <ul>
+                <li>
+                  Built and modernized Quality Management (QMS), Document Management (DMS) and
+                  Training Management (TMS) platforms for regulated, compliance-driven industries.
+                </li>
+                <li>
+                  Led integration of AI copilots, RAG-based knowledge systems and agentic
+                  workflows into existing enterprise products.
+                </li>
+                <li>
+                  Developed UI and backend services, plus third-party integrations such as Azure
+                  Blob Storage and OnlyOffice.
+                </li>
+                <li>
+                  Owned solution architecture and POCs — from requirements through deployment and
+                  customer demos.
+                </li>
+              </ul>
+              <ul class="timeline__tags">
+                <li>Node.js</li><li>React</li><li>TypeScript</li><li>Python</li>
+                <li>Azure OpenAI</li><li>MSSQL</li><li>Neo4j</li><li>vLLM</li>
+              </ul>
+            </div>
+          </li>
+          <li class="timeline__item">
+            <div class="timeline__marker"></div>
+            <div class="timeline__content">
+              <div class="timeline__top">
+                <h3>Associate Software Engineer <span class="timeline__at">@ Yellow Messenger</span></h3>
+                <span class="timeline__date">Oct 2019 — Feb 2020</span>
+              </div>
+              <ul>
+                <li>
+                  Partnered with the customer success team to deliver conversational AI solutions
+                  for business clients.
+                </li>
+                <li>
+                  Built APIs on cloud functions with Elasticsearch, NLP services and third-party
+                  client integrations.
+                </li>
+              </ul>
+              <ul class="timeline__tags">
+                <li>JavaScript</li><li>Node.js</li><li>Elasticsearch</li><li>MongoDB</li>
+              </ul>
+            </div>
+          </li>
+          <li class="timeline__item">
+            <div class="timeline__marker"></div>
+            <div class="timeline__content">
+              <div class="timeline__top">
+                <h3>Software Engineer Intern <span class="timeline__at">@ Yellow Messenger</span></h3>
+                <span class="timeline__date">Mar 2019 — Sept 2019</span>
+              </div>
+              <ul>
+                <li>
+                  Developed cloud-function APIs and helped ship conversational solutions to the
+                  business, gaining first hands-on production experience.
+                </li>
+              </ul>
+              <ul class="timeline__tags">
+                <li>JavaScript</li><li>Node.js</li><li>NLP</li>
+              </ul>
+            </div>
+          </li>
+          <li class="timeline__item">
+            <div class="timeline__marker"></div>
+            <div class="timeline__content">
+              <div class="timeline__top">
+                <h3>B.Tech, Computer Science <span class="timeline__at">@ Vignan Institute of Technology &amp; Science</span></h3>
+                <span class="timeline__date">2015 — 2019</span>
+              </div>
+              <ul>
+                <li>Bachelor of Technology, Major in Computer Science &amp; Engineering.</li>
+              </ul>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <!-- Work / Expertise -->
+      <section class="section" id="work">
+        <h2 class="section__title"><span class="section__num">04.</span> work<span class="caret">()</span></h2>
+        <p class="section__lead">
+          Areas where I've shipped real product — the kinds of systems I love to build.
+        </p>
+        <div class="work">
+          <article class="work-card">
+            <div class="work-card__icon">◆</div>
+            <h3>AI Copilots &amp; Knowledge Systems</h3>
+            <p>
+              RAG-powered assistants and enterprise knowledge management built on LLMs, vector
+              search and Azure OpenAI — bringing answers to where the work happens.
+            </p>
+            <ul class="work-card__tags"><li>LLMs</li><li>RAG</li><li>ChromaDB</li><li>vLLM</li></ul>
+          </article>
+          <article class="work-card">
+            <div class="work-card__icon">▣</div>
+            <h3>Quality &amp; Compliance Platforms</h3>
+            <p>
+              QMS, DMS and TMS for regulated industries — document lifecycle management, audit and
+              validation workflows aligned with standards like ISO 42001.
+            </p>
+            <ul class="work-card__tags"><li>QMS</li><li>DMS</li><li>Workflow</li><li>MSSQL</li></ul>
+          </article>
+          <article class="work-card">
+            <div class="work-card__icon">⚙</div>
+            <h3>Workflow &amp; Migration Platforms</h3>
+            <p>
+              Automation and migration tooling with background job processing and reusable
+              frameworks — moving enterprise data and processes at scale.
+            </p>
+            <ul class="work-card__tags"><li>Node.js</li><li>Redis</li><li>Pipelines</li></ul>
+          </article>
+          <article class="work-card">
+            <div class="work-card__icon">◈</div>
+            <h3>Agentic AI &amp; Automation</h3>
+            <p>
+              Agentic systems that chain tools and reasoning to automate document, compliance and
+              knowledge workflows inside enterprise applications.
+            </p>
+            <ul class="work-card__tags"><li>Agents</li><li>Azure</li><li>Python</li></ul>
+          </article>
+          <article class="work-card">
+            <div class="work-card__icon">◐</div>
+            <h3>Conversational AI</h3>
+            <p>
+              Conversational solutions backed by NLP services, Elasticsearch and cloud-function
+              APIs delivering value for business clients.
+            </p>
+            <ul class="work-card__tags"><li>NLP</li><li>Elasticsearch</li><li>Node.js</li></ul>
+          </article>
+          <article class="work-card work-card--ghost">
+            <div class="work-card__icon">+</div>
+            <h3>Starter Kit</h3>
+            <p>
+              A personal project — reusable scaffolding to spin up new apps quickly. Always
+              tinkering with the next idea.
+            </p>
+            <ul class="work-card__tags"><li>Open Source</li><li>DX</li></ul>
+          </article>
+        </div>
+      </section>
+
+      <!-- Courses -->
+      <section class="section" id="courses">
+        <h2 class="section__title"><span class="section__num">05.</span> courses<span class="caret">()</span></h2>
+        <p class="section__lead">
+          Self-authored training material I've built to teach modern web and AI engineering.
+          Read them online, or grab the full course as a zip.
+        </p>
+        <div class="courses">
+          <article class="course-card">
+            <div class="course-card__head">
+              <span class="course-card__badge">MERN · Full-Stack</span>
+              <span class="course-card__meta">7 modules · ~580 KB</span>
+            </div>
+            <h3>DevLaunch Academy</h3>
+            <p class="course-card__sub">Zero to a working web app in one week.</p>
+            <p>
+              A hands-on MERN-stack curriculum — web foundations, modern JavaScript, React,
+              Node.js, REST APIs and databases, finishing with a full capstone build.
+            </p>
+            <ul class="course-card__tags">
+              <li>JavaScript</li><li>React</li><li>Node.js</li><li>REST</li><li>MongoDB</li>
+            </ul>
+            <div class="course-card__actions">
+              <a class="btn btn--primary" href="./courses/mern/index.html" target="_blank" rel="noopener">Open course →</a>
+              <a class="btn btn--ghost" href="./courses/mern.zip" download>Download .zip</a>
+            </div>
+          </article>
+
+          <article class="course-card">
+            <div class="course-card__head">
+              <span class="course-card__badge course-card__badge--ai">AI · Foundations</span>
+              <span class="course-card__meta">24 chapters · ~620 KB</span>
+            </div>
+            <h3>My AI Learning Journey</h3>
+            <p class="course-card__sub">A complete self-study AI curriculum.</p>
+            <p>
+              From "what is AI" through neural networks, transformers, LLMs, RAG, embeddings,
+              agents, MCP and multi-agent systems — plus safety and a full glossary.
+            </p>
+            <ul class="course-card__tags">
+              <li>LLMs</li><li>Transformers</li><li>RAG</li><li>Agents</li><li>MCP</li>
+            </ul>
+            <div class="course-card__actions">
+              <a class="btn btn--primary" href="./courses/ai/index.html" target="_blank" rel="noopener">Open course →</a>
+              <a class="btn btn--ghost" href="./courses/ai.zip" download>Download .zip</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section class="section section--contact" id="contact">
+        <p class="contact__pre"><span class="section__num">06.</span> what's next?</p>
+        <h2 class="contact__title">Let's build something.</h2>
+        <p class="contact__desc">
+          I'm always happy to talk about AI in the enterprise, interesting architecture problems,
+          or just trade notes. My inbox is open — reach out and I'll get back to you.
+        </p>
+        <a class="btn btn--primary btn--lg" href="mailto:sumanthreddypathi3366@gmail.com">Say hello</a>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer__social">
+        <a href="https://github.com/samar3366" target="_blank" rel="noopener" aria-label="GitHub">
+          <img src="./icon_github.svg" alt="" />
+        </a>
+        <a href="https://www.linkedin.com/in/sum-123" target="_blank" rel="noopener" aria-label="LinkedIn">
           <img src="./icon_linkedin.svg" alt="" />
         </a>
-        <a
-          href="https://api.whatsapp.com/send?phone=+918008089900&text=Hi"
-          target="_blank"
-        >
+        <a href="mailto:sumanthreddypathi3366@gmail.com" aria-label="Email">
+          <img src="./icon_mail.svg" alt="" />
+        </a>
+        <a href="https://api.whatsapp.com/send?phone=+918008089900&text=Hi" target="_blank" rel="noopener" aria-label="WhatsApp">
           <img src="./icon_whatsapp.svg" alt="" />
         </a>
       </div>
+      <p class="footer__line">
+        <span class="tok-comment">// Designed &amp; built by Sumanth Reddy · <span id="year"></span></span>
+      </p>
     </footer>
+
+    <script src="./script.js"></script>
   </body>
 </html>

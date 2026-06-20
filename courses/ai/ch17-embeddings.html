@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 17: Embeddings &amp; Semantic Search — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="5">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch17-embeddings.html" class="current">Part 5: Building With AI</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Building With AI</a> / <span class="current">Embeddings</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 17 · Part 5 of 7 · Building With AI —</div>
+
+  <h1 class="page-title">Embeddings &amp; <em>Semantic Search</em></h1>
+  <p class="page-subtitle">Turn meaning into geometry. Once words and sentences are points in space, "similar in meaning" becomes "nearby" — and that simple trick unlocks search, clustering, recommendation, and RAG.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#kid">Kid Translation: A Library Where Similar Books Live Together</a></li>
+      <li><a href="#what">What Embeddings Actually Are</a></li>
+      <li><a href="#geometry">The Geometry of Meaning</a></li>
+      <li><a href="#cosine">Cosine Similarity: The Workhorse</a></li>
+      <li><a href="#vector-dbs">Vector Databases &amp; ANN Search</a></li>
+      <li><a href="#models">Embedding Models in 2026</a></li>
+      <li><a href="#applications">Beyond RAG: Other Uses</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="kid">Kid Translation: A Library Where Similar Books Live Together</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Imagine a library — but instead of organizing books by alphabet, the librarian organizes them by <em>meaning</em>. All cookbooks sit together. Cat books and dog books are in the same neighborhood (animals). Mystery novels are far from physics textbooks but right next to thrillers.</p>
+    <p>Now imagine the librarian uses GPS coordinates instead of shelves: every book has an exact (x, y, z, ...) location. Books with similar topics get nearby coordinates. To find books like the one you just read, you just measure distances. The closest 5 are your top recommendations.</p>
+    <p>That's an embedding. Each book (or sentence, image, song, code snippet) gets a coordinate in a high-dimensional "meaning space." Similar things end up close. Different things end up far. Once you've put everything in this space, search and recommendation become geometry — fast, simple, powerful.</p>
+  </div>
+
+  <h2 id="what">What Embeddings Actually Are</h2>
+
+  <p>An embedding is a <strong>vector</strong> — a list of numbers — that represents a piece of content. For text, an embedding might look like <code>[0.23, -0.41, 0.07, ..., 0.18]</code> with 768, 1024, 1536, or 3072 dimensions depending on the model.</p>
+
+  <p>You produce them with an <strong>embedding model</strong>: feed in text, get out a vector. The model has been trained so that texts with similar meaning produce similar vectors. The model itself is usually a transformer encoder; the vector is taken from its final-layer output.</p>
+
+  <div class="example">
+    <div class="example-label">Concrete example</div>
+    <p>Embed three sentences with OpenAI's text-embedding-3-small (1536 dims):</p>
+    <ul>
+      <li><code>"How do I cancel my subscription?"</code> → vector A</li>
+      <li><code>"What's the refund policy?"</code> → vector B</li>
+      <li><code>"How does photosynthesis work?"</code> → vector C</li>
+    </ul>
+    <p>A and B are near-neighbors despite sharing barely any words — the model "understood" they're both about leaving a service. C is far from both. The geometry encodes meaning, not vocabulary.</p>
+  </div>
+
+  <h2 id="geometry">The Geometry of Meaning</h2>
+
+  <p>Once concepts are vectors, you can do arithmetic on meaning. The classic example from word embeddings:</p>
+
+  <div class="formula">
+    <div class="formula-label">— Famous Word Embedding Arithmetic —</div>
+    <div class="formula-body">vector("king") − vector("man") + vector("woman") ≈ vector("queen")</div>
+  </div>
+
+  <p>The geometry captures relationships. Subtracting "man" from "king" pulls out a "royalty without gender" direction; adding "woman" applies female gender; the result lands near "queen." Modern embeddings are richer — these directions encode hundreds of thousands of relationships, learned from data.</p>
+
+  <p>Words isn't the only thing that embeds. Images, audio, code, molecules — anything you have data for can be embedded. <strong>Multimodal embeddings</strong> like CLIP put text and images in the same space, so you can search images with text queries.</p>
+
+  <h2 id="cosine">Cosine Similarity: The Workhorse</h2>
+
+  <p>To measure how close two vectors are in meaning, the standard metric is <strong>cosine similarity</strong> — the cosine of the angle between them. It ranges from −1 (opposite) through 0 (unrelated) to 1 (identical direction).</p>
+
+  <figure>
+    <svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr17a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1f6f8b"/></marker>
+        <marker id="arr17b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b54a3b"/></marker>
+        <marker id="arr17c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6b4a8b"/></marker>
+      </defs>
+
+      <!-- High similarity -->
+      <g transform="translate(40, 30)">
+        <text x="80" y="0" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700">cos ≈ 0.95</text>
+        <text x="80" y="16" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">Very similar</text>
+        <line x1="20" y1="170" x2="160" y2="170" stroke="#aaa"/>
+        <line x1="20" y1="30" x2="20" y2="180" stroke="#aaa"/>
+        <line x1="20" y1="170" x2="130" y2="50" stroke="#1f6f8b" stroke-width="3" marker-end="url(#arr17a)"/>
+        <line x1="20" y1="170" x2="135" y2="55" stroke="#b54a3b" stroke-width="3" marker-end="url(#arr17b)"/>
+        <text x="100" y="100" font-family="JetBrains Mono, monospace" font-size="10" fill="#1a4a68">"refund"</text>
+        <text x="80" y="135" font-family="JetBrains Mono, monospace" font-size="10" fill="#8b3a2e">"cancel"</text>
+      </g>
+
+      <!-- Medium -->
+      <g transform="translate(260, 30)">
+        <text x="80" y="0" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700">cos ≈ 0.4</text>
+        <text x="80" y="16" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">Loosely related</text>
+        <line x1="20" y1="170" x2="160" y2="170" stroke="#aaa"/>
+        <line x1="20" y1="30" x2="20" y2="180" stroke="#aaa"/>
+        <line x1="20" y1="170" x2="130" y2="50" stroke="#1f6f8b" stroke-width="3" marker-end="url(#arr17a)"/>
+        <line x1="20" y1="170" x2="150" y2="120" stroke="#6b4a8b" stroke-width="3" marker-end="url(#arr17c)"/>
+        <text x="100" y="100" font-family="JetBrains Mono, monospace" font-size="10" fill="#1a4a68">"refund"</text>
+        <text x="105" y="155" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b3a8b">"shipping"</text>
+      </g>
+
+      <!-- Unrelated -->
+      <g transform="translate(480, 30)">
+        <text x="80" y="0" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700">cos ≈ 0.05</text>
+        <text x="80" y="16" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">Unrelated</text>
+        <line x1="20" y1="170" x2="160" y2="170" stroke="#aaa"/>
+        <line x1="20" y1="30" x2="20" y2="180" stroke="#aaa"/>
+        <line x1="20" y1="170" x2="130" y2="50" stroke="#1f6f8b" stroke-width="3" marker-end="url(#arr17a)"/>
+        <line x1="20" y1="170" x2="160" y2="172" stroke="#6b4a8b" stroke-width="3" marker-end="url(#arr17c)"/>
+        <text x="100" y="100" font-family="JetBrains Mono, monospace" font-size="10" fill="#1a4a68">"refund"</text>
+        <text x="105" y="195" font-family="JetBrains Mono, monospace" font-size="10" fill="#5b3a8b">"photosynthesis"</text>
+      </g>
+    </svg>
+    <p class="diagram-caption">Cosine similarity: small angle = high score. The metric is direction-only — it ignores vector lengths, which is why it works well for meaning regardless of text length.</p>
+  </figure>
+
+  <p>Why cosine and not Euclidean distance? Cosine ignores vector magnitude, focusing only on direction. Two embeddings can have very different lengths (e.g., a long document vs. a short query) but still point the same direction in meaning-space. Cosine captures that. Most embedding models are explicitly trained to put meaning in direction.</p>
+
+  <h2 id="vector-dbs">Vector Databases &amp; ANN Search</h2>
+
+  <p>Searching a million vectors by exact cosine similarity means a million dot products — fast, but not fast enough at internet scale. <strong>Approximate nearest neighbor (ANN)</strong> algorithms trade a small accuracy hit for huge speed gains.</p>
+
+  <p>The dominant ANN algorithm is <strong>HNSW</strong> (Hierarchical Navigable Small World) — it builds a graph of vectors connected to their neighbors at multiple layers, letting you "navigate" to the nearest match in milliseconds even with billions of vectors. Most modern vector databases use HNSW or a variant under the hood.</p>
+
+  <p>The vector database options as of 2026:</p>
+
+  <table class="compare-table">
+    <thead><tr><th>Database</th><th>Style</th><th>Notable</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Pinecone</strong></td><td>Managed cloud</td><td>The fully-managed default. Easy onboarding, scales high.</td></tr>
+      <tr><td><strong>Weaviate</strong></td><td>Open source + cloud</td><td>Schema-based, hybrid search built in, strong filtering.</td></tr>
+      <tr><td><strong>Qdrant</strong></td><td>Open source + cloud</td><td>Rust-based, fast, strong filtering, good developer experience.</td></tr>
+      <tr><td><strong>Milvus</strong></td><td>Open source</td><td>Battle-tested at scale (billions of vectors). Heavyweight.</td></tr>
+      <tr><td><strong>pgvector</strong></td><td>Postgres extension</td><td>Just add vectors to your existing Postgres. Often the right answer.</td></tr>
+      <tr><td><strong>Chroma</strong></td><td>Open source, local-first</td><td>Lightweight, embedded; great for prototypes and local apps.</td></tr>
+      <tr><td><strong>Turbopuffer / LanceDB</strong></td><td>Newer entrants</td><td>Storage-on-blob designs cutting cost dramatically.</td></tr>
+      <tr><td><strong>Elastic / OpenSearch</strong></td><td>Search platform</td><td>Existing systems with vector search added. Strong hybrid search.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout-tip">
+    <div class="callout-label">★ Practical advice</div>
+    <p>For most projects under ~10M vectors, just use pgvector if you already have Postgres. The ergonomics of SQL + vectors in one place often beats specialized DBs. Reach for Pinecone/Weaviate/Qdrant when you need cloud-managed, advanced features, or extreme scale.</p>
+  </div>
+
+  <h2 id="models">Embedding Models in 2026</h2>
+
+  <p>Like LLMs, embedding models come in many flavors. Things to compare: dimensionality, language coverage, max input size, cost, and benchmarks.</p>
+
+  <table class="compare-table">
+    <thead><tr><th>Model</th><th>Dim</th><th>Notable</th></tr></thead>
+    <tbody>
+      <tr><td><strong>text-embedding-3-large</strong> (OpenAI)</td><td>3072 (configurable lower)</td><td>Strong general-purpose. Supports Matryoshka (truncate dim → still useful).</td></tr>
+      <tr><td><strong>Voyage-3 / Voyage-3-large</strong></td><td>1024–2048</td><td>Domain-tuned variants for code, finance, law. Top of MTEB leaderboard.</td></tr>
+      <tr><td><strong>Cohere Embed v3</strong></td><td>1024</td><td>Multilingual, optimized for RAG, with built-in compression.</td></tr>
+      <tr><td><strong>BGE-M3</strong></td><td>1024</td><td>Open weights. Strong multilingual + multi-functional (dense, sparse, multi-vector).</td></tr>
+      <tr><td><strong>Nomic Embed</strong></td><td>768</td><td>Open weights with full reproducibility. 8K context.</td></tr>
+      <tr><td><strong>Gemini Embedding</strong> (Google)</td><td>3072 (configurable)</td><td>Strong cross-language, deep Google integration.</td></tr>
+      <tr><td><strong>E5 family</strong></td><td>varies</td><td>Open Microsoft research models, popular base for fine-tuning.</td></tr>
+    </tbody>
+  </table>
+
+  <p>The MTEB benchmark (Massive Text Embedding Benchmark) is the standard way to compare them. Check the leaderboard before choosing — rankings change quickly as new models drop.</p>
+
+  <h2 id="applications">Beyond RAG: Other Uses</h2>
+
+  <p>Embeddings power a lot more than RAG:</p>
+
+  <ul>
+    <li><strong>Semantic search</strong> — the core use case, in products like documentation search, e-commerce search, code search.</li>
+    <li><strong>Clustering</strong> — group similar items (customer feedback, support tickets, news articles) without needing labels.</li>
+    <li><strong>Classification</strong> — embed the text, then use a small classifier on top. Often beats fine-tuning for low-data scenarios.</li>
+    <li><strong>Deduplication</strong> — find near-duplicates that have different exact wording.</li>
+    <li><strong>Recommendation</strong> — embed users and items in the same space; nearest neighbors are recommendations.</li>
+    <li><strong>Anomaly detection</strong> — items far from any cluster are anomalies.</li>
+    <li><strong>Image / audio search</strong> — same idea, different modalities. CLIP for images, CLAP for audio.</li>
+  </ul>
+
+  <div class="key-point">
+    Embeddings turn meaning into geometry. Once you have meaning as coordinates, all the tools of geometry — distance, clustering, projection — become tools for understanding data.
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · How to sound fluent</div>
+    <p>"<strong>Dense embeddings</strong>" — every dimension has a value (the standard). "<strong>Sparse embeddings</strong>" — most dimensions are zero (e.g., BM25 vectors).</p>
+    <p>"<strong>ANN search</strong>" — approximate nearest neighbor. "<strong>HNSW</strong>" — the dominant graph-based ANN algorithm.</p>
+    <p>"<strong>MTEB</strong>" — the embedding benchmark. "<strong>BEIR</strong>" — the retrieval benchmark.</p>
+    <p>"<strong>Matryoshka embeddings</strong>" — embeddings designed so you can truncate to a smaller dim and still get usable similarity. Cuts storage costs.</p>
+    <p>"<strong>Bi-encoder vs cross-encoder</strong>" — bi-encoder embeds query and doc separately (fast, retrieval). Cross-encoder embeds them together (slower, more accurate, used for reranking).</p>
+    <p>"<strong>ColBERT-style</strong>" — a multi-vector embedding approach where each token gets its own vector; often more accurate than single-vector embeddings.</p>
+    <p>"<strong>Quantization</strong>" — store vectors in 8-bit or 4-bit to cut memory ~4–8× with minor accuracy loss.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself · Answer out loud</div>
+    <ol>
+      <li>What is an embedding, in one sentence?
+        <details><summary>Answer</summary><p>A vector of numbers that represents a piece of content (text, image, etc.) such that semantically similar content gets vectors with similar direction.</p></details>
+      </li>
+      <li>Why use cosine similarity instead of Euclidean distance?
+        <details><summary>Answer</summary><p>Cosine ignores magnitude and focuses on direction, which matches how embedding models encode meaning. Two texts of very different length but the same topic should still rate as similar — Euclidean distance would penalize the length difference.</p></details>
+      </li>
+      <li>What does ANN ("approximate nearest neighbor") buy you over exact search?
+        <details><summary>Answer</summary><p>Vastly faster query times at scale (milliseconds for billions of vectors) at the cost of a small accuracy drop. Critical for production semantic search.</p></details>
+      </li>
+      <li>When should you reach for pgvector vs. a specialized vector DB?
+        <details><summary>Answer</summary><p>Use pgvector when your data is small-to-medium (under ~10M vectors) and you already have Postgres. Use specialized DBs when you need extreme scale, advanced features (hybrid search, multi-vector), or fully managed cloud ops.</p></details>
+      </li>
+      <li>Name three uses of embeddings besides RAG.
+        <details><summary>Answer</summary><p>Many valid: semantic search, clustering, classification, deduplication, recommendation, anomaly detection, image/audio search.</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <h3>Recommended next reading</h3>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Cohere: "What are Embeddings?"</strong> · cohere.com/llmu · Free · Beautiful gentle introduction with interactive demos.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>OpenAI: "Embeddings Guide"</strong> · platform.openai.com/docs/guides/embeddings · Free · Practical reference with usage patterns.</span>
+      </li>
+      <li>
+        <span class="ref-type tool">Tool</span>
+        <span class="ref-detail"><strong>MTEB Leaderboard</strong> · huggingface.co/spaces/mteb/leaderboard · Free · The current rankings of embedding models. Check before choosing.</span>
+      </li>
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"Approximate Nearest Neighbor Search using HNSW"</strong> by Malkov &amp; Yashunin (2018) — the foundational ANN paper.</span>
+      </li>
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction"</strong> by Khattab &amp; Zaharia (2020) — multi-vector retrieval.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Vicki Boykis: "What are Embeddings?"</strong> · vickiboykis.com/what_are_embeddings · Free · A long-form, deeply readable historical and technical tour.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch16-rag.html">← Previous: RAG</a>
+    <div class="nav-spacer"></div>
+    <a href="ch18-knowledge-graphs.html">Next: Knowledge Graphs →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 17 · Part 5 · Building With AI · Chapter 17 of 24</div>
+</footer>
+
+</body>
+</html>

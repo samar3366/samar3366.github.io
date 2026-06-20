@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 6: From Turing to Transformers — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="2">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch06-history.html" class="current">Part 2: History</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">History</a> / <span class="current">Turing to Transformers</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 06 · Part 2 of 7 · History &amp; Why Now —</div>
+
+  <h1 class="page-title">From Turing to <em>Transformers</em></h1>
+  <p class="page-subtitle">Seventy-five years of trying to build thinking machines. Two AI winters, three revolutions, and the small moments that changed everything.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#kid">Kid Translation: The 75-Year Climb</a></li>
+      <li><a href="#1950s">The Dreamers (1950s)</a></li>
+      <li><a href="#first-winter">The First AI Winter (1970s)</a></li>
+      <li><a href="#expert-systems">Expert Systems &amp; The Second Winter (1980s)</a></li>
+      <li><a href="#statistical">The Statistical Revolution (1990s–2000s)</a></li>
+      <li><a href="#deep-learning-era">The Deep Learning Era (2012–2017)</a></li>
+      <li><a href="#transformer-moment">The Transformer Moment (2017)</a></li>
+      <li><a href="#chatgpt">The ChatGPT Moment (2022)</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="kid">Kid Translation: The 75-Year Climb</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Imagine a mountain. People started trying to climb it in 1950. They got partway up, fell down. Tried again, got higher, fell down again. Each time they fell, everyone said "this mountain is impossible."</p>
+    <p>Then, after seventy years of trying, someone in 2017 figured out the right path. By 2022, they were near the top — and suddenly the world noticed.</p>
+    <p>"AI" feels new. It isn't. We've been at this since before computers had screens. The breakthrough today is the result of decades of failures, lessons, and patient attempts. Knowing the history makes today make sense.</p>
+  </div>
+
+  <h2 id="1950s">The Dreamers (1950s)</h2>
+
+  <p>In <strong>1950</strong>, Alan Turing published "Computing Machinery and Intelligence" — the paper that asked "Can machines think?" and proposed what we now call the <strong>Turing Test</strong>: if a machine can converse so that you can't tell it from a human, we should call it intelligent.</p>
+
+  <p>In <strong>1956</strong>, John McCarthy organized the <strong>Dartmouth Conference</strong> — a summer workshop where the term "Artificial Intelligence" was coined. The mood was wildly optimistic. McCarthy thought a small group of researchers could make significant progress in a single summer.</p>
+
+  <p>In <strong>1958</strong>, Frank Rosenblatt built the <strong>Perceptron</strong> — the first artificial neural network, capable of learning to classify simple shapes. The New York Times reported that the Navy expected it to "walk, talk, see, write, reproduce itself, and be conscious of its existence." It... did not.</p>
+
+  <h2 id="first-winter">The First AI Winter (1970s)</h2>
+
+  <p>By the late 1960s, none of the bold predictions had come true. In 1969, Minsky and Papert published a famously devastating book showing the perceptron couldn't learn even simple things like XOR (an "exclusive or" function). Funding dried up. The 1970s became the <strong>First AI Winter</strong> — a decade where serious researchers avoided the term "AI."</p>
+
+  <h2 id="expert-systems">Expert Systems &amp; The Second Winter (1980s)</h2>
+
+  <p>The 1980s saw a comeback through <strong>expert systems</strong> — programs encoded with thousands of "if-then" rules from human experts. MYCIN diagnosed bacterial infections. XCON configured computers. Companies invested heavily.</p>
+
+  <p>But expert systems were brittle. They couldn't handle anything outside their pre-programmed rules. They were also expensive to build and maintain — every rule had to be written by hand. By the late 1980s, the bubble burst. The <strong>Second AI Winter</strong> began.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+      <!-- Timeline axis -->
+      <line x1="40" y1="120" x2="660" y2="120" stroke="#1a1a1a" stroke-width="2"/>
+
+      <!-- Year ticks -->
+      <g font-family="JetBrains Mono, monospace" font-size="10" fill="#6b6b6b">
+        <line x1="60" y1="115" x2="60" y2="125" stroke="#1a1a1a"/>
+        <text x="60" y="142" text-anchor="middle">1950</text>
+        <line x1="160" y1="115" x2="160" y2="125" stroke="#1a1a1a"/>
+        <text x="160" y="142" text-anchor="middle">1970</text>
+        <line x1="260" y1="115" x2="260" y2="125" stroke="#1a1a1a"/>
+        <text x="260" y="142" text-anchor="middle">1990</text>
+        <line x1="370" y1="115" x2="370" y2="125" stroke="#1a1a1a"/>
+        <text x="370" y="142" text-anchor="middle">2012</text>
+        <line x1="490" y1="115" x2="490" y2="125" stroke="#1a1a1a"/>
+        <text x="490" y="142" text-anchor="middle">2017</text>
+        <line x1="600" y1="115" x2="600" y2="125" stroke="#1a1a1a"/>
+        <text x="600" y="142" text-anchor="middle">2022</text>
+      </g>
+
+      <!-- Era labels above -->
+      <g font-family="Newsreader, serif" font-size="11">
+        <text x="100" y="80" text-anchor="middle" font-weight="700" fill="#1f6f8b">Dreamers</text>
+        <text x="100" y="95" text-anchor="middle" font-style="italic" fill="#6b6b6b">Turing, Perceptron</text>
+
+        <text x="200" y="80" text-anchor="middle" font-weight="700" fill="#888">Winter 1</text>
+        <text x="200" y="95" text-anchor="middle" font-style="italic" fill="#6b6b6b">Defeat</text>
+
+        <text x="305" y="80" text-anchor="middle" font-weight="700" fill="#b54a3b">Expert Systems</text>
+        <text x="305" y="95" text-anchor="middle" font-style="italic" fill="#6b6b6b">Rules everywhere</text>
+
+        <text x="420" y="80" text-anchor="middle" font-weight="700" fill="#2d6a3e">Deep Learning</text>
+        <text x="420" y="95" text-anchor="middle" font-style="italic" fill="#6b6b6b">AlexNet, ImageNet</text>
+
+        <text x="540" y="80" text-anchor="middle" font-weight="700" fill="#6b4a8b">Transformer</text>
+        <text x="540" y="95" text-anchor="middle" font-style="italic" fill="#6b6b6b">"Attention is all"</text>
+
+        <text x="630" y="80" text-anchor="middle" font-weight="700" fill="#c08c1f">ChatGPT</text>
+        <text x="630" y="95" text-anchor="middle" font-style="italic" fill="#6b6b6b">Mainstream</text>
+      </g>
+
+      <!-- Era markers below -->
+      <g font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#6b6b6b">
+        <text x="180" y="180" text-anchor="middle" fill="#888">— 1st Winter (1974–80) —</text>
+        <text x="335" y="180" text-anchor="middle" fill="#888">— 2nd Winter (1987–93) —</text>
+      </g>
+      <g stroke="#aaa" stroke-width="1" stroke-dasharray="3 3" fill="none">
+        <line x1="155" y1="160" x2="225" y2="160"/>
+        <line x1="295" y1="160" x2="395" y2="160"/>
+      </g>
+    </svg>
+    <p class="diagram-caption">Two warm summers of optimism, two AI winters of despair. The pattern repeated until 2012 — and might still repeat. Bet on the long climb, not any one peak.</p>
+  </figure>
+
+  <h2 id="statistical">The Statistical Revolution (1990s–2000s)</h2>
+
+  <p>While expert systems crashed, a quieter revolution began: instead of hand-coded rules, researchers used <strong>statistics</strong>. If you had enough data, you could let probability models figure out the patterns. This era brought:</p>
+
+  <ul>
+    <li><strong>Hidden Markov Models</strong> — speech recognition's workhorse for two decades.</li>
+    <li><strong>Support Vector Machines</strong> — the dominant classifier for ~15 years.</li>
+    <li><strong>Bayesian methods</strong> — the foundation of spam filters and recommendation systems.</li>
+    <li><strong>Decision trees, random forests, and boosting</strong> — still useful today (Kaggle competitions love them).</li>
+  </ul>
+
+  <p>This era was unsexy but productive. Google's search ranking, spam filtering, credit-card fraud detection — all came from statistical ML, not deep learning.</p>
+
+  <h2 id="deep-learning-era">The Deep Learning Era (2012–2017)</h2>
+
+  <p>In <strong>September 2012</strong>, a team led by Geoffrey Hinton entered the ImageNet competition with a deep convolutional neural network they called <strong>AlexNet</strong>. It crushed the competition — error rate dropped from 26% to 15% overnight. Suddenly everyone was paying attention to neural networks again.</p>
+
+  <p>The years 2012–2016 belonged to <strong>convolutional networks</strong>. Image classification, object detection, face recognition — all got dramatically better. Self-driving cars suddenly seemed possible. Google bought DeepMind. Facebook poached Yann LeCun. AI was hot again.</p>
+
+  <p>Meanwhile, language was lagging. RNNs and LSTMs dominated, but they were slow to train, capped at short contexts, and far behind humans on most tasks.</p>
+
+  <h2 id="transformer-moment">The Transformer Moment (2017)</h2>
+
+  <p>In <strong>June 2017</strong>, eight researchers at Google published a paper titled <strong>"Attention Is All You Need."</strong> They proposed a new architecture — the <strong>Transformer</strong> — that ditched recurrence entirely. Instead, every position in a sequence could "attend to" every other position directly.</p>
+
+  <div class="example">
+    <div class="example-label">Why this mattered</div>
+    <p>Transformers were faster to train (parallelizable), handled longer contexts, and scaled beautifully — bigger transformers just kept getting better. Within 18 months, transformers had taken over machine translation. Within three years, they ruled all of NLP.</p>
+    <p>The original paper was about translation. The authors had no idea they'd just laid the foundation for ChatGPT. The 2017 paper has now been cited 100,000+ times — among the most influential papers in computer science history.</p>
+  </div>
+
+  <h2 id="chatgpt">The ChatGPT Moment (2022)</h2>
+
+  <p>OpenAI released <strong>GPT-1</strong> (2018), <strong>GPT-2</strong> (2019), and <strong>GPT-3</strong> (2020). Each was a transformer scaled up — more parameters, more training data, better results. GPT-3 was startling: it could write essays, code, poetry. But it was hidden behind an API, and only researchers played with it.</p>
+
+  <p>On <strong>November 30, 2022</strong>, OpenAI launched <strong>ChatGPT</strong> — basically GPT-3.5 wrapped in a friendly chat interface. Within five days, it had a million users. Within two months, 100 million. It became the fastest-growing consumer app in history. Suddenly, everyone — your grandmother, your CEO, your kid — knew what an AI chatbot could do.</p>
+
+  <div class="key-point">
+    The ChatGPT moment wasn't a research breakthrough. The breakthroughs were already in place — transformer (2017), GPT-3 (2020), RLHF (2022). The breakthrough was <em>distribution</em>: a chat box anyone could try.
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · How to sound fluent</div>
+    <p>"<strong>The Dartmouth Conference</strong>" — the 1956 workshop where the term "AI" was coined. Drop this casually when discussing AI history.</p>
+    <p>"<strong>The Turing Test</strong>" — the imitation game. Often invoked, often misunderstood. Modern LLMs arguably pass naive versions of it.</p>
+    <p>"<strong>AI winter</strong>" — periods of dramatically reduced funding and interest after over-promised capabilities failed to materialize. Two clear ones (1974–80, 1987–93). Some worry a third could come.</p>
+    <p>"<strong>Symbolic AI</strong>" or "<strong>GOFAI</strong>" (Good Old-Fashioned AI) — rule-based, logic-driven approaches dominant pre-1990s. Largely supplanted by statistical and now neural methods.</p>
+    <p>"<strong>The bitter lesson</strong>" — Rich Sutton's famous 2019 essay arguing that, again and again, methods that scale with compute beat methods designed with clever human insight. The dominant ideology of modern AI labs.</p>
+    <p>"<strong>The ChatGPT moment</strong>" — shorthand for late November 2022, when AI broke into public consciousness. Useful as a date marker.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself · Answer out loud</div>
+    <ol>
+      <li>What was the Turing Test, and who proposed it?
+        <details><summary>Answer</summary><p>Proposed by Alan Turing in 1950: if you can converse with a machine and not tell it from a human, the machine should count as intelligent. The first practical definition of AI.</p></details>
+      </li>
+      <li>What were the two AI winters, and what caused each?
+        <details><summary>Answer</summary><p>1st Winter (1974–80) followed the failure of perceptrons and over-promised symbolic AI. 2nd Winter (late 1980s) followed the collapse of expert-systems hype. Both: oversold ambitions hit hard limits.</p></details>
+      </li>
+      <li>Why was AlexNet (2012) such a turning point?
+        <details><summary>Answer</summary><p>It dramatically beat all previous methods on ImageNet using a deep CNN trained on GPUs — proving that deep learning at scale could deliver breakthrough results in the real world.</p></details>
+      </li>
+      <li>What did "Attention Is All You Need" propose, and why was it revolutionary?
+        <details><summary>Answer</summary><p>The transformer architecture, which used self-attention to replace recurrence. It was faster, parallelizable, scalable, and handled long-range dependencies far better than RNNs/LSTMs.</p></details>
+      </li>
+      <li>What was actually new about ChatGPT compared to GPT-3?
+        <details><summary>Answer</summary><p>The interface and the RLHF (reinforcement learning from human feedback) tuning that made it follow instructions reliably. The underlying model was barely different from GPT-3.5. The product packaging is what made it a phenomenon.</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <h3>Recommended next reading</h3>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type book">Book</span>
+        <span class="ref-detail"><strong>Genius Makers</strong> by Cade Metz — <em>full book, ~370 pages</em>. Narrative history of the deep learning revolution. Reads like a thriller.</span>
+      </li>
+      <li>
+        <span class="ref-type book">Book</span>
+        <span class="ref-detail"><strong>The Master Algorithm</strong> by Pedro Domingos — <em>chapters 1–3 (pp. 1–80)</em>. Maps the five "tribes" of ML and how they evolved.</span>
+      </li>
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"Computing Machinery and Intelligence"</strong> by Alan Turing (1950) — ~28 pages, free PDF. The founding document. Astonishingly readable.</span>
+      </li>
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"Attention Is All You Need"</strong> by Vaswani et al. (2017) — the original transformer paper. Skim once for vibes; revisit after Chapter 8.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>"A Brief History of AI"</strong> · ourworldindata.org · Free · A great timeline with charts of compute, data, and capability over time.</span>
+      </li>
+      <li>
+        <span class="ref-type video">Video</span>
+        <span class="ref-detail"><strong>Yannic Kilcher: "Attention Is All You Need (paper explained)"</strong> · YouTube · ~28 min · The classic paper walkthrough.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch05-math-you-need.html">← Previous: The Math You Need</a>
+    <div class="nav-spacer"></div>
+    <a href="ch07-why-now.html">Next: Why AI Exploded →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 06 · Part 2 · History · Chapter 6 of 24</div>
+</footer>
+
+</body>
+</html>

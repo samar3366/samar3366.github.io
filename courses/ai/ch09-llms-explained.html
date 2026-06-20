@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 9: How LLMs Actually Work — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="3">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch09-llms-explained.html" class="current">Part 3: Modern LLMs</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Modern LLMs</a> / <span class="current">How LLMs Work</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 09 · Part 3 of 7 · Modern LLMs —</div>
+
+  <h1 class="page-title">How LLMs <em>Actually</em> Work</h1>
+  <p class="page-subtitle">An LLM is a fancy autocomplete: predict the next token, billions of times. Understanding that simple loop unlocks the rest of modern AI.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#kid">Kid Translation: A Very Smart Autocomplete</a></li>
+      <li><a href="#one-token">One Token at a Time: Generation</a></li>
+      <li><a href="#sampling">Sampling: Why the Same Prompt Gives Different Answers</a></li>
+      <li><a href="#context">The Context Window: Working Memory</a></li>
+      <li><a href="#families">Modern Model Families Compared</a></li>
+      <li><a href="#what-llms-are-and-arent">What LLMs Are (And Aren't)</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="kid">Kid Translation: A Very Smart Autocomplete</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>You know how your phone suggests the next word as you type? "I'll be there in five..." → suggestion: "minutes." That's autocomplete.</p>
+    <p>An LLM is autocomplete on steroids. It's been trained on basically the whole internet, and its only job is: <strong>given a bunch of text, what word comes next?</strong></p>
+    <p>That sounds boring. But if your autocomplete is good enough, you can ask it: "Q: What is 17 × 23? A:" and it will autocomplete "391." You can ask it: "Translate to French: I am tired →" and it autocompletes "Je suis fatigué." You can paste a coding problem and it autocompletes the solution.</p>
+    <p>"Predicting the next word" turns out to require understanding language, math, code, history, and reasoning — because the right next word depends on all of those. That's the magic.</p>
+  </div>
+
+  <p>So when you "talk" to ChatGPT or Claude, what's actually happening is: the model is doing autocomplete on a transcript that looks like a dialogue. It writes one token, sees the result, and writes the next one — over and over until it's done.</p>
+
+  <h2 id="one-token">One Token at a Time: Generation</h2>
+
+  <p>This is called <strong>autoregressive generation</strong>. "Autoregressive" just means: the model's own previous outputs become its next inputs.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr9a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+        </marker>
+      </defs>
+
+      <!-- Step 1 -->
+      <text x="50" y="35" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#6b6b6b" letter-spacing="1">STEP 1</text>
+      <rect x="50" y="50" width="500" height="34" rx="3" fill="#fff8e1" stroke="#d4a017"/>
+      <text x="65" y="72" font-family="Newsreader, serif" font-size="13">"The capital of France is"</text>
+      <line x1="555" y1="67" x2="615" y2="67" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr9a)"/>
+      <rect x="620" y="50" width="60" height="34" rx="3" fill="#1f6f8b" stroke="#000" stroke-width="1.5"/>
+      <text x="650" y="72" text-anchor="middle" font-family="Newsreader, serif" font-size="13" fill="#fff" font-weight="700">Paris</text>
+
+      <!-- Step 2 -->
+      <text x="50" y="120" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#6b6b6b" letter-spacing="1">STEP 2</text>
+      <rect x="50" y="135" width="555" height="34" rx="3" fill="#fff8e1" stroke="#d4a017"/>
+      <text x="65" y="157" font-family="Newsreader, serif" font-size="13">"The capital of France is Paris"</text>
+      <line x1="610" y1="152" x2="615" y2="152" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr9a)"/>
+      <rect x="620" y="135" width="60" height="34" rx="3" fill="#1f6f8b" stroke="#000" stroke-width="1.5"/>
+      <text x="650" y="157" text-anchor="middle" font-family="Newsreader, serif" font-size="13" fill="#fff" font-weight="700">,</text>
+
+      <!-- Step 3 -->
+      <text x="50" y="205" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#6b6b6b" letter-spacing="1">STEP 3</text>
+      <rect x="50" y="220" width="565" height="34" rx="3" fill="#fff8e1" stroke="#d4a017"/>
+      <text x="65" y="242" font-family="Newsreader, serif" font-size="13">"The capital of France is Paris,"</text>
+      <line x1="617" y1="237" x2="615" y2="237" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr9a)"/>
+      <rect x="620" y="220" width="60" height="34" rx="3" fill="#1f6f8b" stroke="#000" stroke-width="1.5"/>
+      <text x="650" y="242" text-anchor="middle" font-family="Newsreader, serif" font-size="13" fill="#fff" font-weight="700">a</text>
+
+      <!-- And so on -->
+      <text x="350" y="295" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-style="italic" fill="#3a3a3a">...continues "city of light, located on the Seine..." until done.</text>
+    </svg>
+    <p class="diagram-caption">Generation, one token at a time. The model's output (right) gets appended to the input (left), then the whole thing is fed back in. Repeat until the model produces a stop signal.</p>
+  </figure>
+
+  <p>Every single token requires a full pass through all the model's layers — that's hundreds of billions of multiplications per token. This is why generating long responses takes time and costs money.</p>
+
+  <h2 id="sampling">Sampling: Why the Same Prompt Gives Different Answers</h2>
+
+  <p>The model doesn't actually output "Paris" — it outputs a probability distribution over all 50,000+ possible tokens. <code>Paris</code> might have probability 0.74, <code>Lyon</code> 0.04, <code>the</code> 0.02, and so on. To get an actual word, we have to <em>sample</em> from this distribution.</p>
+
+  <p>Several knobs control the sampling:</p>
+
+  <table class="compare-table">
+    <thead><tr><th>Parameter</th><th>What it does</th><th>Typical use</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Temperature</strong></td><td>0 = always pick the highest-probability token (deterministic). Higher = flatter distribution, more randomness.</td><td>0.0–0.3 for factual tasks, 0.7–1.0 for creative writing.</td></tr>
+      <tr><td><strong>Top-p (nucleus)</strong></td><td>Only sample from the smallest set of tokens whose probabilities sum to p. Cuts off the long tail of unlikely tokens.</td><td>0.9 is a common default.</td></tr>
+      <tr><td><strong>Top-k</strong></td><td>Only consider the top k most likely tokens.</td><td>40 is a common default.</td></tr>
+      <tr><td><strong>Frequency / presence penalty</strong></td><td>Discourages repeating tokens. Useful for long outputs.</td><td>0.0–0.5 for varied prose.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout-tip">
+    <div class="callout-label">★ Practical tip</div>
+    <p>If you ever want the same exact answer from the same prompt: set temperature to 0. If you want creative variation: increase it. If your model's giving repetitive output: try temperature 0.7 + a frequency penalty.</p>
+  </div>
+
+  <h2 id="context">The Context Window: Working Memory</h2>
+
+  <p>The <strong>context window</strong> is how much text the model can "see" at once — both your prompt and the response so far. It's measured in tokens (~4 chars each, on average).</p>
+
+  <p>The original GPT-3 had a 2,048-token context (~1,500 words). Modern frontier models have 128K (Claude, GPT-4 Turbo), 1M (Gemini 1.5 Pro), even 2M (Gemini 1.5 Pro extended). Context window size determines whether you can dump a whole book into a prompt or have to summarize.</p>
+
+  <div class="callout-warn">
+    <div class="callout-label">⚠ Watch out</div>
+    <p>Big context window doesn't mean perfect recall. Models often perform worse on info buried in the middle of a long context (the "lost in the middle" problem). Putting key information at the start or the end works better.</p>
+  </div>
+
+  <p>Two important properties of the context window:</p>
+
+  <ul>
+    <li><strong>Compute scales quadratically with context length.</strong> Doubling the context costs ~4× more compute (because every token attends to every other token). This is why long contexts are expensive.</li>
+    <li><strong>The model has no memory beyond context.</strong> Each conversation starts fresh. "Remembering" previous chats is a UI feature, not a model feature — the previous conversation gets stuffed into the current context.</li>
+  </ul>
+
+  <h2 id="families">Modern Model Families Compared</h2>
+
+  <p>Most frontier LLMs are decoder-only transformers, but each family has distinctive choices, training data, and tuning. The big players as of 2025–2026:</p>
+
+  <table class="compare-table">
+    <thead><tr><th>Family</th><th>Lab</th><th>Style / Strength</th></tr></thead>
+    <tbody>
+      <tr><td><strong>GPT</strong> (4o, 4.1, 5)</td><td>OpenAI</td><td>General-purpose, strong reasoning, broad ecosystem.</td></tr>
+      <tr><td><strong>Claude</strong> (Sonnet, Opus, Haiku)</td><td>Anthropic</td><td>Long context, careful tone, strong coding and writing. Trained with Constitutional AI.</td></tr>
+      <tr><td><strong>Gemini</strong> (Pro, Flash, Ultra)</td><td>Google DeepMind</td><td>Multimodal-native, very long context, deep Google integration.</td></tr>
+      <tr><td><strong>Llama</strong> (3, 4)</td><td>Meta</td><td>Open weights — anyone can download and fine-tune. The dominant open-source choice.</td></tr>
+      <tr><td><strong>Mistral / Mixtral</strong></td><td>Mistral AI</td><td>European, efficient, open weights for many sizes.</td></tr>
+      <tr><td><strong>Qwen</strong></td><td>Alibaba</td><td>Strong multilingual (especially Chinese), open weights.</td></tr>
+      <tr><td><strong>DeepSeek</strong></td><td>DeepSeek</td><td>Open-weight reasoning models with competitive frontier performance at a fraction of training cost.</td></tr>
+      <tr><td><strong>Grok</strong></td><td>xAI</td><td>X (Twitter) integrated, less filtered output style.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Within each family, models come in sizes — usually small/medium/large (often called Haiku/Sonnet/Opus, or Mini/Standard/Large). Smaller = faster + cheaper. Larger = smarter, especially at hard reasoning.</p>
+
+  <h2 id="what-llms-are-and-arent">What LLMs Are (And Aren't)</h2>
+
+  <div class="example">
+    <div class="example-label">What LLMs are</div>
+    <ul>
+      <li>Pattern-matchers over text. Astonishingly good ones.</li>
+      <li>Compressors of human knowledge — a 70B-parameter model has compressed much of public web into 140GB of weights.</li>
+      <li>Probabilistic. They don't have one fixed answer, they have distributions.</li>
+      <li>Stateless. Every call starts fresh from the context you provide.</li>
+    </ul>
+  </div>
+
+  <div class="example">
+    <div class="example-label">What LLMs aren't</div>
+    <ul>
+      <li>Databases. They don't store facts cleanly — facts are smeared across weights and easy to confuse with similar-sounding falsehoods.</li>
+      <li>Calculators. They can do math by reasoning, but they're not reliable arithmetic engines without tool use.</li>
+      <li>Real-time. Their knowledge stops at the training cutoff (often 6+ months ago) unless connected to search.</li>
+      <li>Self-aware in any meaningful sense. They have no continuous existence — each token generation is independent.</li>
+    </ul>
+  </div>
+
+  <div class="key-point">
+    The most useful mental model: an LLM is a brilliant but amnesiac intern who's read the entire internet and works strictly off the documents you put on their desk. Treat the context window as their workspace — and their entire memory.
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · How to sound fluent</div>
+    <p>"<strong>Autoregressive</strong>" — generating one token at a time, feeding output back in. "<strong>Decoder-only</strong>" — the GPT/Claude/Llama architecture (no encoder).</p>
+    <p>"<strong>Tokens per second (TPS)</strong>" — generation speed. Frontier APIs typically deliver 50–200 TPS.</p>
+    <p>"<strong>TTFT</strong>" (time to first token) — latency before output starts. Matters for chat UX.</p>
+    <p>"<strong>Hallucination</strong>" — when the model generates plausible-sounding but false text. Inherent to next-token prediction; mitigated by RAG, tool use, careful prompting.</p>
+    <p>"<strong>Quantization</strong>" — running the model with lower-precision numbers (e.g., 4-bit instead of 16-bit). Cuts memory ~4× with small quality loss. Standard for running open models on consumer hardware.</p>
+    <p>"<strong>MoE</strong>" (mixture of experts) — an architecture where only some weights activate per token. Lets a 700B-param model run at the speed of a 70B-param one. Used by Mixtral, GPT-4, Gemini, DeepSeek.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself · Answer out loud</div>
+    <ol>
+      <li>What does "autoregressive" mean for an LLM?
+        <details><summary>Answer</summary><p>The model generates one token at a time, with each newly produced token appended to the input for the next prediction. The output of step N becomes part of the input for step N+1.</p></details>
+      </li>
+      <li>What does "temperature 0" do?
+        <details><summary>Answer</summary><p>Makes generation deterministic — always picks the highest-probability next token. Same prompt produces the same output. Useful for factual tasks, testing, and reproducibility.</p></details>
+      </li>
+      <li>What's the context window, and why does it matter?
+        <details><summary>Answer</summary><p>The maximum amount of text (in tokens) the model can attend to in a single call. It's the model's working memory. Anything outside doesn't exist for that call.</p></details>
+      </li>
+      <li>Why do LLMs hallucinate?
+        <details><summary>Answer</summary><p>Because they're trained to predict plausible next tokens, not truth. When unsure, they generate confident-sounding text that pattern-matches what truth would look like. The architecture optimizes for plausibility, not accuracy.</p></details>
+      </li>
+      <li>Why is a bigger context window not always strictly better?
+        <details><summary>Answer</summary><p>Compute and cost scale quadratically with context length. Models also tend to lose accuracy on info buried in the middle of long contexts. Targeted retrieval (RAG) is often better than dumping everything in.</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <h3>Recommended next reading</h3>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type video">Video</span>
+        <span class="ref-detail"><strong>Andrej Karpathy: "Intro to Large Language Models"</strong> · YouTube · ~1 hr · The single best introduction to LLMs from one of the field's clearest thinkers.</span>
+      </li>
+      <li>
+        <span class="ref-type video">Video</span>
+        <span class="ref-detail"><strong>Andrej Karpathy: "Deep Dive into LLMs"</strong> · YouTube · ~3.5 hrs · The longer, more technical follow-up. Worth every minute.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Stephen Wolfram: "What Is ChatGPT Doing... and Why Does It Work?"</strong> · writings.stephenwolfram.com · Free · A long, beautifully illustrated explanation.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Anthropic: "Mapping the Mind of an LLM"</strong> · anthropic.com/research · Free · Anthropic's interpretability research showing what features actually exist inside Claude.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>"Lost in the Middle: How Language Models Use Long Contexts"</strong> by Liu et al. (2023) — the paper showing the U-shaped recall problem.</span>
+      </li>
+      <li>
+        <span class="ref-type course">Course</span>
+        <span class="ref-detail"><strong>DeepLearning.AI: "Generative AI with LLMs"</strong> · Coursera · Free audit · Hands-on intro covering training, fine-tuning, and deployment.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch08-transformers.html">← Previous: Transformers</a>
+    <div class="nav-spacer"></div>
+    <a href="ch10-training-llms.html">Next: Training LLMs →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 09 · Part 3 · Modern LLMs · Chapter 9 of 24</div>
+</footer>
+
+</body>
+</html>

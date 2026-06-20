@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 13: Generating Video &amp; Audio — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="4">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch13-video-audio.html" class="current">Part 4: Generative AI</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Generative AI</a> / <span class="current">Video &amp; Audio</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 13 · Part 4 of 7 · Generative AI —</div>
+
+  <h1 class="page-title">Generating <em>Video &amp; Audio</em></h1>
+  <p class="page-subtitle">Video is just images that move; audio is waveforms over time. The same generative tricks apply — with much higher demands on coherence, physics, and continuity.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#kid">Kid Translation: Movies and Music from Words</a></li>
+      <li><a href="#video">Video: Diffusion in Time</a></li>
+      <li><a href="#video-models">The Big Video Models</a></li>
+      <li><a href="#audio">Audio: From Speech to Music</a></li>
+      <li><a href="#voice-cloning">Voice Cloning &amp; Synthetic Speakers</a></li>
+      <li><a href="#whisper">Speech-to-Text: Whisper and Friends</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="kid">Kid Translation: Movies and Music from Words</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>You've seen images come out of text. Now imagine the same trick, but for things that move and make sound.</p>
+    <p><strong>Video:</strong> a movie is just 24 pictures per second. So the AI generates many images that flow together — same prompt, but every frame slightly different, with people walking, cars driving, water flowing.</p>
+    <p><strong>Sound:</strong> sound is a wiggly line. The AI generates the wiggles — for talking, music, sound effects — frame by frame in time, the way image AI generates pixels in space.</p>
+    <p>The hard part isn't generating one frame; it's making them fit together. A character's shirt should stay the same color from second 1 to second 5. A person's voice should sound like the same person across a sentence. Coherence over time is where video and audio AI live or die.</p>
+  </div>
+
+  <h2 id="video">Video: Diffusion in Time</h2>
+
+  <p>Modern video generators are mostly extensions of diffusion. Instead of denoising a 2D image (height × width), they denoise a 3D volume (height × width × time). Each "pixel" in the time dimension is a frame.</p>
+
+  <p>The big challenge is <strong>temporal coherence</strong>: the model must keep the same character, lighting, and physics across many frames. Adding ten more frames isn't ten times harder — it's much harder, because every new frame has to be consistent with all the others.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+      <!-- Time axis -->
+      <text x="350" y="25" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#6b6b6b" letter-spacing="1.5">VIDEO = HEIGHT × WIDTH × TIME (DENOISE THE WHOLE VOLUME)</text>
+
+      <!-- Stacked frames depicting "video volume" -->
+      <g>
+        <rect x="60" y="80" width="100" height="80" rx="3" fill="#fdf0e3" stroke="#b54a3b" stroke-width="1.5"/>
+        <text x="110" y="125" text-anchor="middle" font-family="Newsreader, serif" font-size="11">Frame 1</text>
+
+        <rect x="180" y="80" width="100" height="80" rx="3" fill="#fdf0e3" stroke="#b54a3b" stroke-width="1.5"/>
+        <text x="230" y="125" text-anchor="middle" font-family="Newsreader, serif" font-size="11">Frame 2</text>
+
+        <rect x="300" y="80" width="100" height="80" rx="3" fill="#fdf0e3" stroke="#b54a3b" stroke-width="1.5"/>
+        <text x="350" y="125" text-anchor="middle" font-family="Newsreader, serif" font-size="11">Frame 3</text>
+
+        <text x="450" y="125" font-family="Newsreader, serif" font-size="13" font-style="italic">. . .</text>
+
+        <rect x="500" y="80" width="100" height="80" rx="3" fill="#fdf0e3" stroke="#b54a3b" stroke-width="1.5"/>
+        <text x="550" y="125" text-anchor="middle" font-family="Newsreader, serif" font-size="11">Frame N</text>
+      </g>
+
+      <!-- Bracket below -->
+      <path d="M 60 175 L 60 185 L 600 185 L 600 175" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+      <text x="330" y="205" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#3a3a3a">All frames generated together. Cross-frame attention keeps things consistent.</text>
+    </svg>
+    <p class="diagram-caption">Video diffusion treats the whole video as one volume. Self-attention now spans both pixels-in-a-frame AND frame-to-frame. Compute scales fast.</p>
+  </figure>
+
+  <p>To handle the compute, modern video models use various tricks: <strong>spatiotemporal patches</strong> (chunking the video into 3D blocks the model processes together), <strong>cascaded generation</strong> (generate at low resolution first, then upscale), and <strong>latent diffusion in 3D</strong> (compress to a smaller latent space, denoise there).</p>
+
+  <h2 id="video-models">The Big Video Models</h2>
+
+  <table class="compare-table">
+    <thead><tr><th>Model</th><th>Maker</th><th>Notable</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Sora</strong></td><td>OpenAI</td><td>Long-form, photorealistic, strong physics. The model that made video AI mainstream.</td></tr>
+      <tr><td><strong>Veo</strong> (2, 3)</td><td>Google DeepMind</td><td>Frontier video; strong cinematic control, audio in newer versions.</td></tr>
+      <tr><td><strong>Runway Gen-3 / Gen-4</strong></td><td>Runway</td><td>Polished UI for filmmakers; widely used in production workflows.</td></tr>
+      <tr><td><strong>Kling</strong></td><td>Kuaishou</td><td>Strong open Chinese model; competitive with frontier closed models.</td></tr>
+      <tr><td><strong>Pika</strong></td><td>Pika Labs</td><td>Consumer-friendly; lots of stylization options.</td></tr>
+      <tr><td><strong>HeyGen / Synthesia</strong></td><td>(various)</td><td>Specialized for AI avatars / talking-head video — different problem, different methods.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Common limits as of 2026: most generators output 5–20 seconds at a time, with quality degrading at longer lengths. Frame-to-frame coherence still breaks under stress (object identity, fine motor actions). Asking for "the camera pans left, then a person walks in from the right" is much harder than "a beautiful sunset over the ocean." But the trajectory is steep and improvements arrive monthly.</p>
+
+  <h2 id="audio">Audio: From Speech to Music</h2>
+
+  <p>Audio AI splits into a few distinct subdomains:</p>
+
+  <ul>
+    <li><strong>Text-to-speech (TTS)</strong>: generate spoken audio from written text. ElevenLabs, OpenAI's voice models, Google's Wavenet/Audiobox, Microsoft VALL-E.</li>
+    <li><strong>Music generation</strong>: generate music from prompts. Suno, Udio, Stable Audio, Meta's MusicGen.</li>
+    <li><strong>Sound effects</strong>: generate FX from text. ElevenLabs SoundFX, AudioGen.</li>
+    <li><strong>Speech-to-text (STT)</strong>: transcribe audio. OpenAI's Whisper, Google, AssemblyAI, Deepgram.</li>
+  </ul>
+
+  <p>Most modern audio generators use either diffusion (similar to images, but on spectrograms) or autoregressive token prediction (like LLMs but predicting audio tokens — see "audio codec models" like SoundStream and EnCodec). Increasingly, models combine both.</p>
+
+  <p>The state of music generation in 2025–2026 is striking: Suno and Udio can generate full songs with vocals, lyrics, instrumentation, and structure (verse/chorus) from a one-line prompt. Quality is approaching commercial production for many genres.</p>
+
+  <h2 id="voice-cloning">Voice Cloning &amp; Synthetic Speakers</h2>
+
+  <p>Voice cloning has gone from research curiosity to deployed product. Modern systems can clone someone's voice from <strong>10–30 seconds of reference audio</strong> with shocking fidelity. Tools like ElevenLabs offer voice cloning as a standard feature.</p>
+
+  <div class="callout-warn">
+    <div class="callout-label">⚠ Misuse risk</div>
+    <p>Voice cloning has obvious abuse potential — scam calls impersonating family members, fake political audio, impersonation fraud. Most providers now require consent verification, watermark output, and offer detection tools. But open-weight voice models exist, and detection is an arms race. This is the single most concerning consumer-facing AI deepfake risk.</p>
+  </div>
+
+  <h2 id="whisper">Speech-to-Text: Whisper and Friends</h2>
+
+  <p>OpenAI's <strong>Whisper</strong> (2022) was a quiet revolution. It's a transformer-based speech-to-text model, open-weight, and shockingly robust — handles 90+ languages, accents, background noise, and technical jargon better than anything before it.</p>
+
+  <p>Whisper made high-quality transcription essentially free for any developer. It's now embedded in countless products: meeting transcribers, podcasts, accessibility tools, voice interfaces. Competitors like Deepgram, AssemblyAI, and Google's offerings push the frontier on real-time latency, speaker diarization (who's talking), and emotion.</p>
+
+  <p>The pipeline is now standard:</p>
+
+  <ol class="steps">
+    <li><strong>Whisper → text.</strong> Audio in, text out.</li>
+    <li><strong>LLM → response.</strong> Generate a reply.</li>
+    <li><strong>TTS → audio.</strong> Speak the reply back.</li>
+  </ol>
+
+  <p>This is the loop powering modern voice assistants, AI phone agents, and real-time interpreters. Latency keeps dropping; in 2024–25 OpenAI's GPT-4o introduced <strong>native speech-to-speech</strong> (one model handles audio in and out), eliminating the multi-stage pipeline. Expect that to become standard.</p>
+
+  <div class="key-point">
+    Video and audio are catching up to images fast. The same recipes — diffusion, transformers, scaling laws — apply. The frontier is coherence over time and seamless multimodality.
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · How to sound fluent</div>
+    <p>"<strong>Spatiotemporal diffusion</strong>" — diffusion that operates in space + time, for video.</p>
+    <p>"<strong>Audio codec models</strong>" — models like EnCodec, SoundStream that compress audio into discrete tokens. Key tech behind audio LLMs.</p>
+    <p>"<strong>Mel-spectrogram</strong>" — visual representation of audio (time × frequency × intensity). Many TTS models generate spectrograms then convert to waveform.</p>
+    <p>"<strong>Vocoder</strong>" — converts a spectrogram into a real audio waveform. WaveNet, HiFi-GAN, BigVGAN are popular ones.</p>
+    <p>"<strong>Diarization</strong>" — figuring out who's speaking when, in multi-speaker audio.</p>
+    <p>"<strong>Text-to-video (T2V)</strong>" vs "<strong>image-to-video (I2V)</strong>" — the two main video gen modes. I2V starts from a still image and animates.</p>
+    <p>"<strong>Neural radiance field (NeRF)</strong>" / "<strong>Gaussian splatting</strong>" — different but related: generating 3D scenes (vs flat video) you can fly through.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself · Answer out loud</div>
+    <ol>
+      <li>Why is video harder than image generation, despite both using diffusion?
+        <details><summary>Answer</summary><p>Temporal coherence — the model has to keep characters, objects, and physics consistent across many frames. Each new frame has to fit with all the others, which scales costs fast and creates many ways to fail.</p></details>
+      </li>
+      <li>What was the breakthrough Sora demonstrated?
+        <details><summary>Answer</summary><p>Long-form, photorealistic video with strong physics modeling and consistent characters across many seconds. It used diffusion on space-time patches at scale, showing video gen could rival image gen in quality.</p></details>
+      </li>
+      <li>What does Whisper do, and why was it impactful?
+        <details><summary>Answer</summary><p>Whisper is a transformer-based speech-to-text model. It's open-weight, multilingual, and robust to noise. It made high-quality transcription essentially free, enabling thousands of voice products.</p></details>
+      </li>
+      <li>What's voice cloning, and why is it concerning?
+        <details><summary>Answer</summary><p>Generating a synthetic voice that matches a real person's, often from a few seconds of audio. Concerning because it enables impersonation scams, fake political audio, and identity fraud at scale.</p></details>
+      </li>
+      <li>What's the typical voice-AI pipeline, and what's replacing it?
+        <details><summary>Answer</summary><p>Traditional pipeline: STT → LLM → TTS (three separate models). Replacing it: end-to-end speech-to-speech models (like GPT-4o's voice mode) that handle audio in and out natively. Lower latency, better prosody.</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <h3>Recommended next reading</h3>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>OpenAI: "Sora — Creating video from text"</strong> · openai.com · Free · The original Sora technical report. Demonstrates the "world simulator" framing.</span>
+      </li>
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"Robust Speech Recognition via Large-Scale Weak Supervision"</strong> by Radford et al. (2022) — the Whisper paper.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Lilian Weng: "Generative Modeling by Estimating Gradients of the Data Distribution"</strong> · lilianweng.github.io · Free · Deep technical reference for diffusion + audio diffusion.</span>
+      </li>
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"VALL-E: Neural Codec Language Models are Zero-Shot Text-to-Speech Synthesizers"</strong> by Wang et al. (2023) — Microsoft's voice cloning paper.</span>
+      </li>
+      <li>
+        <span class="ref-type tool">Tool</span>
+        <span class="ref-detail"><strong>ElevenLabs · elevenlabs.io</strong> · Try voice cloning and TTS in your browser. Best way to feel where the technology is.</span>
+      </li>
+      <li>
+        <span class="ref-type tool">Tool</span>
+        <span class="ref-detail"><strong>Suno · suno.com</strong> · Generate full songs with vocals from prompts. Stunning demo of where music AI is.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch12-image-generation.html">← Previous: Image Generation</a>
+    <div class="nav-spacer"></div>
+    <a href="ch14-multimodal.html">Next: Multimodal AI →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 13 · Part 4 · Generative AI · Chapter 13 of 24</div>
+</footer>
+
+</body>
+</html>

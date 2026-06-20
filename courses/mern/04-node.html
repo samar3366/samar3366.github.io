@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Node.js — JavaScript on the Server | DevLaunch Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/styles.css" />
+<style>
+  /* Page-local helpers for this expanded Node module */
+  .pill-row { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 4px; }
+  .pill { font-size:.72rem; font-weight:600; padding:4px 10px; border-radius:999px;
+          background:#1b2030; border:1px solid #2c3447; color:#aab2c5; }
+  .pill.green { border-color:#3c873a; color:#9ee493; }
+  .pill.blue  { border-color:#6c8cff; color:#a9bbff; }
+  .pill.pink  { border-color:#ff7eb6; color:#ffb3d6; }
+  .twocol { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0; }
+  @media (max-width:720px){ .twocol{ grid-template-columns:1fr; } }
+  .mini-card { background:#1b2030; border:1px solid #2c3447; border-radius:12px; padding:14px 16px; }
+  .mini-card h4 { margin:0 0 6px; font-size:.98rem; }
+  .mini-card p { margin:0; color:var(--text-soft); font-size:.92rem; }
+  .analogy { border-left:3px solid #ffce5c; padding:6px 0 6px 14px; margin:12px 0;
+             color:var(--text-soft); font-style:italic; }
+  code .cmt { color:#7a8499; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand"><span class="logo">⚡</span> DevLaunch Academy</a>
+    <nav class="topnav">
+      <a href="index.html">Home</a>
+      <a href="01-foundations.html">Foundations</a>
+      <a href="02-javascript.html">JavaScript</a>
+      <a href="03-react.html">React</a>
+      <a href="04-node.html" class="active">Node</a>
+      <a href="05-rest-apis.html">REST</a>
+      <a href="06-database.html">MSSQL</a>
+      <a href="07-capstone.html">Capstone</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <button class="menu-toggle" style="margin:18px 0;">☰ Sections</button>
+  <div class="layout">
+    <aside class="sidebar">
+      <h4>On this page</h4>
+      <a href="#what">What is Node.js?</a>
+      <a href="#eventloop">The event loop</a>
+      <a href="#run">① Running code</a>
+      <a href="#modules">② Modules (CJS vs ESM)</a>
+      <a href="#core">③ Built-in core modules</a>
+      <a href="#npm">④ npm &amp; packages</a>
+      <a href="#async">⑤ Async patterns &amp; files</a>
+      <a href="#env">⑥ Env vars &amp; config</a>
+      <a href="#http">⑦ A bare server</a>
+      <a href="#express">⑧ Express</a>
+      <a href="#express-deep">⑨ Express, deeper</a>
+      <a href="#middleware">⑩ Middleware</a>
+      <a href="#structure">⑪ Project structure</a>
+      <a href="#tooling">⑫ Reload &amp; debugging</a>
+      <a href="#rest-next">⑬ Toward REST</a>
+      <a href="#quiz">Quiz</a>
+      <a href="#takeaways">Key takeaways</a>
+    </aside>
+
+    <div class="content">
+      <p class="muted" style="margin:0;">Module 3 · <span class="chip inter">Intermediate</span></p>
+      <h1 style="margin-top:6px;">🟩 Node.js: JavaScript on the Server</h1>
+      <p class="lead" style="color:var(--text-soft);font-size:1.12rem;">
+        Browsers run JavaScript for the front-end. <strong>Node.js</strong> lets the <em>same</em> language run
+        on a server — so you can build the back-end with skills you already have. This module is hands-on in your terminal.
+      </p>
+      <div class="callout info"><span class="ci">🖥️</span><p><strong>This module runs on your machine, not in the browser.</strong> Code along in VS Code with a terminal open. If you haven't installed Node yet, see <a href="01-foundations.html#tools">Foundations → Toolkit</a>.</p></div>
+
+      <section id="what" class="section">
+        <h2>What is Node.js, really?</h2>
+        <p>Node.js is a <strong>runtime</strong> — a program that can execute JavaScript outside a browser. The browser gives JS access to the page (the DOM); Node gives JS access to the <strong>computer</strong>: files, the network, databases, and the ability to act as a web server.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 780 200" role="img" aria-label="Browser JS vs Node JS capabilities">
+            <rect x="30" y="40" width="330" height="130" rx="14" fill="#1b2030" stroke="#61dafb" stroke-width="2"/>
+            <text x="195" y="68" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">JS in the Browser</text>
+            <text x="195" y="95" text-anchor="middle" fill="#aab2c5" font-size="12">✔ Update the page (DOM)</text>
+            <text x="195" y="118" text-anchor="middle" fill="#aab2c5" font-size="12">✔ React to clicks</text>
+            <text x="195" y="141" text-anchor="middle" fill="#ff8a88" font-size="12">✘ Can't read files or run a server</text>
+
+            <rect x="420" y="40" width="330" height="130" rx="14" fill="#1b2030" stroke="#3c873a" stroke-width="2"/>
+            <text x="585" y="68" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">JS in Node.js</text>
+            <text x="585" y="95" text-anchor="middle" fill="#9ee493" font-size="12">✔ Read &amp; write files</text>
+            <text x="585" y="118" text-anchor="middle" fill="#9ee493" font-size="12">✔ Run a web server</text>
+            <text x="585" y="141" text-anchor="middle" fill="#9ee493" font-size="12">✔ Talk to databases</text>
+          </svg>
+          <figcaption>Same language, different superpowers. Node is what makes JavaScript a <em>full-stack</em> language.</figcaption>
+        </figure>
+        <div class="callout key"><span class="ci">🔑</span><p>Because front-end <em>and</em> back-end are both JavaScript, you don't switch languages, mental models, or tools. This is the core advantage of the "MERN-style" stack you're learning.</p></div>
+
+        <h3 style="margin-top:26px;">Under the hood: the same engine your browser uses</h3>
+        <p>Here's a fun fact that makes Node click for a lot of people: Node.js is built on <strong>V8</strong> — the very same JavaScript engine inside Google Chrome. Someone took that engine <em>out</em> of the browser, wrapped it in a layer that can touch files and networks, and shipped it as a standalone program called <code>node</code>. So when you run <code>node server.js</code>, you're running your JavaScript through the exact compiler that powers a browser tab — just pointed at your computer instead of a web page.</p>
+        <p>What Node <strong>adds</strong> on top of V8 are the things a server needs and a browser deliberately forbids: reading and writing files, opening network sockets, spawning other programs, reading environment variables, and so on. And what Node <strong>removes</strong> are the browser-only globals: there is no <code>window</code>, no <code>document</code>, no <code>localStorage</code>, no <code>alert</code>. If you try to use them in Node you'll get a <code>ReferenceError</code> — a common surprise for people coming straight from front-end work.</p>
+        <div class="twocol">
+          <div class="mini-card"><h4>🌐 Browser globals</h4><p><code>window</code>, <code>document</code>, <code>fetch</code>, <code>localStorage</code>, <code>alert</code>. Sandboxed for safety — a web page must not read your hard drive.</p></div>
+          <div class="mini-card"><h4>🖥️ Node globals</h4><p><code>process</code>, <code>__dirname</code>, <code>Buffer</code>, <code>global</code>, plus core modules like <code>fs</code> and <code>http</code>. Full machine access — it's <em>your</em> server.</p></div>
+        </div>
+        <div class="callout info"><span class="ci">📌</span><p><strong>Node is not a framework or a language.</strong> It's a <em>runtime</em> — an environment that executes JavaScript. Express, on the other hand, <em>is</em> a framework (a library you install) that runs <em>inside</em> Node. Keeping that distinction straight prevents a lot of early confusion.</p></div>
+      </section>
+
+      <section id="eventloop" class="section">
+        <h2>The event loop &amp; non-blocking I/O <span class="chip inter">Intermediate</span></h2>
+        <p>This is the single most important idea for understanding <em>why</em> Node is so good at building servers. Don't worry — it sounds academic, but the core of it is a simple, everyday idea. Let's build it up with an analogy.</p>
+
+        <div class="analogy">Imagine a coffee shop with one barista. A <strong>blocking</strong> barista takes your order, then stands frozen at the espresso machine until your drink is 100% done before even <em>looking</em> at the next customer. A <strong>non-blocking</strong> barista takes your order, starts the machine, and immediately turns to the next customer while the first drink brews — circling back the moment a drink is ready. Same one barista, but the second shop serves a huge line without anyone standing idle.</div>
+
+        <p>Node is that second barista. It runs your JavaScript on a <strong>single main thread</strong> (one barista), but whenever it hits a slow task — reading a file, querying a database, waiting on the network — it doesn't stand and wait. It hands that slow task off to the system, registers a "call me back when it's done" note, and immediately moves on to other work. The mechanism that keeps checking "is anything finished yet?" and runs the matching callback is called the <strong>event loop</strong>.</p>
+
+        <figure class="diagram">
+          <svg viewBox="0 0 780 270" role="img" aria-label="Blocking versus non-blocking request handling">
+            <text x="195" y="26" text-anchor="middle" fill="#ff8a88" font-size="14" font-weight="700">❌ Blocking (one at a time)</text>
+            <rect x="40" y="44" width="310" height="36" rx="8" fill="#1b2030" stroke="#ff7eb6" stroke-width="2"/>
+            <text x="195" y="67" text-anchor="middle" fill="#fff" font-size="12">Req A → wait for DB… (everyone else waits)</text>
+            <rect x="40" y="90" width="310" height="36" rx="8" fill="#1b2030" stroke="#2c3447" stroke-width="2"/>
+            <text x="195" y="113" text-anchor="middle" fill="#7a8499" font-size="12">Req B → blocked, stuck in line</text>
+            <rect x="40" y="136" width="310" height="36" rx="8" fill="#1b2030" stroke="#2c3447" stroke-width="2"/>
+            <text x="195" y="159" text-anchor="middle" fill="#7a8499" font-size="12">Req C → blocked, stuck in line</text>
+
+            <text x="585" y="26" text-anchor="middle" fill="#9ee493" font-size="14" font-weight="700">✅ Non-blocking (event loop)</text>
+            <circle cx="585" cy="150" r="78" fill="none" stroke="#3c873a" stroke-width="2"/>
+            <text x="585" y="150" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">event</text>
+            <text x="585" y="168" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">loop</text>
+            <rect x="500" y="44" width="170" height="28" rx="8" fill="#13251a" stroke="#3c873a" stroke-width="1.5"/>
+            <text x="585" y="63" text-anchor="middle" fill="#9ee493" font-size="11">A,B,C started together</text>
+            <path d="M508,210 q77,40 154,0" stroke="#38d39f" stroke-width="2" fill="none" marker-end="url(#ev1)"/>
+            <text x="585" y="244" text-anchor="middle" fill="#9ee493" font-size="11">callbacks fire as each finishes</text>
+            <defs><marker id="ev1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#38d39f"/></marker></defs>
+          </svg>
+          <figcaption>One thread, but slow work happens "in the background." The event loop runs your callback when each task finishes — so thousands of users can be served at once.</figcaption>
+        </figure>
+
+        <p>This is why people say Node is great for <strong>I/O-heavy</strong> work: APIs, web servers, chat apps, anything that spends most of its time <em>waiting</em> on databases or networks rather than crunching numbers. While one request waits on the database, Node happily serves dozens of others. That's the secret behind handling many connections with very little memory.</p>
+
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>The flip side — never block the loop.</strong> Because there's only one main thread, a single long <em>synchronous</em> task (a giant <code>for</code> loop, <code>JSON.parse</code> on a 50&nbsp;MB string, or the synchronous <code>fs.readFileSync</code> in a busy server) freezes <em>every</em> user at once — the frozen barista. Prefer the async versions (<code>await readFile(...)</code>), and keep heavy CPU work out of the request path.</p></div>
+
+        <p>You can actually <em>feel</em> the event loop in plain JavaScript — this snippet runs in your browser, which uses the same model. Predict the order before you hit Run:</p>
+        <div class="code-wrap live">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">event-loop-demo.js</span><span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">console.log("1 — runs now (synchronous)");
+
+setTimeout(function () {
+  console.log("3 — runs later (timer callback)");
+}, 0);
+
+Promise.resolve().then(function () {
+  console.log("2 — runs after sync, before timers");
+});
+
+console.log("1b — still synchronous, runs before 2 and 3");
+// Output order: 1, 1b, 2, 3
+// Synchronous code finishes FIRST, then queued callbacks run.</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>The lesson: synchronous code always runs to completion first; anything async (timers, promises, file reads) is <em>queued</em> and run by the event loop afterward. That ordering is the heartbeat of every Node program.</p></div>
+
+        <!-- ===== Interactive animated event-loop visualizer ===== -->
+        <style>
+          .evloop { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin:22px 0; background:var(--bg-soft); }
+          .evloop-bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 14px; border-bottom:1px solid var(--border); background:#11151f; }
+          .evloop-bar button { background:var(--bg-elev); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:7px 14px; font-weight:700; font-size:0.85rem; cursor:pointer; }
+          .evloop-bar button.play { background:var(--brand-2); color:#062018; border-color:transparent; }
+          .evloop-bar button.on { background:var(--warn); color:#2a2200; }
+          .evloop-bar button:disabled { opacity:.4; cursor:not-allowed; }
+          .evloop-step { margin-left:auto; font-size:0.82rem; color:var(--text-dim); font-family:var(--mono); }
+          .evloop-note { padding:11px 15px; font-size:0.9rem; color:#cfe3ff; background:rgba(108,140,255,.08); border-bottom:1px solid var(--border); min-height:44px; display:flex; align-items:center; }
+          .evloop-stage { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:0; }
+          .evloop-code { padding:14px; border-right:1px solid var(--border); font-family:var(--mono); font-size:0.86rem; }
+          .evloop-code .ln { padding:5px 10px; border-radius:6px; color:#aab2c5; white-space:pre-wrap; transition:background .2s, color .2s; }
+          .evloop-code .ln.active { background:rgba(255,206,92,.16); color:#fff; box-shadow:inset 3px 0 0 #ffce5c; }
+          .evloop-engine { padding:14px; display:flex; flex-direction:column; gap:10px; }
+          .ev-box { border:1px solid var(--border); border-radius:10px; padding:9px 11px; min-height:56px; background:#0b0e16; }
+          .ev-box.stack { border-left:3px solid #6c8cff; }
+          .ev-box.webapi { border-left:3px solid #ff9d54; }
+          .ev-box.micro { border-left:3px solid #ff7eb6; }
+          .ev-box.macro { border-left:3px solid #ffce5c; }
+          .ev-box h6 { margin:0 0 7px; font-size:0.68rem; text-transform:uppercase; letter-spacing:.08em; color:#fff; }
+          .ev-box h6 span { text-transform:none; letter-spacing:0; color:var(--text-dim); font-weight:600; }
+          .ev-items { display:flex; flex-direction:column; gap:5px; }
+          .ev-item { font-family:var(--mono); font-size:0.8rem; padding:5px 9px; border-radius:6px; animation:evpop .25s ease; }
+          .ev-item.ev-stack { background:rgba(108,140,255,.18); color:#cfe3ff; }
+          .ev-item.ev-webapi { background:rgba(255,157,84,.16); color:#ffd9b8; }
+          .ev-item.ev-micro { background:rgba(255,126,182,.16); color:#ffd0e6; }
+          .ev-item.ev-macro { background:rgba(255,206,92,.16); color:#ffe9b8; }
+          .ev-empty { color:#4a5470; font-size:0.78rem; font-style:italic; }
+          .evloop-console { padding:12px 15px; border-top:1px solid var(--border); }
+          .evloop-console h6 { margin:0 0 8px; font-size:0.68rem; text-transform:uppercase; letter-spacing:.08em; color:#7fe0bf; }
+          .ev-out { display:flex; gap:8px; flex-wrap:wrap; min-height:30px; align-items:center; }
+          .ev-chip { font-family:var(--mono); font-weight:700; background:rgba(56,211,159,.16); color:#9ef5cf; border:1px solid rgba(56,211,159,.45); border-radius:7px; padding:5px 13px; animation:evpop .25s ease; }
+          @keyframes evpop { from{ opacity:0; transform:translateY(-6px);} to{opacity:1; transform:none;} }
+          @media (max-width:760px){ .evloop-stage{ grid-template-columns:1fr; } .evloop-code{ border-right:none; border-bottom:1px solid var(--border);} }
+        </style>
+
+        <h3 style="margin-top:26px;">Watch the event loop in action 🎬</h3>
+        <p>Reading about queues is one thing — <em>seeing</em> them is another. Below is the same idea, animated. Press <strong>Play</strong> to run it automatically, or use <strong>Step ▶</strong> to advance one move at a time and predict what happens next. Keep your eye on one thing: the promise callback (<code>C</code>) overtakes the timer callback (<code>D</code>) <em>even though the timer was scheduled first</em> — because the <strong>Microtask Queue always empties before the Callback Queue</strong>.</p>
+
+        <div class="evloop" id="evloop">
+          <div class="evloop-bar">
+            <button data-ev-play class="play">▶ Play</button>
+            <button data-ev-prev>◀ Back</button>
+            <button data-ev-next>Step ▶</button>
+            <button data-ev-reset>↺ Reset</button>
+            <span class="evloop-step" data-ev-step>Step 0 / 15</span>
+          </div>
+          <div class="evloop-note" data-ev-note></div>
+          <div class="evloop-stage">
+            <div class="evloop-code" data-ev-code></div>
+            <div class="evloop-engine">
+              <div class="ev-box stack"><h6>📚 Call Stack <span>— where code runs right now</span></h6><div class="ev-items" data-ev-stack></div></div>
+              <div class="ev-box webapi"><h6>🌐 Web APIs / Background <span>— timers, I/O run here</span></h6><div class="ev-items" data-ev-webapi></div></div>
+              <div class="ev-box micro"><h6>⚡ Microtask Queue <span>— Promises (drained first)</span></h6><div class="ev-items" data-ev-micro></div></div>
+              <div class="ev-box macro"><h6>⏲ Callback Queue <span>— Timers (run after microtasks)</span></h6><div class="ev-items" data-ev-macro></div></div>
+            </div>
+          </div>
+          <div class="evloop-console"><h6>🖥 Console output</h6><div class="ev-out" data-ev-out></div></div>
+        </div>
+
+        <div class="callout info"><span class="ci">🧭</span><p><strong>How to read it:</strong> the <span style="color:#9fb2ff;font-weight:700;">Call Stack</span> is the single barista — only what's here is actually executing. Slow tasks go to the <span style="color:#ffbf8c;font-weight:700;">Background</span>; when they finish, their callbacks line up in a <strong>queue</strong>. The event loop only pulls a queued callback onto the stack when the stack is empty — and it <em>always</em> empties the <span style="color:#ffa7d0;font-weight:700;">Microtask Queue</span> before touching the <span style="color:#ffd98c;font-weight:700;">Callback Queue</span>.</p></div>
+
+        <div class="callout key"><span class="ci">🔑</span><p><strong>The rule the animation proves:</strong> &nbsp;1) Run all synchronous code. &nbsp;2) Drain the <em>entire</em> Microtask Queue (promises). &nbsp;3) Take <em>one</em> task from the Callback Queue (timers/I/O), then repeat from step&nbsp;2. This is exactly why <code>A, B, C, D</code> — not <code>A, B, D, C</code> — is the output.</p></div>
+
+        <script>
+          (function () {
+            const root = document.getElementById("evloop");
+            if (!root) return;
+
+            const CODE = [
+              "console.log('A');",
+              "setTimeout(() => console.log('D'), 0);",
+              "Promise.resolve().then(() => console.log('C'));",
+              "console.log('B');",
+            ];
+
+            // Each step is a full snapshot of the engine's state.
+            const STEPS = [
+              { line: null, stack: [], webapi: [], micro: [], macro: [], out: [],
+                note: "Ready. Press Play to watch Node run this code — or Step ▶ through it yourself." },
+              { line: 0, stack: ["console.log('A')"], webapi: [], micro: [], macro: [], out: [],
+                note: "Line 1 runs: the call to console.log('A') is pushed onto the Call Stack." },
+              { line: 0, stack: [], webapi: [], micro: [], macro: [], out: ["A"],
+                note: "console.log prints 'A', then pops off the stack. The stack is empty again." },
+              { line: 1, stack: ["setTimeout(…)"], webapi: [], micro: [], macro: [], out: ["A"],
+                note: "Line 2 runs: setTimeout is a background API. It registers the timer and returns immediately — it does NOT wait here." },
+              { line: 1, stack: [], webapi: ["⏲ Timer 0ms → cb1"], micro: [], macro: [], out: ["A"],
+                note: "The timer now ticks in the Background. The stack is free to keep running the rest of the script." },
+              { line: 1, stack: [], webapi: [], micro: [], macro: ["cb1: () => log('D')"], out: ["A"],
+                note: "The 0ms timer finishes. But its callback can't run yet — it lines up in the Callback (macrotask) Queue and waits." },
+              { line: 2, stack: ["Promise.then(…)"], webapi: [], micro: [], macro: ["cb1: () => log('D')"], out: ["A"],
+                note: "Line 3 runs: we attach a .then callback to an already-resolved promise." },
+              { line: 2, stack: [], webapi: [], micro: ["cb2: () => log('C')"], macro: ["cb1: () => log('D')"], out: ["A"],
+                note: "The promise's callback goes to the Microtask Queue — a SEPARATE, higher-priority queue from timers." },
+              { line: 3, stack: ["console.log('B')"], webapi: [], micro: ["cb2: () => log('C')"], macro: ["cb1: () => log('D')"], out: ["A"],
+                note: "Line 4 runs: console.log('B') is pushed onto the stack." },
+              { line: 3, stack: [], webapi: [], micro: ["cb2: () => log('C')"], macro: ["cb1: () => log('D')"], out: ["A", "B"],
+                note: "Prints 'B'. The script's synchronous code is now FINISHED — and both queued callbacks are still just waiting." },
+              { line: null, stack: [], webapi: [], micro: ["cb2: () => log('C')"], macro: ["cb1: () => log('D')"], out: ["A", "B"],
+                note: "Event loop wakes up: the stack is empty. RULE 1 → empty the ENTIRE Microtask Queue before any macrotask." },
+              { line: null, stack: ["cb2: () => log('C')"], webapi: [], micro: [], macro: ["cb1: () => log('D')"], out: ["A", "B"],
+                note: "The event loop moves cb2 (the promise callback) from the Microtask Queue onto the Call Stack." },
+              { line: null, stack: [], webapi: [], micro: [], macro: ["cb1: () => log('D')"], out: ["A", "B", "C"],
+                note: "Prints 'C'. Microtask Queue is now empty — so the loop may finally look at the Callback Queue." },
+              { line: null, stack: [], webapi: [], micro: [], macro: ["cb1: () => log('D')"], out: ["A", "B", "C"],
+                note: "RULE 2 → take ONE task from the Callback Queue (the timer callback)." },
+              { line: null, stack: ["cb1: () => log('D')"], webapi: [], micro: [], macro: [], out: ["A", "B", "C"],
+                note: "The event loop moves cb1 (the timer callback) onto the Call Stack." },
+              { line: null, stack: [], webapi: [], micro: [], macro: [], out: ["A", "B", "C", "D"],
+                note: "Prints 'D'. Every queue is empty — the program is done. ✅  Final order: A · B · C · D." },
+            ];
+
+            const codeEl = root.querySelector("[data-ev-code]");
+            CODE.forEach((line, idx) => {
+              const d = document.createElement("div");
+              d.className = "ln"; d.dataset.idx = idx; d.textContent = line;
+              codeEl.appendChild(d);
+            });
+            const lines = codeEl.querySelectorAll(".ln");
+            const noteEl = root.querySelector("[data-ev-note]");
+            const stepEl = root.querySelector("[data-ev-step]");
+            const boxes = {
+              stack: root.querySelector("[data-ev-stack]"),
+              webapi: root.querySelector("[data-ev-webapi]"),
+              micro: root.querySelector("[data-ev-micro]"),
+              macro: root.querySelector("[data-ev-macro]"),
+              out: root.querySelector("[data-ev-out]"),
+            };
+            const btnPlay = root.querySelector("[data-ev-play]");
+            const btnNext = root.querySelector("[data-ev-next]");
+            const btnPrev = root.querySelector("[data-ev-prev]");
+            const btnReset = root.querySelector("[data-ev-reset]");
+
+            let i = 0, timer = null;
+
+            function fill(box, items, kind) {
+              box.innerHTML = "";
+              if (!items.length) { const e = document.createElement("span"); e.className = "ev-empty"; e.textContent = "empty"; box.appendChild(e); return; }
+              items.forEach((t) => { const el = document.createElement("div"); el.className = "ev-item ev-" + kind; el.textContent = t; box.appendChild(el); });
+            }
+            function fillOut(box, items) {
+              box.innerHTML = "";
+              if (!items.length) { const e = document.createElement("span"); e.className = "ev-empty"; e.textContent = "(no output yet)"; box.appendChild(e); return; }
+              items.forEach((t) => { const el = document.createElement("span"); el.className = "ev-chip"; el.textContent = t; box.appendChild(el); });
+            }
+            function render() {
+              const s = STEPS[i];
+              lines.forEach((l) => l.classList.toggle("active", Number(l.dataset.idx) === s.line));
+              noteEl.textContent = s.note;
+              stepEl.textContent = "Step " + i + " / " + (STEPS.length - 1);
+              fill(boxes.stack, s.stack, "stack");
+              fill(boxes.webapi, s.webapi, "webapi");
+              fill(boxes.micro, s.micro, "micro");
+              fill(boxes.macro, s.macro, "macro");
+              fillOut(boxes.out, s.out);
+              btnPrev.disabled = i === 0;
+              btnNext.disabled = i === STEPS.length - 1;
+            }
+            function next() { if (i < STEPS.length - 1) { i++; render(); } if (i === STEPS.length - 1) stop(); }
+            function prev() { if (i > 0) { i--; render(); } }
+            function stop() { if (timer) { clearInterval(timer); timer = null; } btnPlay.textContent = "▶ Play"; btnPlay.classList.remove("on"); }
+            function play() {
+              if (timer) return;
+              if (i === STEPS.length - 1) { i = 0; render(); }
+              btnPlay.textContent = "⏸ Pause"; btnPlay.classList.add("on");
+              timer = setInterval(() => { if (i < STEPS.length - 1) next(); else stop(); }, 1500);
+            }
+            btnPlay.addEventListener("click", () => (timer ? stop() : play()));
+            btnNext.addEventListener("click", () => { stop(); next(); });
+            btnPrev.addEventListener("click", () => { stop(); prev(); });
+            btnReset.addEventListener("click", () => { stop(); i = 0; render(); });
+            render();
+          })();
+        </script>
+      </section>
+
+      <section id="run" class="section">
+        <h2>① Running your first Node program</h2>
+        <p>Create a file <code>hello.js</code> and run it with <code>node hello.js</code>. Note: in Node there's no <code>alert</code> or <code>document</code> — you print with <code>console.log</code>, which writes to the terminal.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">hello.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">const name = "World";
+console.log(`Hello, ${name}! Running on Node ${process.version}`);
+
+// process.argv holds command-line arguments
+console.log("You ran:", process.argv[1]);</code></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">terminal</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">node hello.js
+// → Hello, World! Running on Node v20.x.x</code></pre>
+        </div>
+        <div class="callout tip"><span class="ci">💡</span><p>All the JavaScript you learned in Module 1 — variables, functions, arrays, <code>map</code>, <code>async/await</code> — works identically here. You're not learning a new language, just a new environment.</p></div>
+
+        <h3 style="margin-top:24px;">Two ways to run JavaScript: the script and the REPL</h3>
+        <p>There are two everyday ways to execute code with Node, and you'll use both:</p>
+        <ol class="steps">
+          <li><strong>Run a file.</strong> <code>node hello.js</code> executes the whole file top to bottom and exits. This is how you run real programs and servers.</li>
+          <li><strong>The REPL (interactive shell).</strong> Type just <code>node</code> with no filename and you get a live prompt where you can type one expression at a time and see the result instantly — perfect for trying out a quick idea, like a browser console but in your terminal. Type <code>.exit</code> or press <kbd>Ctrl</kbd>+<kbd>C</kbd> twice to leave.</li>
+        </ol>
+        <div class="callout info"><span class="ci">🧪</span><p>REPL stands for <strong>R</strong>ead–<strong>E</strong>val–<strong>P</strong>rint <strong>L</strong>oop: it reads what you type, evaluates it, prints the answer, and loops back for more. Great for sanity-checking "does <code>[1,2,3].includes(2)</code> return true?" without creating a file.</p></div>
+
+        <h3 style="margin-top:24px;">Passing arguments &amp; <code>process.argv</code></h3>
+        <p>Programs often need input. The <code>process</code> object (a Node global, no import needed) exposes <code>process.argv</code> — an array of the words typed on the command line. The first two entries are always the path to <code>node</code> and the path to your script; <em>your</em> arguments start at index&nbsp;2.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">greet.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">// Run as:  node greet.js Alice
+const args = process.argv.slice(2);   // drop node + script path
+const who = args[0] || "stranger";
+console.log(`Hello, ${who}!`);        // → Hello, Alice!</code></pre>
+        </div>
+        <p>That <code>process.argv.slice(2)</code> trick is pure JavaScript array work — try the slicing logic right here in the browser:</p>
+        <div class="code-wrap live">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">argv-demo.js</span><span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">// Pretend this is what Node hands you in process.argv:
+const argv = ["/usr/bin/node", "/app/greet.js", "Alice", "--loud"];
+
+const userArgs = argv.slice(2);   // skip the first two
+console.log("Your arguments:", userArgs);
+console.log("First arg:", userArgs[0]);
+console.log("Loud mode?", userArgs.includes("--loud"));</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+      </section>
+
+      <section id="modules" class="section">
+        <h2>② Modules — splitting code across files</h2>
+        <p>Real apps span many files. <strong>Modules</strong> let one file <code>export</code> things and another <code>import</code> them. Think of it like a kitchen: instead of one enormous 5,000-line recipe, you keep ingredients in labelled jars (modules) and grab exactly what you need. Each file is its own private scope — variables don't leak between files unless you explicitly export them, which keeps things tidy and prevents name clashes.</p>
+        <p>Node actually supports <strong>two</strong> module systems, and you'll bump into both in the wild. Knowing the difference saves you from a category of baffling errors.</p>
+        <div class="twocol">
+          <div class="mini-card"><h4>📦 CommonJS (CJS) — the original</h4><p>Uses <code>require()</code> and <code>module.exports</code>. The default for older Node code and most npm tutorials. Files often end in <code>.js</code> (or <code>.cjs</code>).</p></div>
+          <div class="mini-card"><h4>✨ ES Modules (ESM) — the modern standard</h4><p>Uses <code>import</code> / <code>export</code> — the <em>same</em> syntax you used in React. The web standard, and what we use in this course. Enabled with <code>"type":"module"</code>.</p></div>
+        </div>
+
+        <h3 style="margin-top:22px;">The same module, both ways</h3>
+        <div class="twocol">
+          <div class="code-wrap" style="margin:0;">
+            <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">CommonJS</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">// math.cjs — export
+function add(a, b) { return a + b; }
+module.exports = { add };
+
+// app.cjs — import
+const { add } = require("./math.cjs");
+console.log(add(2, 3)); // 5</code></pre>
+          </div>
+          <div class="code-wrap" style="margin:0;">
+            <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">ES Modules</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">// math.js — export
+export function add(a, b) { return a + b; }
+
+// app.js — import
+import { add } from "./math.js";
+console.log(add(2, 3)); // 5</code></pre>
+          </div>
+        </div>
+        <p>Below is the standard ESM form we'll use everywhere from here on. Notice the two flavours of export: <strong>named</strong> exports (any number per file, imported by exact name in <code>{ }</code>) and a single <strong>default</strong> export (imported under any name you like).</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">math.js — exports</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">export function add(a, b) {
+  return a + b;
+}
+export const PI = 3.14159;</code></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">app.js — imports</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import { add, PI } from "./math.js";       // named imports — exact names
+import myMath, { add as plus } from "./bundle.js"; // default + rename
+
+console.log(add(2, 3));   // 5
+console.log(PI);          // 3.14159
+console.log(plus(4, 4));  // 8  (renamed with "as")</code></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">bundle.js — a default export</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">export function add(a, b) { return a + b; }   // named
+// exactly ONE default export allowed per file:
+export default { version: "1.0", name: "myMath" };</code></pre>
+        </div>
+        <table>
+          <thead><tr><th>Concept</th><th>CommonJS</th><th>ES Modules</th></tr></thead>
+          <tbody>
+            <tr><td>Export</td><td><code>module.exports = …</code></td><td><code>export</code> / <code>export default</code></td></tr>
+            <tr><td>Import</td><td><code>require("./x")</code></td><td><code>import … from "./x.js"</code></td></tr>
+            <tr><td>Enable it</td><td>default</td><td><code>"type":"module"</code> in package.json</td></tr>
+            <tr><td>File extension</td><td><code>.js</code> / <code>.cjs</code></td><td><code>.js</code> / <code>.mjs</code></td></tr>
+            <tr><td>Top-level <code>await</code></td><td>❌ not allowed</td><td>✅ allowed</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn"><span class="ci">⚠️</span><p>To use <code>import</code>/<code>export</code>, add <code>"type": "module"</code> to your <code>package.json</code>. <strong>Two beginner gotchas in ESM:</strong> (1) you must include the file <em>extension</em> in relative imports — <code>"./math.js"</code>, not <code>"./math"</code>; and (2) there's no <code>require</code>, <code>__dirname</code>, or <code>__filename</code> by default (you recreate the last two from <code>import.meta.url</code> if needed). Mixing the two systems is the source of the dreaded <code>"Cannot use import statement outside a module"</code> error — it almost always means you forgot <code>"type":"module"</code>.</p></div>
+        <div class="callout tip"><span class="ci">🧭</span><p><strong>How to choose:</strong> for any new project, use ES Modules — it's the standard, matches React, and supports top-level <code>await</code>. You'll only reach for CommonJS when maintaining older code or using a rare package that hasn't modernised yet.</p></div>
+      </section>
+
+      <section id="core" class="section">
+        <h2>③ The built-in toolbox: core modules <span class="chip inter">Intermediate</span></h2>
+        <p>Before you install a single package from npm, Node already ships with a generous standard library — the <strong>core modules</strong>. These are built in: you just <code>import</code> them, no installation needed. Knowing what's already in the box stops you from installing a package for something Node can do natively. Here's a tour of the ones you'll actually reach for.</p>
+
+        <h3><code>fs</code> / <code>fs/promises</code> — the file system</h3>
+        <p>Read, write, append, delete, and inspect files and folders. Always prefer the promise-based version (<code>fs/promises</code>) so you can <code>await</code> instead of nesting callbacks — and so you don't block the event loop.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">fs-tour.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import { readFile, writeFile, mkdir, readdir } from "fs/promises";
+
+await mkdir("data", { recursive: true });           // make a folder
+await writeFile("data/log.txt", "first line\n");    // create/overwrite
+const files = await readdir("data");                // list a folder
+console.log(files);                                 // → ["log.txt"]</code></pre>
+        </div>
+
+        <h3><code>path</code> — build file paths safely</h3>
+        <p>Never glue paths together with <code>"folder/" + name</code> — Windows uses <code>\</code> and macOS/Linux use <code>/</code>, and you'll create bugs. The <code>path</code> module joins paths correctly for whatever OS you're on.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">path-tour.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import path from "path";
+
+path.join("routes", "tasks.js");   // "routes/tasks.js" (or routes\tasks.js on Windows)
+path.resolve("data", "log.txt");   // absolute path from the current dir
+path.basename("/app/server.js");   // "server.js"
+path.extname("photo.PNG");         // ".PNG"</code></pre>
+        </div>
+
+        <h3><code>os</code>, <code>url</code>, <code>process</code> — the environment</h3>
+        <div class="twocol">
+          <div class="mini-card"><h4><code>os</code></h4><p>Info about the machine: <code>os.platform()</code>, <code>os.cpus().length</code>, <code>os.totalmem()</code>, <code>os.homedir()</code>.</p></div>
+          <div class="mini-card"><h4><code>url</code></h4><p>Parse and build URLs: <code>new URL("https://x.com/a?id=5")</code> gives you <code>.pathname</code>, <code>.searchParams</code>, etc.</p></div>
+        </div>
+        <p>The <code>process</code> object (global — no import) is your program's window into the outside world: <code>process.env</code> (environment variables), <code>process.argv</code> (CLI args), <code>process.cwd()</code> (current working directory), and <code>process.exit(code)</code> (stop the program; <code>0</code> means success, anything else signals an error).</p>
+
+        <h3><code>events</code> — the EventEmitter pattern</h3>
+        <p>A huge amount of Node is built on a simple publish/subscribe idea: one part of your code <strong>emits</strong> a named event, and other parts <strong>listen</strong> for it. You already met this style in the browser with <code>button.addEventListener("click", …)</code>. Node's <code>EventEmitter</code> is the same concept, and Express's <code>app</code> and the HTTP server are themselves emitters under the hood.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">events-tour.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import { EventEmitter } from "events";
+
+const bus = new EventEmitter();
+
+// listen ("subscribe")
+bus.on("order", (item) =&gt; {
+  console.log(`👨‍🍳 Cooking a ${item}`);
+});
+
+// emit ("publish") — triggers every listener
+bus.emit("order", "pizza");   // → 👨‍🍳 Cooking a pizza
+bus.emit("order", "salad");   // → 👨‍🍳 Cooking a salad</code></pre>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>Listeners run <em>in the order they were registered</em>, and emitting an event with no listeners simply does nothing. This "fire an event, whoever cares responds" pattern keeps parts of a system loosely coupled — the emitter doesn't need to know who's listening.</p></div>
+      </section>
+
+      <section id="npm" class="section">
+        <h2>④ npm — the world's package library</h2>
+        <p><strong>npm</strong> (Node Package Manager) installs reusable code packages written by others, so you don't reinvent the wheel. There are over two million of them — for servers, dates, validation, you name it. npm comes bundled <em>with</em> Node, so once you've installed Node you already have it. When someone says "there's a package for that," npm is where it lives.</p>
+        <ol class="steps">
+          <li><strong>Start a project.</strong> In an empty folder, run <code>npm init -y</code>. This creates <code>package.json</code>, the "ID card" of your project.</li>
+          <li><strong>Install a package.</strong> <code>npm install express</code> downloads Express and records it in <code>package.json</code>. Packages land in a <code>node_modules</code> folder (never edit or commit that folder).</li>
+          <li><strong>Use it.</strong> <code>import express from "express";</code> and you're off.</li>
+        </ol>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">package.json (after installing)</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">{
+  "name": "my-server",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}</code></pre>
+        </div>
+        <table>
+          <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>npm init -y</code></td><td>Create a new project (package.json)</td></tr>
+            <tr><td><code>npm install &lt;name&gt;</code></td><td>Add a package</td></tr>
+            <tr><td><code>npm install</code></td><td>Install everything listed in package.json (e.g. after cloning)</td></tr>
+            <tr><td><code>npm run dev</code></td><td>Run a script defined under "scripts"</td></tr>
+          </tbody>
+        </table>
+        <h3 style="margin-top:22px;">Anatomy of <code>package.json</code></h3>
+        <p>This little file is the heart of every Node project. Let's read it field by field — once it stops looking like magic, npm makes a lot more sense.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">package.json — annotated</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">{
+  "name": "my-server",          <span class="cmt">// project name (lowercase, no spaces)</span>
+  "version": "1.0.0",           <span class="cmt">// YOUR app's version (semver)</span>
+  "type": "module",             <span class="cmt">// use import/export (ESM)</span>
+  "main": "server.js",          <span class="cmt">// the entry-point file</span>
+  "scripts": {                  <span class="cmt">// named shortcuts, run via "npm run"</span>
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {             <span class="cmt">// needed to RUN the app</span>
+    "express": "^4.19.2"
+  },
+  "devDependencies": {          <span class="cmt">// only needed while DEVELOPING</span>
+    "nodemon": "^3.1.0"
+  }
+}</code></pre>
+        </div>
+        <div class="twocol">
+          <div class="mini-card"><h4>📦 dependencies</h4><p>Packages your app needs to <em>run</em> in production — Express, a database driver, etc. Installed with <code>npm install express</code>.</p></div>
+          <div class="mini-card"><h4>🛠️ devDependencies</h4><p>Tools only used <em>while building</em> — test runners, nodemon, linters. The end user never needs them. Installed with <code>npm install -D nodemon</code> (the <code>-D</code> flag).</p></div>
+        </div>
+
+        <h3 style="margin-top:22px;">Semantic versioning: what <code>^</code> and <code>~</code> mean</h3>
+        <p>A version like <code>4.19.2</code> is <strong>MAJOR.MINOR.PATCH</strong>. The prefix in front of it tells npm how much it's allowed to auto-upgrade when someone runs <code>npm install</code>:</p>
+        <table>
+          <thead><tr><th>You wrote</th><th>npm may install</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>^4.19.2</code></td><td>4.19.2 up to &lt;5.0.0</td><td><strong>Caret</strong> — new minor + patch fixes (the common default)</td></tr>
+            <tr><td><code>~4.19.2</code></td><td>4.19.2 up to &lt;4.20.0</td><td><strong>Tilde</strong> — only patch fixes, stricter</td></tr>
+            <tr><td><code>4.19.2</code></td><td>exactly 4.19.2</td><td><strong>Pinned</strong> — never changes</td></tr>
+          </tbody>
+        </table>
+        <p>The version rules are: bump <strong>PATCH</strong> for bug fixes, <strong>MINOR</strong> for new backward-compatible features, and <strong>MAJOR</strong> for breaking changes. So a caret (<code>^</code>) says "give me fixes and features, but never a breaking major version."</p>
+
+        <div class="callout key"><span class="ci">🔒</span><p><strong>So what's <code>package-lock.json</code>?</strong> Your <code>package.json</code> says "<code>^4.19.2</code>" (a <em>range</em>), but the lock file records the <em>exact</em> version that actually got installed, down to every nested dependency. Commit it! It guarantees your teammate's <code>npm install</code> produces the identical <code>node_modules</code> as yours — no more "works on my machine."</p></div>
+
+        <h3 style="margin-top:22px;">Local vs global, and <code>npx</code></h3>
+        <ul>
+          <li><strong>Local install</strong> (<code>npm install express</code>): goes into <em>this project's</em> <code>node_modules</code>. The normal case — each project keeps its own copies, so versions can't conflict.</li>
+          <li><strong>Global install</strong> (<code>npm install -g some-cli</code>): installed once for your whole machine, usable from any folder. Reserve this for command-line tools, not app dependencies.</li>
+          <li><strong><code>npx</code></strong>: runs a package <em>without</em> permanently installing it — e.g. <code>npx create-vite@latest</code>. Perfect for one-off scaffolding tools you don't want cluttering your machine.</li>
+        </ul>
+
+        <div class="callout tip"><span class="ci">⚡</span><p><code>node --watch server.js</code> auto-restarts your server when you save a file — like Vite's hot reload, but for the back-end.</p></div>
+        <div class="callout warn"><span class="ci">🚫</span><p><strong>Never commit <code>node_modules</code> to Git.</strong> It can be hundreds of megabytes and is fully rebuildable from <code>package.json</code> + <code>package-lock.json</code>. Add it to <code>.gitignore</code>. Anyone who clones your repo just runs <code>npm install</code> to recreate it.</p></div>
+      </section>
+
+      <section id="async" class="section">
+        <h2>⑤ Async patterns &amp; the file system</h2>
+        <p>Node tasks like reading files take time, so they're <strong>async</strong> — exactly the <code>async/await</code> you learned in Module 1. But since you'll read other people's Node code constantly, it helps to know the <em>three generations</em> of async style you'll encounter, because they all do the same job in increasingly readable ways.</p>
+
+        <h3>1. Callbacks (the original) &amp; the "error-first" rule</h3>
+        <p>The oldest Node style passes a function to be called <em>when the work finishes</em>. Node's convention is the <strong>error-first callback</strong>: the callback's first argument is always an error (or <code>null</code> if all went well), and the result comes second. You check the error before trusting the data.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">callback-style.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import { readFile } from "fs";   // callback version (no /promises)
+
+readFile("note.txt", "utf-8", (err, text) =&gt; {
+  if (err) {                     // ALWAYS check error first
+    console.error("Failed:", err.message);
+    return;
+  }
+  console.log("Got:", text);     // only safe to use after the check
+});</code></pre>
+        </div>
+        <div class="callout warn"><span class="ci">😵</span><p>Nesting many callbacks creates the infamous "callback hell" — a staircase of code drifting off the right edge of the screen. Promises and <code>async/await</code> were invented to fix exactly this.</p></div>
+
+        <h3>2. Promises</h3>
+        <p>A <strong>Promise</strong> represents a value that isn't ready yet — it will eventually <em>resolve</em> with a result or <em>reject</em> with an error. You chain <code>.then()</code> for success and <code>.catch()</code> for failure, flattening the staircase into a readable pipeline.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">promise-style.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import { readFile } from "fs/promises";
+
+readFile("note.txt", "utf-8")
+  .then((text) =&gt; console.log("Got:", text))
+  .catch((err) =&gt; console.error("Failed:", err.message));</code></pre>
+        </div>
+
+        <h3>3. async / await (what we use)</h3>
+        <p>This is just promises with nicer syntax — it <em>reads</em> like ordinary top-to-bottom code, but pauses at each <code>await</code> until the promise settles. Wrap it in <code>try/catch</code> to handle errors, the same way you'd catch a thrown exception.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">files.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import { readFile, writeFile } from "fs/promises";
+
+async function main() {
+  try {
+    await writeFile("note.txt", "Hello from Node!");     // write a file
+    const text = await readFile("note.txt", "utf-8");     // read it back
+    console.log("File says:", text);
+  } catch (err) {
+    console.error("Something went wrong:", err.message);  // one place catches all awaits
+  }
+}
+
+main();</code></pre>
+        </div>
+        <div class="callout info"><span class="ci">💡</span><p>This is why Module 1's async section mattered: <em>every</em> back-end operation — files, network, database queries — is asynchronous. <code>await</code> is your everyday tool here. A single <code>try/catch</code> can guard several <code>await</code> calls at once — if any one rejects, control jumps straight to <code>catch</code>.</p></div>
+
+        <p>You can practice the <code>try/catch</code>-around-<code>await</code> shape right here — this is genuine browser-runnable JavaScript using a promise that rejects:</p>
+        <div class="code-wrap live">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">try-catch-demo.js</span><span class="actions"><button class="reset">Reset</button><button class="copy">Copy</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">// A fake async task — resolves OK or rejects after a tick.
+function fetchUser(id) {
+  return new Promise(function (resolve, reject) {
+    if (id === 1) resolve({ id: 1, name: "Ada" });
+    else reject(new Error("No user with id " + id));
+  });
+}
+
+async function main() {
+  try {
+    const ok = await fetchUser(1);
+    console.log("Found:", ok.name);
+    const bad = await fetchUser(99);   // this one rejects
+    console.log("never reached");
+  } catch (err) {
+    console.log("Caught:", err.message);
+  }
+}
+main();</textarea>
+          <div class="console"><div class="console-head">Console</div><div class="console-body"></div></div>
+        </div>
+
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>Unhandled rejections.</strong> If a promise rejects and nobody is there to <code>.catch()</code> it (or no <code>try/catch</code> around the <code>await</code>), Node prints an <code>UnhandledPromiseRejection</code> warning and may crash. The fix is simply to always handle errors — and you can add a final safety net at the top of your app:</p></div>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">safety-net.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">process.on("unhandledRejection", (reason) =&gt; {
+  console.error("Unhandled promise rejection:", reason);
+  // log it, alert yourself, then exit cleanly in production
+});</code></pre>
+        </div>
+      </section>
+
+      <section id="env" class="section">
+        <h2>⑥ Environment variables &amp; configuration <span class="chip inter">Intermediate</span></h2>
+        <p>Your code needs <em>settings</em> that change between your laptop and the real server: which port to run on, the database password, secret API keys. The golden rule of professional back-end work is: <strong>configuration and secrets do not belong in your source code.</strong> They live <em>outside</em> it, in <strong>environment variables</strong>.</p>
+        <div class="analogy">Think of environment variables like the dials on the outside of a machine. The machine (your code) is the same everywhere, but you turn the dials differently for "test mode" vs "production mode" — without ever opening the machine up and rewiring it.</div>
+        <p>Node exposes every environment variable on the <code>process.env</code> object as a string. You read them like any other property:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">config.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">// process.env values are ALWAYS strings (or undefined)
+const PORT = process.env.PORT || 4000;          // fall back to a default
+const dbPass = process.env.DB_PASSWORD;         // never hard-code this!
+
+console.log(`Starting on port ${PORT}`);</code></pre>
+        </div>
+
+        <h3>The <code>.env</code> file + the <code>dotenv</code> package</h3>
+        <p>Typing variables on the command line every time is tedious. The standard solution is a <code>.env</code> file holding <code>KEY=value</code> lines, loaded by the tiny <code>dotenv</code> package (<code>npm install dotenv</code>). It reads the file and copies each entry into <code>process.env</code> at startup.</p>
+        <div class="twocol">
+          <div class="code-wrap" style="margin:0;">
+            <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">.env</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">PORT=5000
+DB_PASSWORD=sup3r-s3cret
+JWT_SECRET=keep-me-private</code></pre>
+          </div>
+          <div class="code-wrap" style="margin:0;">
+            <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">server.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import "dotenv/config";   // load .env BEFORE anything reads env vars
+
+console.log(process.env.PORT);        // "5000"
+console.log(process.env.DB_PASSWORD); // "sup3r-s3cret"</code></pre>
+          </div>
+        </div>
+        <div class="callout warn"><span class="ci">🔐</span><p><strong>Why this matters so much:</strong> if you hard-code a password or API key in <code>server.js</code> and push it to GitHub, it's now public forever (even if you delete it later — Git keeps history). Leaked keys get scraped by bots within <em>minutes</em>. Always: (1) put secrets in <code>.env</code>, (2) add <code>.env</code> to <code>.gitignore</code>, and (3) commit a safe <code>.env.example</code> with blank values so teammates know which keys to set.</p></div>
+        <div class="callout key"><span class="ci">🔑</span><p>Load <code>dotenv</code> at the very <em>top</em> of your entry file, before any module that reads <code>process.env</code>. Load it late and those modules will see <code>undefined</code> — a frustrating, silent bug.</p></div>
+      </section>
+
+      <section id="http" class="section">
+        <h2>⑦ A web server from scratch (just to see it)</h2>
+        <p>Node can be a web server with zero extra packages. You won't write servers this way in practice — but seeing it once demystifies what Express does <em>for</em> you.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">bare-server.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import { createServer } from "http";
+
+const server = createServer((request, response) => {
+  response.writeHead(200, { "Content-Type": "text/plain" });
+  response.end("Hello from a raw Node server!");
+});
+
+server.listen(4000, () => {
+  console.log("Server running at http://localhost:4000");
+});</code></pre>
+        </div>
+        <p>Run it with <code>node bare-server.js</code>, then open <a href="http://localhost:4000" target="_blank" rel="noopener">http://localhost:4000</a> in your browser. You just served a web page from your own computer! 🎉</p>
+        <div class="callout warn"><span class="ci">😅</span><p>Notice there's no easy way to handle different URLs or methods here — you'd write a mountain of <code>if</code> statements. That pain is exactly why Express exists.</p></div>
+      </section>
+
+      <section id="express" class="section">
+        <h2>⑧ Express — the friendly web framework</h2>
+        <p><strong>Express</strong> is the most popular Node framework. It turns the messy raw server into clean, readable <strong>routes</strong>: "when a request comes to <em>this</em> URL with <em>this</em> method, run <em>this</em> function."</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 780 180" role="img" aria-label="Express routing">
+            <rect x="30" y="70" width="150" height="50" rx="10" fill="#1b2030" stroke="#61dafb" stroke-width="2"/>
+            <text x="105" y="100" text-anchor="middle" fill="#fff" font-size="13">Request</text>
+            <path d="M185,95 L260,95" stroke="#6c8cff" stroke-width="2" marker-end="url(#e1)"/>
+            <rect x="265" y="40" width="250" height="110" rx="12" fill="#13251a" stroke="#3c873a" stroke-width="2"/>
+            <text x="390" y="65" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Express router</text>
+            <text x="390" y="90" text-anchor="middle" fill="#9ee493" font-size="12" font-family="monospace">GET  /tasks  → list</text>
+            <text x="390" y="110" text-anchor="middle" fill="#9ee493" font-size="12" font-family="monospace">POST /tasks  → create</text>
+            <text x="390" y="130" text-anchor="middle" fill="#9ee493" font-size="12" font-family="monospace">GET  /tasks/5 → one</text>
+            <path d="M520,95 L600,95" stroke="#38d39f" stroke-width="2" marker-end="url(#e2)"/>
+            <rect x="605" y="70" width="150" height="50" rx="10" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="680" y="100" text-anchor="middle" fill="#fff" font-size="13">Response (JSON)</text>
+            <defs>
+              <marker id="e1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6c8cff"/></marker>
+              <marker id="e2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#38d39f"/></marker>
+            </defs>
+          </svg>
+          <figcaption>Express matches each incoming request to the right handler based on its method + URL.</figcaption>
+        </figure>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">server.js — your first real server</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import express from "express";
+
+const app = express();
+app.use(express.json());     // lets us read JSON request bodies
+
+// A route: method + path + handler
+app.get("/", (req, res) => {
+  res.send("Welcome to my API!");
+});
+
+app.get("/api/hello", (req, res) => {
+  res.json({ message: "Hello, world!", time: new Date() });
+});
+
+// :name is a URL parameter
+app.get("/api/greet/:name", (req, res) => {
+  res.json({ greeting: `Hi, ${req.params.name}!` });
+});
+
+app.listen(4000, () => {
+  console.log("API running at http://localhost:4000");
+});</code></pre>
+        </div>
+        <p>Run <code>node server.js</code> and visit <a href="http://localhost:4000/api/greet/Sam" target="_blank" rel="noopener">localhost:4000/api/greet/Sam</a>. You'll get back JSON: <code>{"greeting":"Hi, Sam!"}</code>.</p>
+        <table>
+          <thead><tr><th>Piece</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>app.get(path, handler)</code></td><td>Handle GET requests to <code>path</code></td></tr>
+            <tr><td><code>req</code></td><td>The request — what the client sent (params, body, headers)</td></tr>
+            <tr><td><code>res</code></td><td>The response — how you reply (<code>res.json(...)</code>, <code>res.send(...)</code>)</td></tr>
+            <tr><td><code>req.params.name</code></td><td>A value from the URL, e.g. the <code>:name</code> part</td></tr>
+            <tr><td><code>req.body</code></td><td>JSON data the client sent (needs <code>express.json()</code>)</td></tr>
+          </tbody>
+        </table>
+        <div class="callout key"><span class="ci">🔑</span><p>These routes <em>are</em> your REST API. Module 4 zooms in on doing them properly — methods, status codes, and full CRUD. You've just built the foundation.</p></div>
+      </section>
+
+      <section id="express-deep" class="section">
+        <h2>⑨ Express, deeper: reading requests &amp; shaping responses <span class="chip adv">Advanced</span></h2>
+        <p>Once you've got routes responding, the next skill is fluently reading what the client sent and replying in exactly the right way. Every request handler gets two objects — <code>req</code> (what came in) and <code>res</code> (how you reply). Here's where the useful data lives on <code>req</code>:</p>
+        <table>
+          <thead><tr><th>On <code>req</code></th><th>Holds</th><th>Example URL / source</th></tr></thead>
+          <tbody>
+            <tr><td><code>req.params</code></td><td>Named bits of the path (<code>:id</code>)</td><td><code>/tasks/<strong>42</strong></code> → <code>req.params.id === "42"</code></td></tr>
+            <tr><td><code>req.query</code></td><td>The <code>?key=value</code> string</td><td><code>/tasks?<strong>done=true&amp;sort=name</strong></code></td></tr>
+            <tr><td><code>req.body</code></td><td>JSON the client POSTed</td><td>needs <code>express.json()</code> middleware</td></tr>
+            <tr><td><code>req.headers</code></td><td>Request headers</td><td><code>req.headers["content-type"]</code></td></tr>
+            <tr><td><code>req.method</code></td><td>GET / POST / PUT / DELETE…</td><td>the HTTP verb used</td></tr>
+          </tbody>
+        </table>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">reading-requests.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">// GET /api/tasks/42?fields=title
+app.get("/api/tasks/:id", (req, res) =&gt; {
+  console.log(req.params.id);     // "42"  (from the path)
+  console.log(req.query.fields);  // "title" (from ?fields=...)
+  res.json({ id: req.params.id });
+});
+
+// POST /api/tasks   body: { "title": "Buy milk" }
+app.post("/api/tasks", (req, res) =&gt; {
+  const newTask = req.body;       // { title: "Buy milk" }
+  res.status(201).json(newTask);  // 201 = "Created"
+});</code></pre>
+        </div>
+
+        <h3>Sending the right response</h3>
+        <p>The <code>res</code> object has a small, friendly toolkit. The most important habit is setting a correct <strong>status code</strong> — a three-digit number telling the client what happened (you'll go deep on these next module).</p>
+        <div class="twocol">
+          <div class="mini-card"><h4><code>res.json(obj)</code></h4><p>Send a JavaScript object back as JSON. The bread-and-butter of an API.</p></div>
+          <div class="mini-card"><h4><code>res.status(code)</code></h4><p>Set the status, then chain a body: <code>res.status(404).json(...)</code>. Default is 200.</p></div>
+          <div class="mini-card"><h4><code>res.send(text)</code></h4><p>Send plain text or HTML. Express guesses the content type for you.</p></div>
+          <div class="mini-card"><h4><code>res.sendStatus(204)</code></h4><p>Set status <em>and</em> send a short matching body in one call (e.g. <code>204 No Content</code>).</p></div>
+        </div>
+
+        <h3>Modular routes with <code>express.Router()</code></h3>
+        <p>Cramming every route into <code>server.js</code> gets unwieldy fast. A <strong>Router</strong> is a mini-app: a self-contained bundle of related routes you define in its own file and then "mount" under a path prefix. All your task routes go in <code>routes/tasks.js</code>, mounted at <code>/api/tasks</code> — so inside that file you only write the part <em>after</em> the prefix.</p>
+        <div class="twocol">
+          <div class="code-wrap" style="margin:0;">
+            <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">routes/tasks.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import { Router } from "express";
+const router = Router();
+
+router.get("/", (req, res) =&gt; {       // → GET /api/tasks
+  res.json([{ id: 1, title: "Learn Node" }]);
+});
+router.get("/:id", (req, res) =&gt; {    // → GET /api/tasks/:id
+  res.json({ id: req.params.id });
+});
+
+export default router;</code></pre>
+          </div>
+          <div class="code-wrap" style="margin:0;">
+            <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">server.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import express from "express";
+import taskRoutes from "./routes/tasks.js";
+
+const app = express();
+app.use(express.json());
+
+// mount the router under a prefix:
+app.use("/api/tasks", taskRoutes);
+
+app.listen(4000);</code></pre>
+          </div>
+        </div>
+
+        <h3>Serving static files</h3>
+        <p>Need to serve a built React app, images, or a plain HTML page? One line. <code>express.static</code> turns a folder into web-accessible files.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">static.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">// files in ./public are served at the site root:
+//   public/logo.png  →  http://localhost:4000/logo.png
+app.use(express.static("public"));</code></pre>
+        </div>
+
+        <h3>404s &amp; centralized error handling</h3>
+        <p>Two pieces every real Express app needs, and they go <strong>last</strong>, after all your routes. A catch-all 404 handler runs when no route matched, and a special <strong>4-argument</strong> error handler catches anything that threw. Express recognises the error handler purely by its <em>four</em> parameters — <code>(err, req, res, next)</code> — so the signature matters.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">errors.js — place these AFTER all routes</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">// 1) Nothing matched → 404
+app.use((req, res) =&gt; {
+  res.status(404).json({ error: "Not found" });
+});
+
+// 2) Something threw → central error handler (note the 4 args!)
+app.use((err, req, res, next) =&gt; {
+  console.error(err.stack);
+  res.status(500).json({ error: "Internal server error" });
+});</code></pre>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p>Order is everything in Express — it checks middleware and routes <em>top to bottom</em>. Put the 404 handler <strong>after</strong> your real routes (or it'll swallow every request), and the error handler <strong>dead last</strong> of all.</p></div>
+      </section>
+
+      <section id="middleware" class="section">
+        <h2>⑩ Middleware — code that runs in the middle <span class="chip adv">Advanced</span></h2>
+        <p><strong>Middleware</strong> is a function that runs <em>between</em> the request arriving and your route handler — for logging, checking logins, parsing data, etc. <code>express.json()</code> above is middleware. The mental model: every request flows through a <strong>pipeline</strong> of middleware functions, each of which can inspect it, modify it, end it early, or pass it along by calling <code>next()</code>.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 780 170" role="img" aria-label="Express middleware pipeline">
+            <rect x="20" y="65" width="90" height="44" rx="9" fill="#1b2030" stroke="#6c8cff" stroke-width="2"/>
+            <text x="65" y="92" text-anchor="middle" fill="#fff" font-size="12">Request</text>
+            <path d="M112,87 L150,87" stroke="#6c8cff" stroke-width="2" marker-end="url(#mw)"/>
+            <rect x="152" y="60" width="120" height="54" rx="9" fill="#1b2030" stroke="#ffce5c" stroke-width="2"/>
+            <text x="212" y="84" text-anchor="middle" fill="#ffce5c" font-size="11">logger</text>
+            <text x="212" y="101" text-anchor="middle" fill="#7a8499" font-size="10">next() →</text>
+            <path d="M274,87 L300,87" stroke="#6c8cff" stroke-width="2" marker-end="url(#mw)"/>
+            <rect x="302" y="60" width="120" height="54" rx="9" fill="#1b2030" stroke="#ffce5c" stroke-width="2"/>
+            <text x="362" y="84" text-anchor="middle" fill="#ffce5c" font-size="11">express.json()</text>
+            <text x="362" y="101" text-anchor="middle" fill="#7a8499" font-size="10">next() →</text>
+            <path d="M424,87 L450,87" stroke="#6c8cff" stroke-width="2" marker-end="url(#mw)"/>
+            <rect x="452" y="60" width="120" height="54" rx="9" fill="#1b2030" stroke="#ffce5c" stroke-width="2"/>
+            <text x="512" y="84" text-anchor="middle" fill="#ffce5c" font-size="11">auth check</text>
+            <text x="512" y="101" text-anchor="middle" fill="#7a8499" font-size="10">next() →</text>
+            <path d="M574,87 L600,87" stroke="#38d39f" stroke-width="2" marker-end="url(#mw2)"/>
+            <rect x="602" y="60" width="120" height="54" rx="9" fill="#13251a" stroke="#3c873a" stroke-width="2"/>
+            <text x="662" y="84" text-anchor="middle" fill="#9ee493" font-size="11">route handler</text>
+            <text x="662" y="101" text-anchor="middle" fill="#9ee493" font-size="10">res.json()</text>
+            <defs>
+              <marker id="mw" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6c8cff"/></marker>
+              <marker id="mw2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#38d39f"/></marker>
+            </defs>
+          </svg>
+          <figcaption>Each middleware either calls <code>next()</code> to pass the request on, or ends it with a response. Any link in the chain can stop the flow.</figcaption>
+        </figure>
+        <p>You can write your own:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">middleware.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">// A logger that runs on every request
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();   // pass control to the next handler — don't forget this!
+});
+
+// A simple "auth" gate for one route
+function requireKey(req, res, next) {
+  if (req.headers["x-api-key"] === "secret123") {
+    next();                       // allowed — continue
+  } else {
+    res.status(401).json({ error: "Unauthorized" });
+  }
+}
+
+app.get("/api/admin", requireKey, (req, res) => {
+  res.json({ data: "Top secret 🤫" });
+});</code></pre>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p>Always call <code>next()</code> (or send a response) in middleware. Forget it and the request hangs forever — a classic beginner bug. The browser just spins; nothing crashes, which makes it sneaky to debug.</p></div>
+
+        <h3>App-level vs router-level</h3>
+        <p>Where you attach middleware decides what it applies to:</p>
+        <ul>
+          <li><code>app.use(fn)</code> — <strong>app-level</strong>: runs for <em>every</em> request to the whole server (logging, CORS, body parsing).</li>
+          <li><code>router.use(fn)</code> or <code>app.use("/api/admin", fn)</code> — <strong>router/path-level</strong>: runs only for requests matching that prefix (e.g. an auth gate just for admin routes).</li>
+          <li><code>app.get("/x", fn1, fn2, handler)</code> — <strong>route-level</strong>: middleware for one specific route, listed before the final handler.</li>
+        </ul>
+
+        <h3>Third-party middleware you'll meet constantly</h3>
+        <p>You rarely write everything yourself — the ecosystem has battle-tested middleware you just <code>install</code> and <code>use</code>:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">common-middleware.js</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import express from "express";
+import cors from "cors";       // npm install cors
+import morgan from "morgan";   // npm install morgan
+
+const app = express();
+
+app.use(cors());              // allow your React app to call this API
+app.use(morgan("dev"));       // log every request: GET /api/tasks 200 4ms
+app.use(express.json());      // parse JSON bodies into req.body
+
+// ...your routes go here, AFTER the middleware above</code></pre>
+        </div>
+        <div class="callout info"><span class="ci">🌍</span><p><strong>What is CORS?</strong> Browsers block a page on <code>localhost:5173</code> (your React app) from calling an API on <code>localhost:4000</code> by default — a security rule called the same-origin policy. The <code>cors</code> middleware tells the browser "it's fine, I allow this," which you'll need the moment your front-end and back-end run on different ports.</p></div>
+      </section>
+
+      <section id="structure" class="section">
+        <h2>⑪ A sensible project structure: separation of concerns</h2>
+        <p>As your server grows, a single giant <code>server.js</code> becomes a nightmare to navigate. The professional cure is <strong>separation of concerns</strong>: each file has <em>one job</em>. Routes decide <em>which</em> URL does what; controllers decide <em>what to do</em>; services hold the business logic; the db layer talks to the database. A request flows cleanly through these layers.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 780 150" role="img" aria-label="Request flowing through app layers">
+            <rect x="14" y="55" width="120" height="44" rx="9" fill="#1b2030" stroke="#6c8cff" stroke-width="2"/>
+            <text x="74" y="74" text-anchor="middle" fill="#fff" font-size="12">server.js</text>
+            <text x="74" y="90" text-anchor="middle" fill="#7a8499" font-size="10">starts app</text>
+            <path d="M136,77 L168,77" stroke="#6c8cff" stroke-width="2" marker-end="url(#st)"/>
+            <rect x="170" y="55" width="120" height="44" rx="9" fill="#1b2030" stroke="#ffce5c" stroke-width="2"/>
+            <text x="230" y="74" text-anchor="middle" fill="#ffce5c" font-size="12">routes/</text>
+            <text x="230" y="90" text-anchor="middle" fill="#7a8499" font-size="10">which URL?</text>
+            <path d="M292,77 L324,77" stroke="#6c8cff" stroke-width="2" marker-end="url(#st)"/>
+            <rect x="326" y="55" width="120" height="44" rx="9" fill="#1b2030" stroke="#ff7eb6" stroke-width="2"/>
+            <text x="386" y="74" text-anchor="middle" fill="#ffb3d6" font-size="12">controllers/</text>
+            <text x="386" y="90" text-anchor="middle" fill="#7a8499" font-size="10">what to do</text>
+            <path d="M448,77 L480,77" stroke="#6c8cff" stroke-width="2" marker-end="url(#st)"/>
+            <rect x="482" y="55" width="120" height="44" rx="9" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="542" y="74" text-anchor="middle" fill="#9ee493" font-size="12">services/</text>
+            <text x="542" y="90" text-anchor="middle" fill="#7a8499" font-size="10">logic</text>
+            <path d="M604,77 L636,77" stroke="#6c8cff" stroke-width="2" marker-end="url(#st)"/>
+            <rect x="638" y="55" width="120" height="44" rx="9" fill="#13251a" stroke="#3c873a" stroke-width="2"/>
+            <text x="698" y="74" text-anchor="middle" fill="#9ee493" font-size="12">db/</text>
+            <text x="698" y="90" text-anchor="middle" fill="#7a8499" font-size="10">the database</text>
+            <defs><marker id="st" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6c8cff"/></marker></defs>
+          </svg>
+          <figcaption>Each layer only talks to its neighbour. Swap your database later? Only <code>db/</code> changes — the routes never notice.</figcaption>
+        </figure>
+        <p>Here's a clean starting layout you'll expand in the capstone:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">folder structure</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">my-server/
+├── package.json
+├── package-lock.json    // exact dependency versions (commit this)
+├── .env                 // secrets — NEVER commit this
+├── .env.example         // blank template — safe to commit
+├── .gitignore           // lists node_modules and .env
+├── server.js            // entry point: wires it all together
+├── routes/
+│   └── tasks.js         // URL → controller mapping
+├── controllers/
+│   └── taskController.js // request/response handling
+├── services/
+│   └── taskService.js   // business logic (no req/res here)
+├── db/
+│   └── pool.js          // database connection
+└── node_modules/        // installed packages (auto-generated)</code></pre>
+        </div>
+        <div class="callout key"><span class="ci">🧩</span><p>The big win of this layout: each file is small and testable, and you can reason about one concern at a time. A new teammate can guess exactly where a piece of code lives. Don't over-engineer a tiny script with all five layers — but as soon as a file passes ~150 lines, start splitting.</p></div>
+      </section>
+
+      <section id="tooling" class="section">
+        <h2>⑫ Auto-reload &amp; debugging your Node app</h2>
+        <h3>Stop restarting by hand: auto-reload</h3>
+        <p>Restarting the server after every edit gets old in about five minutes. Two ways to make it automatic:</p>
+        <div class="twocol">
+          <div class="mini-card"><h4>Built-in <code>--watch</code></h4><p>Modern Node (18+) has it built in: <code>node --watch server.js</code>. No install needed. Restarts on save.</p></div>
+          <div class="mini-card"><h4><code>nodemon</code></h4><p>The long-time favourite: <code>npm install -D nodemon</code>, then <code>nodemon server.js</code>. More configurable; works on older Node too.</p></div>
+        </div>
+        <p>Wire whichever you choose into a <code>dev</code> script so you just type <code>npm run dev</code>:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">package.json scripts</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">"scripts": {
+  "start": "node server.js",          <span class="cmt">// production: run once</span>
+  "dev": "node --watch server.js"     <span class="cmt">// development: auto-restart</span>
+}</code></pre>
+        </div>
+
+        <h3>Reading a stack trace</h3>
+        <p>When Node crashes, don't panic at the wall of red text — it's a <strong>stack trace</strong>, and it's trying to help. Read it <em>top to bottom</em>: the first line is <em>what</em> went wrong, and the first <code>at …</code> line pointing at <em>your</em> file (not deep inside <code>node_modules</code>) is usually <em>where</em>.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">a typical stack trace</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">TypeError: Cannot read properties of undefined (reading 'name')
+    at getUser (/app/controllers/userController.js:12:18)  <span class="cmt">← your bug: file:line:col</span>
+    at /app/routes/users.js:7:5
+    at Layer.handle (/app/node_modules/express/lib/router/layer.js:95:5)</code></pre>
+        </div>
+        <ul>
+          <li><strong>Line 1</strong> names the error type and message — here, something was <code>undefined</code> when you tried to read <code>.name</code>.</li>
+          <li><strong>The first <code>at</code> with your path</strong> is the scene of the crime: <code>userController.js</code>, line 12, column 18.</li>
+          <li>Lines pointing into <code>node_modules</code> are usually just the framework's plumbing — skip past them.</li>
+        </ul>
+
+        <h3>Two debugging tools</h3>
+        <ul>
+          <li><strong><code>console.log</code></strong> — humble but mighty. Sprinkle logs to see what a variable actually holds. <code>console.log({ req: req.body })</code> labels the output so you don't lose track.</li>
+          <li><strong><code>node --inspect server.js</code></strong> — opens a real debugger you can attach to from Chrome DevTools or VS Code, letting you set breakpoints and step through line by line. Reach for it when <code>console.log</code> isn't enough.</li>
+        </ul>
+        <div class="callout tip"><span class="ci">💡</span><p>VS Code can launch Node with the debugger attached at the press of <kbd>F5</kbd> — breakpoints, variable inspection, the works. Once you've debugged a tricky bug this way once, you'll never want to go back.</p></div>
+      </section>
+
+      <section id="rest-next" class="section">
+        <h2>⑬ What you've built is (almost) a REST API</h2>
+        <p>Take a step back — those <code>app.get</code> and <code>app.post</code> routes returning JSON? That's the skeleton of a <strong>REST API</strong>: a standard, predictable way for clients (your React app, a mobile app, anyone) to read and change data over HTTP.</p>
+        <p>A REST API maps the four things you do to data — <em>create, read, update, delete</em> ("CRUD") — onto HTTP methods, like this:</p>
+        <table>
+          <thead><tr><th>Goal</th><th>HTTP method</th><th>Example route</th></tr></thead>
+          <tbody>
+            <tr><td>Read a list</td><td><code>GET</code></td><td><code>GET /api/tasks</code></td></tr>
+            <tr><td>Read one</td><td><code>GET</code></td><td><code>GET /api/tasks/42</code></td></tr>
+            <tr><td>Create</td><td><code>POST</code></td><td><code>POST /api/tasks</code></td></tr>
+            <tr><td>Update</td><td><code>PUT</code> / <code>PATCH</code></td><td><code>PUT /api/tasks/42</code></td></tr>
+            <tr><td>Delete</td><td><code>DELETE</code></td><td><code>DELETE /api/tasks/42</code></td></tr>
+          </tbody>
+        </table>
+        <div class="callout key"><span class="ci">➡️</span><p>You already have all the Express tools to do this. The <a href="05-rest-apis.html">next module — REST APIs</a> makes it rigorous: proper status codes, full CRUD, request validation, and clean error responses. You're perfectly set up for it.</p></div>
+      </section>
+
+      <section id="quiz" class="section">
+        <h2>Quiz</h2>
+        <div class="quiz">
+          <div class="q">1. What does Node.js let you do that browser JavaScript can't?</div>
+          <div class="opt" data-correct="true">Read files, run a server, and access the computer</div>
+          <div class="opt" data-correct="false">Use variables and functions</div>
+          <div class="opt" data-correct="false">Write arrow functions</div>
+          <div class="explain">✅ Node runs JS on the server with access to the file system, network and databases. The language is identical — the powers differ.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">2. What is <code>npm</code> for?</div>
+          <div class="opt" data-correct="false">It's a programming language</div>
+          <div class="opt" data-correct="true">Installing and managing reusable code packages</div>
+          <div class="opt" data-correct="false">Styling web pages</div>
+          <div class="explain">✅ npm downloads packages (like Express) and tracks them in <code>package.json</code>.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">3. In Express, what does <code>res.json({...})</code> do?</div>
+          <div class="opt" data-correct="true">Sends a JSON response back to the client</div>
+          <div class="opt" data-correct="false">Reads JSON from a file</div>
+          <div class="opt" data-correct="false">Restarts the server</div>
+          <div class="explain">✅ <code>res</code> is the response object; <code>res.json(...)</code> replies with JSON data — the typical response from a REST API.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">4. What must middleware call to pass control onward?</div>
+          <div class="opt" data-correct="false">return()</div>
+          <div class="opt" data-correct="true">next()</div>
+          <div class="opt" data-correct="false">continue()</div>
+          <div class="explain">✅ <code>next()</code> hands the request to the next middleware or route handler. Forgetting it makes the request hang.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">5. Why is Node able to handle many connections at once on a single thread?</div>
+          <div class="opt" data-correct="true">Its event loop does slow I/O in the background and runs callbacks when each finishes</div>
+          <div class="opt" data-correct="false">It secretly starts one new thread per user</div>
+          <div class="opt" data-correct="false">It runs every request twice for safety</div>
+          <div class="explain">✅ Node is non-blocking: while one request waits on a file or database, the event loop serves others. Just don't block it with heavy synchronous work.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">6. In <code>package.json</code>, <code>"express": "^4.19.2"</code> allows npm to install…</div>
+          <div class="opt" data-correct="false">Only exactly 4.19.2</div>
+          <div class="opt" data-correct="true">4.19.2 up to (but not including) 5.0.0</div>
+          <div class="opt" data-correct="false">Any version, even 6.x</div>
+          <div class="explain">✅ The caret <code>^</code> permits new minor and patch versions but never a breaking major. <code>~</code> would be stricter (patch only); no prefix pins the exact version.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">7. Where should a database password live?</div>
+          <div class="opt" data-correct="false">Hard-coded in server.js so it's easy to find</div>
+          <div class="opt" data-correct="true">In a <code>.env</code> file that's git-ignored, read via <code>process.env</code></div>
+          <div class="opt" data-correct="false">In package.json under "dependencies"</div>
+          <div class="explain">✅ Secrets go in <code>.env</code> (added to <code>.gitignore</code>) and are read through <code>process.env</code>. Hard-coding them risks leaking secrets the moment you push to GitHub.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">8. Express recognises your centralized error handler by…</div>
+          <div class="opt" data-correct="false">Its name being "errorHandler"</div>
+          <div class="opt" data-correct="true">It taking four arguments: <code>(err, req, res, next)</code></div>
+          <div class="opt" data-correct="false">It being placed first, before all routes</div>
+          <div class="explain">✅ The 4-argument signature is what marks a function as an error handler, and it belongs <em>last</em>, after all routes and the 404 handler.</div>
+        </div>
+      </section>
+
+      <section id="takeaways" class="section">
+        <h2>Key takeaways</h2>
+        <div class="card">
+          <ul>
+            <li><strong>Node.js</strong> is a <em>runtime</em> (built on Chrome's V8 engine) that runs JavaScript on the server — same language, plus access to files, network and databases; no <code>window</code> or <code>document</code>.</li>
+            <li>The <strong>event loop</strong> makes Node non-blocking: it handles many connections on one thread by doing slow I/O in the background — so never block it with heavy synchronous work.</li>
+            <li><strong>Modules</strong> split code across files. Prefer modern <strong>ES Modules</strong> (<code>import</code>/<code>export</code>, needs <code>"type":"module"</code>) over older CommonJS (<code>require</code>).</li>
+            <li>Node ships with <strong>core modules</strong> — <code>fs</code>, <code>path</code>, <code>os</code>, <code>url</code>, <code>http</code>, <code>events</code>, <code>process</code> — before you install anything.</li>
+            <li><strong>npm</strong> installs packages; <code>package.json</code> lists dependencies vs devDependencies, semver (<code>^ ~</code>) controls upgrades, and <code>package-lock.json</code> pins exact versions. Never commit <code>node_modules</code>.</li>
+            <li>Back-end work is <strong>async</strong> — callbacks → promises → <code>async/await</code>. Wrap awaits in <code>try/catch</code> and handle rejections.</li>
+            <li>Keep config &amp; secrets in <strong>environment variables</strong> (<code>.env</code> + <code>dotenv</code>, git-ignored), read via <code>process.env</code>.</li>
+            <li><strong>Express</strong> turns requests into clean <strong>routes</strong> with <code>req</code> (<code>.params</code>, <code>.query</code>, <code>.body</code>) and <code>res</code> (<code>.json</code>, <code>.status</code>). Use <code>express.Router()</code>, <code>express.static</code>, a 404 handler, and a 4-arg error handler.</li>
+            <li><strong>Middleware</strong> runs in a pipeline between request and handler — order matters, always call <code>next()</code>. Lean on <code>cors</code>, <code>morgan</code>, and <code>express.json()</code>.</li>
+            <li>Organise real apps by <strong>separation of concerns</strong> (routes / controllers / services / db), auto-reload with <code>--watch</code> or <code>nodemon</code>, and read <strong>stack traces</strong> top-down to debug.</li>
+          </ul>
+          <label class="complete-toggle"><input type="checkbox" data-module="node" /> Mark this module complete</label>
+        </div>
+      </section>
+
+      <div class="pager">
+        <a href="03-react.html" class="prev"><div class="dir">← Previous</div><div class="ttl">2 · React</div></a>
+        <a href="05-rest-apis.html" class="next"><div class="dir">Next →</div><div class="ttl">4 · REST APIs</div></a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>DevLaunch Academy · Module 3 of 6</p>
+  <div class="signature" aria-label="Author signature">
+    <span class="sig-br">/**</span>
+    <span class="sig-line"><span class="sig-tag">* @author</span>&nbsp; Sumanth Reddy Pathi</span>
+    <span class="sig-line"><span class="sig-tag">* @role</span>&nbsp;&nbsp;&nbsp; Software Engineer · 7+ yrs — Web · AI &amp; MedTech</span>
+    <span class="sig-line"><span class="sig-tag">* @company</span> Compliance Group</span>
+    <span class="sig-br">*/<span class="sig-caret">&nbsp;▌</span></span>
+  </div>
+</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>

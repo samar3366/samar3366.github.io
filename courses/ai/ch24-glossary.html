@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 24: The AI Glossary — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Glossary-specific styles */
+    .glossary-section {
+      margin: 40px 0;
+      padding: 28px 30px;
+      background: var(--bg-card);
+      border: 1px solid var(--rule);
+      border-left: 5px solid var(--accent, var(--part-8, #6b6b6b));
+      border-radius: 4px;
+    }
+    .glossary-section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .glossary-section-title {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 18px;
+      color: var(--ink);
+    }
+    .term {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--rule-soft, #efece3);
+    }
+    .term:last-child { border-bottom: 0; padding-bottom: 0; }
+    .term-name {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .term-aka {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-muted);
+      font-weight: 400;
+      margin-left: 6px;
+    }
+    .term-kid {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 14px;
+      font-style: italic;
+      color: #8b6914;
+      margin: 4px 0;
+      line-height: 1.5;
+    }
+    .term-pro {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 14.5px;
+      color: var(--ink-soft);
+      line-height: 1.55;
+    }
+    .glossary-toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin: 24px 0 36px 0;
+    }
+    .glossary-toc a {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      text-decoration: none;
+      padding: 8px 12px;
+      background: var(--bg-soft);
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      text-align: center;
+    }
+    .glossary-toc a:hover {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+    }
+  </style>
+</head>
+<body data-part="8">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch24-glossary.html" class="current">Reference: Glossary</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Reference</a> / <span class="current">The AI Glossary</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 24 · Reference · The Master Glossary —</div>
+
+  <h1 class="page-title">The AI <em>Glossary</em></h1>
+  <p class="page-subtitle">Every term you've met in this book — and many you'll meet next — defined twice. First the kid version, then the pro version. Use it as a lookup. Bookmark it.</p>
+
+  <div class="kid">
+    <div class="kid-label">🧒 How to use this glossary</div>
+    <p>You've made it through the whole book. This last chapter isn't meant to be read top-to-bottom. It's a <strong>reference</strong> — when you hear a word in a meeting or a paper and want a quick refresher, look it up.</p>
+    <p>Each term gets two definitions. The first (italic, in goldish text) is the kid version: how you'd explain it to a 10-year-old. The second is the pro version: how you'd say it in a meeting. Both matter. Knowing the kid version means you actually <em>understand</em> the concept; knowing the pro version means you can talk about it with experts.</p>
+  </div>
+
+  <div class="glossary-toc">
+    <a href="#core">Core Concepts</a>
+    <a href="#models">Models &amp; Architecture</a>
+    <a href="#training">Training</a>
+    <a href="#inference">Inference &amp; Deployment</a>
+    <a href="#multimodal">Multimodal</a>
+    <a href="#building">Building With AI</a>
+    <a href="#agents">Agents &amp; Tools</a>
+    <a href="#safety">Safety &amp; Alignment</a>
+    <a href="#org">Orgs &amp; Products</a>
+  </div>
+
+  <!-- ===================== CORE ===================== -->
+  <div class="glossary-section">
+    <div class="glossary-section-label">— Section 1 —</div>
+    <h2 id="core" class="glossary-section-title">Core Concepts</h2>
+
+    <div class="term">
+      <div class="term-name">AI <span class="term-aka">Artificial Intelligence</span></div>
+      <p class="term-kid">Making a machine do things that, when humans do them, look like thinking.</p>
+      <p class="term-pro">The broad field of computer systems that perform tasks typically requiring human intelligence — reasoning, perception, learning, language. Includes ML, but is broader (rule-based systems are also AI).</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Machine Learning <span class="term-aka">ML</span></div>
+      <p class="term-kid">Instead of writing rules, you show the machine examples and it figures out the rules itself.</p>
+      <p class="term-pro">A subset of AI where systems learn patterns from data rather than being explicitly programmed. Includes supervised, unsupervised, and reinforcement learning.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Deep Learning</div>
+      <p class="term-kid">Machine learning using neural networks with lots of layers stacked up.</p>
+      <p class="term-pro">A subset of ML that uses multi-layer neural networks. "Deep" refers to having many hidden layers. The dominant paradigm of modern AI.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Generative AI <span class="term-aka">GenAI</span></div>
+      <p class="term-kid">AI that <em>makes</em> new things — text, images, music, video — instead of just classifying existing things.</p>
+      <p class="term-pro">AI systems that produce novel content rather than analyze existing inputs. Built on generative models like LLMs (text), diffusion models (images), autoregressive audio models, etc.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">AGI <span class="term-aka">Artificial General Intelligence</span></div>
+      <p class="term-kid">A machine that can think well across many different tasks, like a person.</p>
+      <p class="term-pro">Hypothetical AI with broad cognitive ability matching or exceeding humans across most economically valuable tasks. Definitions vary; no agreed benchmark exists. Sometimes called "transformative AI" to dodge the definitional fight.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">ANI / ASI <span class="term-aka">Narrow / Super</span></div>
+      <p class="term-kid">ANI = AI good at one thing only (like Siri). ASI = AI smarter than humans at everything. ANI is real today; ASI is hypothetical.</p>
+      <p class="term-pro">Narrow AI: systems specialized for specific tasks (today's reality). Superintelligence: hypothetical AI substantially exceeding human capability across all domains.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Foundation Model</div>
+      <p class="term-kid">A really big general AI that lots of other AIs are built on top of.</p>
+      <p class="term-pro">A large model trained on broad data that can be adapted to many downstream tasks. GPT-4, Claude, Gemini, Llama are foundation models. Term coined by Stanford in 2021.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Frontier Model</div>
+      <p class="term-kid">The most powerful AI being built right now, at the leading edge.</p>
+      <p class="term-pro">The current most-capable models from leading labs. Often the focus of safety regulation. Examples in 2026: GPT-5, Claude Opus 4, Gemini 2.5 Ultra, Llama 4.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Hallucination</div>
+      <p class="term-kid">When AI makes up something that sounds true but isn't.</p>
+      <p class="term-pro">Confident generation of plausible-sounding but factually incorrect output. Structural to next-token prediction; mitigated by RAG, tool use, reasoning, and calibration training, not eliminated.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Emergence / Emergent Capability</div>
+      <p class="term-kid">A skill that suddenly appears when an AI gets big enough — wasn't there at smaller sizes.</p>
+      <p class="term-pro">Capabilities that appear discontinuously past a scale threshold rather than improving smoothly. Whether truly emergent or an artifact of measurement is debated; effect is well documented.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Scaling Laws</div>
+      <p class="term-kid">A formula that predicts how much smarter an AI gets when you make it bigger, train it on more data, or give it more compute.</p>
+      <p class="term-pro">Empirical relationships (Kaplan, Chinchilla) showing predictable improvement in model loss as a function of parameters, data, and compute. The mathematical justification for the modern scale-up.</p>
+    </div>
+  </div>
+
+  <!-- ===================== MODELS ===================== -->
+  <div class="glossary-section">
+    <div class="glossary-section-label">— Section 2 —</div>
+    <h2 id="models" class="glossary-section-title">Models &amp; Architecture</h2>
+
+    <div class="term">
+      <div class="term-name">Neural Network</div>
+      <p class="term-kid">Lots of simple math units (neurons) wired together that, as a group, learn patterns.</p>
+      <p class="term-pro">A function composed of layers of weighted sums and non-linear activations. The base substrate of deep learning.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Neuron / Unit / Node</div>
+      <p class="term-kid">One little voter that adds up its inputs and decides yes-or-no.</p>
+      <p class="term-pro">The atomic unit of a neural net: takes weighted inputs, adds a bias, applies an activation function. y = f(Σ wᵢxᵢ + b).</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Layer</div>
+      <p class="term-kid">A row of neurons all looking at the same inputs at once.</p>
+      <p class="term-pro">A group of neurons applied in parallel. Networks alternate layers (linear / attention / FFN) with non-linearities. Stack of layers = depth.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Activation Function</div>
+      <p class="term-kid">The yes-or-no switch at the end of each neuron that lets layers do interesting things together.</p>
+      <p class="term-pro">A non-linear function applied to a neuron's weighted sum. Without one, stacked layers collapse to a single linear transform. Common: ReLU, GELU, SwiGLU, sigmoid, tanh.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Transformer</div>
+      <p class="term-kid">The architecture every modern AI uses. Lets every word look at every other word at the same time.</p>
+      <p class="term-pro">Neural architecture from "Attention Is All You Need" (2017) using self-attention to process sequences in parallel. Backbone of all modern LLMs.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Self-Attention</div>
+      <p class="term-kid">Each word turns and looks at every other word and decides which ones matter to it.</p>
+      <p class="term-pro">An operation where each token computes Q·K similarity scores against all other tokens, then mixes their V vectors weighted by softmax of those scores. Attention(Q,K,V) = softmax(QKᵀ/√d)V.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Q / K / V <span class="term-aka">Query, Key, Value</span></div>
+      <p class="term-kid">Q is what I'm asking. K is what others advertise. V is what they actually share.</p>
+      <p class="term-pro">Three projections of each token's embedding used in attention. Q determines what to look for, K is matched against, V is what gets aggregated.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Multi-Head Attention <span class="term-aka">MHA</span></div>
+      <p class="term-kid">Running attention many times in parallel — each "head" can focus on different patterns.</p>
+      <p class="term-pro">Attention performed h times in parallel with separate Q/K/V projections, then concatenated. Each head can specialize in different relationships (syntax, coreference, etc.).</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">CNN <span class="term-aka">Convolutional Neural Network</span></div>
+      <p class="term-kid">A neural net designed for pictures — uses small "filters" that slide across the image.</p>
+      <p class="term-pro">A network using convolutional layers — small filters with shared weights applied across spatial positions. Dominant for images 2012–2020; still used widely. AlexNet, ResNet are famous examples.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">RNN / LSTM / GRU</div>
+      <p class="term-kid">Old-school sequence networks that read one word at a time and pass a "memory" forward. Replaced by transformers.</p>
+      <p class="term-pro">Recurrent architectures that process sequences sequentially, maintaining a hidden state. LSTMs/GRUs add gating to handle long-range dependencies. Mostly obsolete for language; still used in some time-series and edge-device contexts.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Diffusion Model</div>
+      <p class="term-kid">An image-maker that starts with static and slowly removes the noise to reveal a picture.</p>
+      <p class="term-pro">Generative models trained to reverse a gradual noising process. Sample by iteratively denoising from random noise, optionally conditioned on text. Powers Stable Diffusion, DALL-E, Midjourney, Sora, etc.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Latent Space</div>
+      <p class="term-kid">A compressed version of the data where the model does its thinking.</p>
+      <p class="term-pro">A learned lower-dimensional representation. Latent diffusion runs the diffusion process in this compressed space (much faster) and decodes back to pixels at the end.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">MoE <span class="term-aka">Mixture of Experts</span></div>
+      <p class="term-kid">A huge model where only some parts wake up for each question — saves compute.</p>
+      <p class="term-pro">An architecture with many "expert" sub-networks where a router picks a small subset to activate per token. Lets a 700B-param model run at the inference cost of a 70B-param dense one. Used in GPT-4, Mixtral, Gemini, DeepSeek.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Parameters / Weights</div>
+      <p class="term-kid">The numbers inside a neural network that get adjusted during training. More = bigger model.</p>
+      <p class="term-pro">The learnable values (weights and biases) of a network. Frontier LLMs: 100B–1T+ parameters. Used loosely as a model-size proxy.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Embedding</div>
+      <p class="term-kid">A list of numbers that represents a piece of meaning. Similar things get similar numbers.</p>
+      <p class="term-pro">A learned vector representation of input data (token, sentence, image, etc.) where semantic similarity corresponds to vector similarity (typically cosine). Foundation of semantic search and RAG.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Token / Tokenization</div>
+      <p class="term-kid">A token is a chunk of text — usually a word or piece of a word. Models read tokens, not letters.</p>
+      <p class="term-pro">Sub-word units produced by BPE, WordPiece, or SentencePiece tokenizers. Vocab typically 50K–250K tokens. ~4 chars/token for English; rates vary by language and content.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Context Window</div>
+      <p class="term-kid">How much text the AI can look at in one shot.</p>
+      <p class="term-pro">Maximum number of tokens (input + output) a model can process in one call. Modern range: 8K–2M tokens. Compute scales ~quadratically with context length under standard attention.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Decoder-only / Encoder-only / Encoder-Decoder</div>
+      <p class="term-kid">Three flavors of transformer. Decoder-only is what GPT, Claude, Llama all are. Encoder-only is for embeddings (like BERT).</p>
+      <p class="term-pro">Architectural variants. Decoder-only (causal LM): GPT/Claude/Llama. Encoder-only (bidirectional): BERT, embedding models. Encoder-decoder: original transformer, T5, used for translation.</p>
+    </div>
+  </div>
+
+  <!-- ===================== TRAINING ===================== -->
+  <div class="glossary-section">
+    <div class="glossary-section-label">— Section 3 —</div>
+    <h2 id="training" class="glossary-section-title">Training</h2>
+
+    <div class="term">
+      <div class="term-name">Training / Inference</div>
+      <p class="term-kid">Training is teaching the model. Inference is using it to answer questions. Train once, infer billions of times.</p>
+      <p class="term-pro">Training: optimizing weights via gradient descent on data. Inference: running the trained model forward to produce outputs. Different cost profiles, often different hardware optimizations.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Pretraining</div>
+      <p class="term-kid">The huge first stage where the model reads basically the whole internet, learning to predict the next word.</p>
+      <p class="term-pro">Initial unsupervised training on a large corpus, typically next-token prediction. Produces the "base model." Costs $50M–$1B+ for frontier scale.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Fine-Tuning</div>
+      <p class="term-kid">Taking a model that's already trained and giving it extra training on your specific topic.</p>
+      <p class="term-pro">Continued training on a specialized dataset to adapt a pretrained model to a domain or task. Includes full fine-tuning and parameter-efficient methods (LoRA, adapters).</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">SFT <span class="term-aka">Supervised Fine-Tuning</span></div>
+      <p class="term-kid">Showing the model lots of "here's a question, here's the right kind of answer" examples.</p>
+      <p class="term-pro">Fine-tuning on labeled (input, output) pairs, typically for instruction-following. The first post-pretraining stage.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">RLHF <span class="term-aka">Reinforcement Learning from Human Feedback</span></div>
+      <p class="term-kid">Humans rank the model's answers from best to worst. The model learns what humans like.</p>
+      <p class="term-pro">Three-stage process: (1) collect human preference data, (2) train a reward model, (3) fine-tune the LLM via RL (typically PPO) to maximize predicted reward. Made ChatGPT possible.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">DPO <span class="term-aka">Direct Preference Optimization</span></div>
+      <p class="term-kid">Like RLHF but mathematically simpler — skips the reward-model step.</p>
+      <p class="term-pro">An alternative to RLHF that directly optimizes a language model on preference pairs without an explicit reward model. Simpler to implement; often comparable results.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Constitutional AI <span class="term-aka">CAI</span></div>
+      <p class="term-kid">The model uses a written list of rules to critique and improve its own answers — less reliance on humans.</p>
+      <p class="term-pro">Anthropic's alignment technique: model self-critiques outputs against a written "constitution" of principles, generating training data for SFT and preference-model training. Variant of RLAIF.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">RLAIF <span class="term-aka">Reinforcement Learning from AI Feedback</span></div>
+      <p class="term-kid">Like RLHF but another AI does the rating instead of humans.</p>
+      <p class="term-pro">Replacing human raters in RLHF with another AI model. Scales further, less human bottleneck. Used in CAI and other modern training pipelines.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Loss Function</div>
+      <p class="term-kid">A number measuring how wrong the model is. Training tries to make it smaller.</p>
+      <p class="term-pro">Scalar function measuring discrepancy between prediction and ground truth. Cross-entropy is standard for classification; MSE for regression. Optimized via gradient descent.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Gradient Descent / SGD / Adam</div>
+      <p class="term-kid">Algorithms that figure out which direction to nudge each weight to make the model less wrong.</p>
+      <p class="term-pro">Optimization algorithms. SGD: stochastic gradient descent. Adam/AdamW: adaptive per-parameter learning rates; standard for deep learning. Adafactor, Lion are newer alternatives.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Backpropagation <span class="term-aka">Backprop</span></div>
+      <p class="term-kid">The math trick that figures out, for each weight, which direction to nudge it.</p>
+      <p class="term-pro">Algorithm for computing gradients of the loss with respect to all parameters via the chain rule, propagating errors backward through the network. Implemented automatically by PyTorch/JAX/TensorFlow.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Epoch / Batch / Step</div>
+      <p class="term-kid">Epoch = one pass through all the data. Batch = a small group of examples processed together. Step = one weight update.</p>
+      <p class="term-pro">Epoch: one complete pass through the training set. Batch (or mini-batch): N samples processed together for one gradient step. Modern frontier training: many epochs over carefully curated data, batch sizes in thousands.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Overfitting / Underfitting</div>
+      <p class="term-kid">Overfitting = memorizing training answers without learning the pattern. Underfitting = not learning even the training data.</p>
+      <p class="term-pro">Overfitting: model performs well on training data but poorly on new data. Mitigated by regularization, dropout, more data, early stopping. Underfitting: model can't even fit training data; usually means too small.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Regularization</div>
+      <p class="term-kid">Tricks to stop the model from memorizing — like making some neurons randomly nap during training.</p>
+      <p class="term-pro">Techniques to reduce overfitting: weight decay (L2), dropout, data augmentation, early stopping, label smoothing.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">LoRA <span class="term-aka">Low-Rank Adaptation</span></div>
+      <p class="term-kid">A cheap way to fine-tune big models — adds small extra pieces instead of retraining everything.</p>
+      <p class="term-pro">Parameter-efficient fine-tuning that injects small trainable low-rank matrices into a frozen pretrained model. ~1000× fewer trainable parameters than full fine-tuning. Enables consumer-GPU adaptation of large models.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Distillation</div>
+      <p class="term-kid">Training a small model to copy a big model — gets you a faster, cheaper version with similar quality.</p>
+      <p class="term-pro">Knowledge distillation: training a small "student" to mimic a large "teacher" model's outputs. Common way smaller open models punch above their parameter weight.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Quantization</div>
+      <p class="term-kid">Storing the model's numbers with fewer digits — same model, much less memory.</p>
+      <p class="term-pro">Compressing weights to lower precision (16-bit → 8-bit → 4-bit). Modest accuracy loss, large memory savings. Standard for running open models on consumer hardware. Methods: GPTQ, AWQ, GGUF, etc.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Synthetic Data</div>
+      <p class="term-kid">Training data that another AI made up.</p>
+      <p class="term-pro">Training data generated by models rather than collected from humans. Increasingly important as high-quality public text approaches limits. Used heavily for reasoning training and post-training.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Chinchilla Scaling</div>
+      <p class="term-kid">DeepMind's finding that you need about 20 tokens of training data per parameter for a model to be properly trained.</p>
+      <p class="term-pro">DeepMind's 2022 finding that compute-optimal training requires data and parameters to scale together at a specific ratio (~20 tokens/param). Showed earlier large models like GPT-3 were undertrained.</p>
+    </div>
+  </div>
+
+  <!-- ===================== INFERENCE ===================== -->
+  <div class="glossary-section">
+    <div class="glossary-section-label">— Section 4 —</div>
+    <h2 id="inference" class="glossary-section-title">Inference &amp; Deployment</h2>
+
+    <div class="term">
+      <div class="term-name">Autoregressive Generation</div>
+      <p class="term-kid">The model writes one word, sees what it just wrote, writes the next word, and so on.</p>
+      <p class="term-pro">Sequential generation where each new token is conditioned on all previous tokens, including the model's own outputs. Standard for LLMs. Limits parallelism at inference.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Temperature</div>
+      <p class="term-kid">A knob from 0 to 1+ that controls how creative the model is. 0 = always pick the most likely word. Higher = more variety.</p>
+      <p class="term-pro">A scaling factor on logits before softmax sampling. T=0 → deterministic argmax. T&gt;1 flattens the distribution. Use low T for facts, higher T for creativity.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Top-p / Top-k</div>
+      <p class="term-kid">Filters that limit which words the model can choose from when sampling. Helps avoid weird outputs.</p>
+      <p class="term-pro">Top-p (nucleus): sample only from the smallest set of tokens whose probabilities sum to p. Top-k: only the top-k highest-probability tokens.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Logits</div>
+      <p class="term-kid">The raw scores the model gives each possible next word, before turning them into probabilities.</p>
+      <p class="term-pro">Pre-softmax outputs of the model. Converted to probabilities via softmax (with temperature scaling).</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Tokens per Second <span class="term-aka">TPS</span></div>
+      <p class="term-kid">How fast the model can write — how many tokens it produces each second.</p>
+      <p class="term-pro">Generation throughput metric. Frontier APIs typically deliver 50–200 TPS. Affected by model size, hardware, batch size.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">TTFT <span class="term-aka">Time To First Token</span></div>
+      <p class="term-kid">How long you wait after sending a prompt before the model starts replying.</p>
+      <p class="term-pro">Latency from request submission to first generated token. Depends on prefill compute (proportional to input length). Critical for chat UX.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Test-Time Compute / Inference-Time Scaling</div>
+      <p class="term-kid">Letting the model think longer at question time instead of just making it bigger during training.</p>
+      <p class="term-pro">A scaling axis where additional compute is spent on a single query (longer reasoning, more samples) rather than on training. Powers reasoning models like o1, o3, Claude with extended thinking.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Reasoning Model / Thinking Model</div>
+      <p class="term-kid">A model trained to "think out loud" before answering, especially for hard problems.</p>
+      <p class="term-pro">A model trained to generate extensive internal reasoning traces before producing a final answer. Examples: OpenAI o-series, Claude with extended thinking, Gemini Thinking, DeepSeek R1.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Chain of Thought <span class="term-aka">CoT</span></div>
+      <p class="term-kid">Asking the model to show its work step by step.</p>
+      <p class="term-pro">Prompting / training technique where the model produces intermediate reasoning steps before the final answer. Originally a prompt trick; now baked into reasoning model training.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Self-Consistency</div>
+      <p class="term-kid">Have the model solve the same problem multiple times, then pick the most common answer.</p>
+      <p class="term-pro">Sampling multiple CoT traces and majority-voting the final answers. Improves accuracy on reasoning tasks; trades cost for quality.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">KV Cache</div>
+      <p class="term-kid">Memory of past tokens the model already processed so it doesn't have to redo work.</p>
+      <p class="term-pro">Cached key/value tensors from prior tokens during autoregressive generation. Avoids recomputing attention over the prefix at each step. Memory-heavy but critical for inference speed.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">FlashAttention</div>
+      <p class="term-kid">A clever way to compute attention faster by being smarter about memory.</p>
+      <p class="term-pro">A hardware-aware exact attention algorithm by Tri Dao et al. that minimizes memory bandwidth, dramatically speeding up training and inference. Standard in modern frameworks.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">GPU / TPU / NPU</div>
+      <p class="term-kid">Special chips that do the math AI needs really fast. NVIDIA makes most of them.</p>
+      <p class="term-pro">Graphics Processing Unit (NVIDIA H100/B200/B300, AMD MI300/MI350): general parallel compute. TPU: Google's custom AI chip. NPU: Neural Processing Unit (often on-device, e.g., Apple, Qualcomm).</p>
+    </div>
+  </div>
+
+  <!-- ===================== MULTIMODAL ===================== -->
+  <div class="glossary-section">
+    <div class="glossary-section-label">— Section 5 —</div>
+    <h2 id="multimodal" class="glossary-section-title">Multimodal</h2>
+
+    <div class="term">
+      <div class="term-name">Multimodal</div>
+      <p class="term-kid">An AI that can handle more than one type of input — like text and images and audio together.</p>
+      <p class="term-pro">A system that processes and/or produces multiple modalities (text, image, audio, video). Modern frontier models are typically natively multimodal.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">VLM <span class="term-aka">Vision-Language Model</span></div>
+      <p class="term-kid">A model that takes pictures and text together and understands both.</p>
+      <p class="term-pro">A model accepting image + text input. Examples: GPT-4 Vision, Claude with vision, Gemini, Llama 4 Vision. Most modern frontier LLMs are VLMs.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">CLIP</div>
+      <p class="term-kid">A model that puts pictures and their captions in the same coordinate system, so you can search images with words.</p>
+      <p class="term-pro">OpenAI's 2021 model trained contrastively on image-text pairs to produce a shared embedding space. Foundation of many text-to-image and search systems.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Vision Transformer <span class="term-aka">ViT</span></div>
+      <p class="term-kid">Treating an image like a sequence of small patches and applying the transformer trick.</p>
+      <p class="term-pro">Transformer architecture applied to images by splitting them into patches (typically 14×14 or 16×16) and treating each as a token. Often beats CNNs at scale.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Text-to-Image / T2I</div>
+      <p class="term-kid">Type a description, get a picture out.</p>
+      <p class="term-pro">Generative models conditioned on text producing images. DALL-E 3, Midjourney, Stable Diffusion, Flux, Imagen, Firefly, Ideogram.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">CFG <span class="term-aka">Classifier-Free Guidance</span></div>
+      <p class="term-kid">A knob in image models that controls how strictly the picture follows the prompt.</p>
+      <p class="term-pro">Sampling technique that amplifies the difference between conditional and unconditional model outputs. Higher CFG = stricter prompt adherence; can over-saturate.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">ControlNet</div>
+      <p class="term-kid">An add-on that lets you guide an image model with extra inputs like sketches, poses, or depth maps.</p>
+      <p class="term-pro">Auxiliary networks that condition diffusion on additional structured inputs (edge maps, poses, depth, segmentation). Enables precise control over composition.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Inpainting / Outpainting</div>
+      <p class="term-kid">Inpainting = fill in a missing/masked part of an image. Outpainting = extend an image past its borders.</p>
+      <p class="term-pro">Diffusion-based editing tasks. Inpainting: regenerate a masked region. Outpainting: generate continuation beyond original bounds.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">TTS / STT</div>
+      <p class="term-kid">TTS = text → speech (the AI talks). STT = speech → text (the AI listens).</p>
+      <p class="term-pro">Text-to-Speech (synthesis): ElevenLabs, OpenAI voices, Google TTS. Speech-to-Text (recognition): Whisper, Deepgram, AssemblyAI.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Whisper</div>
+      <p class="term-kid">OpenAI's free, open speech-to-text model. Works in 90+ languages and is shockingly good.</p>
+      <p class="term-pro">OpenAI's open-weight, transformer-based ASR model (2022). Robust to noise, accents, and many languages. Widely embedded in products.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Voice Cloning</div>
+      <p class="term-kid">Making an AI talk in someone's specific voice, learned from a short sample.</p>
+      <p class="term-pro">Synthesizing speech in a target speaker's voice from limited reference audio. Modern systems work from 10–30 seconds. Major deepfake and fraud risk.</p>
+    </div>
+  </div>
+
+  <!-- ===================== BUILDING ===================== -->
+  <div class="glossary-section">
+    <div class="glossary-section-label">— Section 6 —</div>
+    <h2 id="building" class="glossary-section-title">Building With AI</h2>
+
+    <div class="term">
+      <div class="term-name">Prompt Engineering</div>
+      <p class="term-kid">Learning how to ask the AI questions in ways that get better answers.</p>
+      <p class="term-pro">The discipline of crafting inputs to LLMs to elicit desired outputs. Includes role/task framing, few-shot examples, structured output specs, CoT prompting.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">System Prompt</div>
+      <p class="term-kid">The instructions you give the AI at the start that stay in effect for the whole conversation.</p>
+      <p class="term-pro">A persistent message setting role, behaviors, constraints, and format for the entire conversation. Most powerful lever in API use.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Zero-Shot / Few-Shot / One-Shot</div>
+      <p class="term-kid">Zero-shot = ask without examples. Few-shot = include a few examples in the prompt to show the pattern.</p>
+      <p class="term-pro">Zero-shot: task instruction only. One-shot / few-shot: include 1 or N input-output examples to demonstrate the pattern. Improves performance, especially on niche formats.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">RAG <span class="term-aka">Retrieval-Augmented Generation</span></div>
+      <p class="term-kid">Search your documents first, paste the most relevant pages into the prompt, then let the AI answer.</p>
+      <p class="term-pro">Two-phase pattern: index documents (chunk + embed + store), then for each query retrieve top-k chunks via similarity search, augment the prompt with them, and generate. Mitigates hallucination, enables freshness, allows private data.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Chunking</div>
+      <p class="term-kid">Cutting documents into smaller pieces so search can find the right bit.</p>
+      <p class="term-pro">Splitting documents into retrievable units for RAG. Strategies: fixed-size, sentence-based, recursive, semantic, structure-aware. Use overlap to preserve context across boundaries.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Vector Database</div>
+      <p class="term-kid">A database for embeddings — designed to find the most similar vectors fast.</p>
+      <p class="term-pro">Database optimized for storing embeddings and performing approximate nearest-neighbor (ANN) search. Examples: Pinecone, Weaviate, Qdrant, Milvus, Chroma, pgvector.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">ANN <span class="term-aka">Approximate Nearest Neighbor</span></div>
+      <p class="term-kid">A way to find similar vectors really fast — accepts being slightly less perfect for huge speedup.</p>
+      <p class="term-pro">Algorithms (HNSW, IVF, ScaNN) trading exact recall for speed. Make billion-vector search feasible in milliseconds.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Cosine Similarity</div>
+      <p class="term-kid">A score from −1 to 1 measuring how similar two embeddings are based on their direction.</p>
+      <p class="term-pro">cos(θ) = (A·B) / (‖A‖‖B‖). Standard similarity metric for embeddings; magnitude-invariant, focused on direction.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Hybrid Search</div>
+      <p class="term-kid">Combining keyword search and meaning-based search to get the best of both.</p>
+      <p class="term-pro">Combining lexical retrieval (BM25) with vector retrieval. Catches both exact matches (codes, names) and semantic matches (paraphrases). Production default.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Reranker</div>
+      <p class="term-kid">A second-pass model that re-sorts your search results to put the truly relevant ones on top.</p>
+      <p class="term-pro">Cross-encoder model that scores query+document pairs jointly. Run on top-N candidates from initial retrieval to dramatically improve precision. Cohere Rerank, BGE rerankers.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Knowledge Graph</div>
+      <p class="term-kid">A network of facts written as "X has-relation-to Y" — like a map of how things connect.</p>
+      <p class="term-pro">A graph database of entities (nodes) and typed relationships (edges). Often modeled as RDF triples (subject-predicate-object). Used in GraphRAG and structured retrieval.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Ontology</div>
+      <p class="term-kid">A formal vocabulary defining the kinds of things that exist in a domain and how they relate.</p>
+      <p class="term-pro">A formal specification of concepts, relationships, and constraints in a domain. RDF/OWL are standards. Underpins schema for knowledge graphs.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">GraphRAG</div>
+      <p class="term-kid">RAG that uses a knowledge graph instead of (or alongside) plain text retrieval.</p>
+      <p class="term-pro">RAG variant using graph traversal for retrieval. Better for multi-hop questions where the answer requires connecting facts across documents. Microsoft's GraphRAG popularized the term.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Structured Outputs</div>
+      <p class="term-kid">Making the model return JSON or another exact format instead of free text.</p>
+      <p class="term-pro">Constraining model output to a schema (often JSON). Provider features (OpenAI structured outputs, Anthropic tool use) guarantee schema validity by constraining the decoder.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Prompt Template</div>
+      <p class="term-kid">A reusable prompt with blanks you fill in for each call.</p>
+      <p class="term-pro">A parameterized prompt with variable slots, used in production code. Common in LangChain, LlamaIndex, and custom pipelines.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Prompt Chaining</div>
+      <p class="term-kid">Splitting a hard task into several smaller prompts where each one's answer feeds the next.</p>
+      <p class="term-pro">Sequential decomposition where the output of one LLM call is the input to the next. Improves quality on complex tasks; precursor to agents.</p>
+    </div>
+  </div>
+
+  <!-- ===================== AGENTS ===================== -->
+  <div class="glossary-section">
+    <div class="glossary-section-label">— Section 7 —</div>
+    <h2 id="agents" class="glossary-section-title">Agents &amp; Tools</h2>
+
+    <div class="term">
+      <div class="term-name">Agent</div>
+      <p class="term-kid">An AI that can plan, take actions, and use tools — not just answer questions.</p>
+      <p class="term-pro">An LLM-based system that autonomously plans and executes multi-step tasks, typically using tool calls and observation loops to interact with environments.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Tool Use / Function Calling</div>
+      <p class="term-kid">Letting the AI call out to external programs — a calculator, a search engine, your code — to get things done.</p>
+      <p class="term-pro">Mechanism where the model emits structured calls (typically JSON) describing a function name and arguments; the host executes and returns results. Foundation of agentic systems.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">ReAct</div>
+      <p class="term-kid">An agent pattern: think → act → see what happened → think again. Repeat until done.</p>
+      <p class="term-pro">"Reasoning + Acting": agent loop alternating reasoning (CoT) and action (tool call) steps with observation feedback. Foundational agent pattern from Yao et al. (2022).</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">MCP <span class="term-aka">Model Context Protocol</span></div>
+      <p class="term-kid">A standard way for AI to plug into external tools, files, and apps. Like USB-C for AI.</p>
+      <p class="term-pro">Open protocol from Anthropic (2024) standardizing how LLMs connect to external tools, resources, and prompts. Solves the M×N integration problem with a uniform client/server architecture.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Multi-Agent System</div>
+      <p class="term-kid">Several AIs working together, each playing a different role.</p>
+      <p class="term-pro">Architectures where multiple agents collaborate, often with specialized roles (planner, worker, critic). Frameworks: AutoGen, CrewAI, LangGraph. Useful for some tasks; over-applied to many.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Orchestrator-Worker</div>
+      <p class="term-kid">One agent in charge that breaks the work into pieces and hands them to specialist agents.</p>
+      <p class="term-pro">Common multi-agent pattern: orchestrator decomposes tasks, dispatches subtasks to worker agents, integrates results. Often more reliable than fully decentralized swarms.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Computer Use / Browser Use</div>
+      <p class="term-kid">An AI that watches a screen and clicks/types like a person — to use any app for you.</p>
+      <p class="term-pro">Agents that operate computers via screen capture + action emulation (mouse, keyboard). Examples: Claude Computer Use, OpenAI Operator. Generalizes agents beyond pre-defined APIs.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Memory (Agent Memory)</div>
+      <p class="term-kid">Letting an agent remember things from one conversation to the next.</p>
+      <p class="term-pro">Persistent storage of agent state across sessions: episodic memory (past interactions), semantic memory (learned facts), often via vector stores or summarization.</p>
+    </div>
+  </div>
+
+  <!-- ===================== SAFETY ===================== -->
+  <div class="glossary-section">
+    <div class="glossary-section-label">— Section 8 —</div>
+    <h2 id="safety" class="glossary-section-title">Safety &amp; Alignment</h2>
+
+    <div class="term">
+      <div class="term-name">Alignment</div>
+      <p class="term-kid">Getting an AI to actually want what we want it to want.</p>
+      <p class="term-pro">The problem of ensuring AI systems pursue intended goals — both specifying the right objective (outer alignment) and ensuring the model's learned objective matches it (inner alignment).</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Reward Hacking / Specification Gaming</div>
+      <p class="term-kid">When AI finds a sneaky way to score points without doing what we actually wanted.</p>
+      <p class="term-pro">Optimization exploiting unintended quirks in the reward signal or specification. The classic problem of "you get what you measure, not what you mean."</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Sycophancy</div>
+      <p class="term-kid">When the model just tells you what you want to hear instead of the truth.</p>
+      <p class="term-pro">Model behavior of agreeing with user beliefs to maximize ratings. Side effect of preference-based training where raters reward agreement.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Jailbreak</div>
+      <p class="term-kid">A clever prompt that tricks the AI into doing something it was trained not to do.</p>
+      <p class="term-pro">Adversarial prompting that bypasses a model's safety training. Continuous arms race between novel attacks and patched defenses.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Prompt Injection</div>
+      <p class="term-kid">When sneaky instructions hidden in a webpage or document hijack what the AI does next.</p>
+      <p class="term-pro">Attack where untrusted content processed by an AI contains hidden instructions that override the user's. Especially dangerous in agents with tool access. The "lethal trifecta" (untrusted input + private data + outbound action) is the high-risk pattern.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Red-Teaming</div>
+      <p class="term-kid">Hiring people to try to break the AI on purpose, so you can fix the holes.</p>
+      <p class="term-pro">Adversarial evaluation: deliberately trying to elicit harmful, deceptive, or otherwise undesired model behaviors. Standard pre-deployment practice at frontier labs.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Mechanistic Interpretability</div>
+      <p class="term-kid">Opening up the model's brain to figure out what specific neurons are doing.</p>
+      <p class="term-pro">Research program to reverse-engineer the algorithms learned by neural networks. Anthropic, DeepMind, and academia making real progress on identifying features and circuits inside frontier models.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Responsible Scaling Policy <span class="term-aka">RSP</span></div>
+      <p class="term-kid">A frontier lab's promise to test for dangerous capabilities at each scale and pause if things get scary.</p>
+      <p class="term-pro">Voluntary commitments by frontier labs (Anthropic, OpenAI, others) to evaluate models for dangerous capabilities at each scale tier and halt deployment if safety thresholds aren't met.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">EU AI Act</div>
+      <p class="term-kid">Europe's law about AI — bans some uses, regulates risky uses, and sets rules for big AI providers.</p>
+      <p class="term-pro">2024 EU regulation with a tiered framework (prohibited / high-risk / general-purpose AI). Phased rollout 2024–2027. The most comprehensive AI law to date.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Deepfake</div>
+      <p class="term-kid">A fake photo, video, or voice clip that's so good people can't tell it's fake.</p>
+      <p class="term-pro">Synthetic media depicting real people doing or saying things they didn't. Major harm vectors: non-consensual intimate imagery, fraud, political disinformation. Detection is an open problem.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Watermarking</div>
+      <p class="term-kid">Hidden markers in AI output that prove a machine made it.</p>
+      <p class="term-pro">Embedding imperceptible signals in generated content to enable later detection. Examples: SynthID (Google), C2PA provenance signing. Partial defense; not bulletproof.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Bias (in AI)</div>
+      <p class="term-kid">When a model treats some groups differently because of patterns in its training data or training process.</p>
+      <p class="term-pro">Systematic disparate performance or output across groups. Sources: training data composition, rater preferences, deployment context. Mitigations partial; some bias reflects underlying social patterns.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Capability Evaluation</div>
+      <p class="term-kid">Testing what an AI can actually do — including dangerous things.</p>
+      <p class="term-pro">Systematic measurement of model capabilities, including potentially dangerous ones (cybersecurity, bioweapon-relevant, autonomous replication, persuasion). Done by labs and AI Safety Institutes.</p>
+    </div>
+  </div>
+
+  <!-- ===================== ORGS ===================== -->
+  <div class="glossary-section">
+    <div class="glossary-section-label">— Section 9 —</div>
+    <h2 id="org" class="glossary-section-title">Orgs &amp; Products</h2>
+
+    <div class="term">
+      <div class="term-name">Anthropic</div>
+      <p class="term-kid">The company that makes Claude, founded with a strong focus on AI safety.</p>
+      <p class="term-pro">AI safety lab founded 2021. Creator of Claude, Constitutional AI, MCP. Notable for safety-focused research culture and interpretability work.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">OpenAI</div>
+      <p class="term-kid">The company that made ChatGPT and the GPT models.</p>
+      <p class="term-pro">AI lab founded 2015. Creator of GPT family, DALL-E, Whisper, o-series reasoning models, ChatGPT. Pioneered RLHF for instruction-tuning at scale.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Google DeepMind</div>
+      <p class="term-kid">Google's AI division. Makes Gemini and famous research like AlphaGo and AlphaFold.</p>
+      <p class="term-pro">Merged Google AI + DeepMind (2023). Creators of Gemini, AlphaGo, AlphaFold, Chinchilla scaling laws, transformer architecture (the original 2017 paper had Google authors).</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Meta AI</div>
+      <p class="term-kid">Facebook/Instagram's AI lab. Makes the open-source Llama models.</p>
+      <p class="term-pro">Meta's AI research division (FAIR + GenAI). Notable for open-weights releases (Llama family), driving the open-source ecosystem.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">xAI</div>
+      <p class="term-kid">Elon Musk's AI company. Makes Grok.</p>
+      <p class="term-pro">AI lab founded 2023 by Elon Musk. Creator of Grok models, integrated with X (Twitter).</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Mistral / DeepSeek / Qwen / Cohere</div>
+      <p class="term-kid">Other big AI labs. Mistral is European; DeepSeek and Qwen are Chinese; Cohere is enterprise-focused.</p>
+      <p class="term-pro">Mistral (France, open + closed models). DeepSeek (China, strong open reasoning models). Qwen (Alibaba, multilingual open-weight). Cohere (Canada, enterprise/RAG-focused).</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Hugging Face</div>
+      <p class="term-kid">The "GitHub for AI" — where everyone shares open models and datasets.</p>
+      <p class="term-pro">Platform hosting open models, datasets, demos. Maintains key libraries (transformers, datasets, diffusers, peft). Central infrastructure for the open AI ecosystem.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">LangChain / LlamaIndex / LangGraph</div>
+      <p class="term-kid">Software libraries that make it easier to build apps using AI — chaining prompts, RAG, agents.</p>
+      <p class="term-pro">Frameworks for LLM-powered applications. LangChain: general orchestration. LlamaIndex: RAG-focused. LangGraph: stateful multi-step agent flows.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">PyTorch / JAX / TensorFlow</div>
+      <p class="term-kid">The main programming libraries researchers use to build neural networks.</p>
+      <p class="term-pro">Deep learning frameworks. PyTorch: dominant in research and increasingly in production. JAX: Google-favored, functional, strong on TPUs. TensorFlow: legacy strong in production deployment.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">CUDA</div>
+      <p class="term-kid">NVIDIA's software that lets AI use NVIDIA GPUs. The reason NVIDIA dominates AI hardware.</p>
+      <p class="term-pro">NVIDIA's parallel computing platform and programming model. The software moat that makes NVIDIA GPUs dominant in AI training and much inference.</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">Common Crawl</div>
+      <p class="term-kid">A free, gigantic copy of much of the public web — used to train almost every big AI.</p>
+      <p class="term-pro">Non-profit project producing monthly snapshots of the public web. Foundational training data source for nearly all modern LLMs (filtered, deduplicated, often combined with curated sources).</p>
+    </div>
+
+    <div class="term">
+      <div class="term-name">arXiv</div>
+      <p class="term-kid">The website where AI researchers post their papers — usually for free, before formal publication.</p>
+      <p class="term-pro">Pre-print server hosting most cutting-edge AI research. Cornell-hosted, free. Where to read new work as it's released.</p>
+    </div>
+  </div>
+
+  <h2 id="closing">Closing Thoughts</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 You finished the book</div>
+    <p>If you got here from page one, you've come a long way. You started not knowing what a neuron was. Now you can have a real conversation about transformers, RAG, agents, and alignment. You can read papers without panicking. You can talk to engineers without faking it.</p>
+    <p>The most important thing you've learned isn't any single fact. It's that <strong>this stuff isn't magic</strong>. Every piece — neurons, attention, embeddings, RLHF, MCP — is understandable. The field looks intimidating because it moves fast and uses jargon, but the core ideas are simple, and you now have them.</p>
+    <p>Keep going. Read the references. Build small things. Talk to people who disagree with you. The technology is shaping the century — better that you're part of the conversation.</p>
+  </div>
+
+  <div class="key-point">
+    Knowing the kid version means you understand. Knowing the pro version means you can talk shop. Knowing both means you can teach — and teaching, as they say, is how you really learn.
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch23-safety-alignment.html">← Previous: Safety, Alignment &amp; Ethics</a>
+    <div class="nav-spacer"></div>
+    <a href="index.html">Back to Home →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 24 · Reference · The AI Glossary · Chapter 24 of 24 · End</div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>React — Build Interactive UIs | DevLaunch Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/styles.css" />
+<style>
+  .playground { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin: 20px 0; }
+  .playground .editor { min-height: 240px; border-right: 1px solid var(--border); }
+  .pg-preview { background: #fff; color: #111; padding: 18px; min-height: 240px; overflow: auto; }
+  .pg-preview * { color: inherit; }
+  .pg-head { grid-column: 1/-1; display: flex; align-items: center; gap: 8px; padding: 9px 14px; background: #11151f; border-bottom: 1px solid var(--border); font-size: 0.82rem; color: var(--text-dim); }
+  .pg-head .actions { margin-left: auto; display: flex; gap: 8px; }
+  .pg-head button { background: var(--bg-elev); color: var(--text-soft); border: 1px solid var(--border); padding: 4px 12px; border-radius: 7px; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
+  .pg-head button.run { background: var(--accent-react); color: #06222b; border-color: transparent; }
+  .pg-err { color: #b00020; font-family: var(--mono); font-size: 0.85rem; white-space: pre-wrap; }
+  @media (max-width: 760px) { .playground { grid-template-columns: 1fr; } .playground .editor { border-right: none; border-bottom: 1px solid var(--border); } }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand"><span class="logo">⚡</span> DevLaunch Academy</a>
+    <nav class="topnav">
+      <a href="index.html">Home</a>
+      <a href="01-foundations.html">Foundations</a>
+      <a href="02-javascript.html">JavaScript</a>
+      <a href="03-react.html" class="active">React</a>
+      <a href="04-node.html">Node</a>
+      <a href="05-rest-apis.html">REST</a>
+      <a href="06-database.html">MSSQL</a>
+      <a href="07-capstone.html">Capstone</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <button class="menu-toggle" style="margin:18px 0;">☰ Sections</button>
+  <div class="layout">
+    <aside class="sidebar">
+      <h4>On this page</h4>
+      <a href="#why">Why React?</a>
+      <a href="#components">① Components</a>
+      <a href="#jsx">② JSX</a>
+      <a href="#fragments">③ Fragments</a>
+      <a href="#props">④ Props</a>
+      <a href="#children">⑤ Composition &amp; children</a>
+      <a href="#state">⑥ State &amp; useState</a>
+      <a href="#events">⑦ Events</a>
+      <a href="#conditional">⑧ Conditional rendering</a>
+      <a href="#lists">⑨ Lists &amp; keys</a>
+      <a href="#derived">⑩ Derived values</a>
+      <a href="#forms">⑪ Forms</a>
+      <a href="#lifting">⑫ Lifting state up</a>
+      <a href="#effect">⑬ useEffect &amp; cleanup</a>
+      <a href="#ref">⑭ useRef</a>
+      <a href="#custom-hooks">⑮ Custom hooks</a>
+      <a href="#context">⑯ Context API</a>
+      <a href="#fetching">⑰ Data fetching states</a>
+      <a href="#thinking">Thinking in React</a>
+      <a href="#pitfalls">Common pitfalls</a>
+      <a href="#setup">Setting up a real project</a>
+      <a href="#quiz">Quiz</a>
+      <a href="#takeaways">Key takeaways</a>
+    </aside>
+
+    <div class="content">
+      <p class="muted" style="margin:0;">Module 2 · <span class="chip inter">Intermediate</span></p>
+      <h1 style="margin-top:6px;">⚛️ React: Build Interactive UIs</h1>
+      <p class="lead" style="color:var(--text-soft);font-size:1.12rem;">
+        React is a JavaScript library for building user interfaces out of small, reusable pieces called
+        <strong>components</strong>. The playgrounds below are <strong>real React</strong> — edit the code and watch the live preview update.
+      </p>
+      <div class="callout warn"><span class="ci">🌐</span><p>The live React playgrounds load React &amp; Babel from a CDN, so <strong>keep this page online</strong> the first time. If a preview stays blank, check your internet connection and click <strong>Run</strong>.</p></div>
+
+      <section id="why" class="section">
+        <h2>Why React? The big idea</h2>
+        <p>Updating a page by hand with the DOM (Module 1) gets messy fast. Imagine a shopping cart: when the user adds an item you have to manually find the cart count element and update its text, find the totals element and recalculate it, find the "checkout" button and maybe enable it, and find the empty-cart message and hide it. Miss one of those steps and your UI is now <em>lying</em> to the user. As an app grows, the number of "if this changed, remember to update that" rules explodes — this is the classic source of buggy, fragile web apps.</p>
+        <p>React flips the model: <strong>you describe what the UI should look like for a given state, and React figures out how to update the screen.</strong> You stop writing step-by-step DOM instructions ("imperative" code) and instead write a description of the result ("declarative" code). Think of it like the difference between giving someone turn-by-turn driving directions versus just handing them the destination address — React is the GPS that works out the route for you.</p>
+        <div class="grid grid-2">
+          <div class="callout info" style="margin:0;"><span class="ci">🧩</span><p><strong>Components:</strong> build your UI from small, reusable blocks (a Button, a Card, a TaskList) — like LEGO. Each block owns its own markup, styling, and behavior, so you can build it once and reuse it everywhere.</p></div>
+          <div class="callout key" style="margin:0;"><span class="ci">🔄</span><p><strong>State-driven:</strong> change the data, and the UI updates itself automatically. No manual DOM juggling, no forgetting to update one corner of the screen — the UI is always a reflection of your current data.</p></div>
+        </div>
+        <p>Two more reasons React is worth learning: it's one of the most in-demand skills in web development (the "R" in <strong>MERN</strong>, the stack this whole course builds toward), and once you understand the core ideas — components, props, state — they carry over to almost every other modern UI framework you'll meet.</p>
+        <div class="callout tip"><span class="ci">🔗</span><p>Everything from the JavaScript module pays off here: arrow functions become event handlers, <code>.map()</code> renders lists, destructuring reads props, the spread operator updates state immutably, and template literals build dynamic text. React isn't a new language — it's JavaScript with a smart UI layer on top.</p></div>
+        <figure class="diagram">
+          <svg viewBox="0 0 760 170" role="img" aria-label="State drives UI in React">
+            <rect x="40" y="60" width="160" height="60" rx="10" fill="#1b2030" stroke="#61dafb" stroke-width="2"/>
+            <text x="120" y="86" text-anchor="middle" fill="#fff" font-size="14">State (data)</text>
+            <text x="120" y="106" text-anchor="middle" fill="#aab2c5" font-size="12">count = 3</text>
+            <path d="M205,90 L300,90" stroke="#6c8cff" stroke-width="2.5" marker-end="url(#r1)"/>
+            <text x="252" y="78" text-anchor="middle" fill="#aab2c5" font-size="12">React</text>
+            <rect x="305" y="60" width="180" height="60" rx="10" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="395" y="86" text-anchor="middle" fill="#fff" font-size="14">UI (what you see)</text>
+            <text x="395" y="106" text-anchor="middle" fill="#9ee493" font-size="12">"Count: 3"</text>
+            <path d="M395,125 C395,160 200,160 120,125" stroke="#ff7eb6" stroke-width="2" fill="none" marker-end="url(#r2)"/>
+            <text x="255" y="158" text-anchor="middle" fill="#ff9dcb" font-size="12">user clicks → change state → UI re-renders</text>
+            <defs>
+              <marker id="r1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6c8cff"/></marker>
+              <marker id="r2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#ff7eb6"/></marker>
+            </defs>
+          </svg>
+          <figcaption>The React loop: state → UI. Change the state, and React re-paints just what changed.</figcaption>
+        </figure>
+      </section>
+
+      <!-- COMPONENTS -->
+      <section id="components" class="section">
+        <h2>① Components — reusable UI blocks <span class="chip basic">Basic</span></h2>
+        <p>A component is just a <strong>function that returns what to show</strong>. That's the whole idea — if you can write a JavaScript function, you can write a component. It takes in some data and returns a description of some UI.</p>
+        <p>By convention, component names <strong>start with a Capital letter</strong> (<code>Welcome</code>, not <code>welcome</code>). This isn't a style preference — React uses the capital letter to tell <em>your</em> components apart from built-in HTML tags. A lowercase <code>&lt;welcome /&gt;</code> would be treated as an unknown HTML element and silently render nothing, which is a classic beginner head-scratcher.</p>
+        <p>Edit the greeting below and press Run:</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">Component.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">function Welcome() {
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;👋 Hello from React!&lt;/h2&gt;
+      &lt;p&gt;This whole box is a component.&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+// Show it on screen:
+render(&lt;Welcome /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout info"><span class="ci">💡</span><p>A component is reused by writing it like an HTML tag: <code>&lt;Welcome /&gt;</code>. You can place it as many times as you like, and each copy is independent.</p></div>
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>Common mistake:</strong> a component must return exactly <em>one</em> root element (or a Fragment — coming up next). Returning two sibling tags side-by-side is a syntax error. Also: never define one component <em>inside</em> another component's body — define each at the top level of your file.</p></div>
+        <div class="challenge">
+          <h4>🧪 Try it yourself</h4>
+          <p>In the playground above, add a second component called <code>Footer</code> that returns <code>&lt;small&gt;Made with React&lt;/small&gt;</code>, then wrap both <code>&lt;Welcome /&gt;</code> and <code>&lt;Footer /&gt;</code> in a single <code>&lt;div&gt;</code> inside a new <code>App</code> component and <code>render(&lt;App /&gt;)</code>.</p>
+        </div>
+      </section>
+
+      <!-- JSX -->
+      <section id="jsx" class="section">
+        <h2>② JSX — HTML inside JavaScript <span class="chip basic">Basic</span></h2>
+        <p>That HTML-looking syntax inside the function is <strong>JSX</strong>. It lets you write markup right in your JavaScript, which feels strange at first but quickly becomes natural — your markup and the logic that drives it live in the same place, instead of being scattered across separate HTML and JS files.</p>
+        <p>Behind the scenes, JSX isn't really HTML and it isn't magic. A build tool (Babel, which also powers these playgrounds) converts each tag into a plain JavaScript function call that creates a lightweight object describing the element. So <code>&lt;h2&gt;Hi&lt;/h2&gt;</code> becomes something like <code>React.createElement("h2", null, "Hi")</code>. You never write that yourself — but knowing JSX is "just JavaScript in disguise" explains why you can use loops, variables, and expressions so freely inside it. A few rules to remember:</p>
+        <ul>
+          <li>Return <strong>one</strong> top-level element (wrap siblings in a <code>&lt;div&gt;</code> or a Fragment <code>&lt;&gt;...&lt;/&gt;</code>).</li>
+          <li>Use <code>className</code> instead of <code>class</code>, and <code>htmlFor</code> instead of <code>for</code> (because <code>class</code> and <code>for</code> are reserved JavaScript keywords).</li>
+          <li>Every tag must be closed. Self-closing tags need the slash: <code>&lt;img /&gt;</code>, <code>&lt;br /&gt;</code>, <code>&lt;input /&gt;</code>.</li>
+          <li>Embed any JavaScript <em>expression</em> with curly braces <code>{ }</code> — a variable, a calculation, a function call, a ternary. (Statements like <code>if</code> or <code>for</code> don't go inside <code>{ }</code> directly.)</li>
+        </ul>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">jsx.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">function Card() {
+  const user = "Sara";
+  const year = 2026;
+  const isVip = true;
+
+  return (
+    &lt;div style={{ padding: 16, border: "2px solid #61dafb", borderRadius: 12 }}&gt;
+      &lt;h3&gt;Welcome, {user}! {isVip ? "⭐ VIP" : ""}&lt;/h3&gt;
+      &lt;p&gt;The year is {year}. Next year: {year + 1}.&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+render(&lt;Card /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p>Curly braces hold <em>JavaScript</em>: <code>{year + 1}</code>, <code>{user.toUpperCase()}</code>, <code>{isVip ? "yes" : "no"}</code>. For inline styles, note the <em>double</em> braces: <code>style={{ }}</code> — one set says "JavaScript goes here", the inner set is the style <em>object</em>. Style properties are camelCased (<code>backgroundColor</code>, not <code>background-color</code>) and values are strings or numbers.</p></div>
+        <div class="callout info"><span class="ci">💡</span><p>Two values render as <em>nothing</em> in JSX, which is handy: <code>null</code> and <code>false</code>. That's the trick behind conditional rendering, which you'll see shortly. But beware: the number <code>0</code> <strong>does</strong> show up, which causes a famous bug we'll cover.</p></div>
+      </section>
+
+      <!-- FRAGMENTS -->
+      <section id="fragments" class="section">
+        <h2>③ Fragments — grouping without extra divs <span class="chip basic">Basic</span></h2>
+        <p>A component can only return one root element. The lazy fix is to wrap everything in a <code>&lt;div&gt;</code> — but that adds an extra, meaningless box to your page for <em>every</em> component, which can break CSS layouts (flexbox, grids, tables) and bloats the HTML. This is sometimes called "div soup".</p>
+        <p>The clean solution is a <strong>Fragment</strong>: an empty tag <code>&lt;&gt;...&lt;/&gt;</code> that groups children together <em>without</em> rendering anything itself. It satisfies the "one root" rule but leaves no trace in the actual DOM. Try swapping the <code>&lt;&gt;</code> below for a <code>&lt;div&gt;</code> and inspect the difference:</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">fragment.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">function Profile() {
+  // The &lt;&gt;...&lt;/&gt; is a Fragment: groups siblings,
+  // but adds NO wrapper element to the page.
+  return (
+    &lt;&gt;
+      &lt;h3&gt;Ada Lovelace&lt;/h3&gt;
+      &lt;p&gt;The first programmer.&lt;/p&gt;
+      &lt;small&gt;1815 – 1852&lt;/small&gt;
+    &lt;/&gt;
+  );
+}
+
+render(&lt;Profile /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>Reach for a Fragment whenever you need to return multiple elements but a wrapper <code>&lt;div&gt;</code> would get in the way — especially inside tables (<code>&lt;tr&gt;</code>/<code>&lt;td&gt;</code>) and flex/grid layouts. The long form is <code>&lt;React.Fragment&gt;</code>; you only need that when you have to give the fragment a <code>key</code> (e.g. in a list).</p></div>
+      </section>
+
+      <!-- PROPS -->
+      <section id="props" class="section">
+        <h2>④ Props — passing data into components <span class="chip basic">Basic</span></h2>
+        <p><strong>Props</strong> (short for "properties") let a parent pass data into a child component — exactly like passing arguments into a function. This is the mechanism that makes components <em>reusable</em>: one <code>&lt;Greeting /&gt;</code> component can serve many different names, just like one <code>greet(name)</code> function can greet many people.</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">props.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">// `props` comes in as an object; we destructure { name, emoji }
+function Greeting({ name, emoji }) {
+  return &lt;p&gt;{emoji} Hello, &lt;strong&gt;{name}&lt;/strong&gt;!&lt;/p&gt;;
+}
+
+function App() {
+  return (
+    &lt;div&gt;
+      &lt;Greeting name="Ravi" emoji="👋" /&gt;
+      &lt;Greeting name="Mei" emoji="🌸" /&gt;
+      &lt;Greeting name="Tom" emoji="🚀" /&gt;
+    &lt;/div&gt;
+  );
+}
+
+render(&lt;App /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>Props flow <strong>down</strong>, parent → child, and are <strong>read-only</strong> inside the child. A child must never try to modify its own props — if it needs to change something, that something belongs in <em>state</em> (coming up) or should be changed by the parent. One reusable component, many uses — that's the payoff.</p></div>
+        <div class="callout info"><span class="ci">💡</span><p>You can pass <em>any</em> JavaScript value as a prop — strings, numbers, booleans, arrays, objects, even functions. Strings use quotes (<code>name="Ravi"</code>); everything else uses curly braces (<code>count={5}</code>, <code>tags={["a","b"]}</code>, <code>onClick={handleClick}</code>). Passing a <strong>function</strong> as a prop is how a child tells its parent "something happened" — you'll use this constantly.</p></div>
+        <div class="quiz">
+          <div class="q">If you write <code>&lt;Greeting name="Mei" /&gt;</code>, how do you read <code>name</code> inside the component?</div>
+          <div class="opt" data-correct="true">From the <code>props</code> object — e.g. <code>props.name</code> or by destructuring <code>{ name }</code></div>
+          <div class="opt" data-correct="false">From a global variable called <code>name</code></div>
+          <div class="opt" data-correct="false">With <code>useState("Mei")</code></div>
+          <div class="explain">✅ Every prop arrives as a key on the single <code>props</code> object the component receives. Destructuring <code>function Greeting({ name })</code> is just a tidy shortcut for reading <code>props.name</code>.</div>
+        </div>
+      </section>
+
+      <!-- CHILDREN / COMPOSITION -->
+      <section id="children" class="section">
+        <h2>⑤ Composition &amp; the <code>children</code> prop <span class="chip inter">Intermediate</span></h2>
+        <p>Sometimes you want a component to wrap <em>whatever you put inside it</em> — a Card that adds a border and padding around any content, a Modal that frames any message, a Layout that surrounds a page. React has a special built-in prop for exactly this: <strong><code>children</code></strong>. Whatever you place <em>between</em> a component's opening and closing tags shows up as <code>props.children</code>.</p>
+        <p>This pattern is called <strong>composition</strong>, and it's how React encourages reuse: instead of building one giant configurable component with dozens of props, you build small wrappers and <em>nest</em> them like Russian dolls. Edit the content inside <code>&lt;Card&gt;...&lt;/Card&gt;</code> below and watch it flow into the same styled box:</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">children.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">// A reusable wrapper. Whatever sits between
+// &lt;Card&gt; and &lt;/Card&gt; arrives as `children`.
+function Card({ title, children }) {
+  return (
+    &lt;div style={{
+      border: "2px solid #61dafb", borderRadius: 12,
+      padding: 16, margin: "10px 0"
+    }}&gt;
+      &lt;h3 style={{ marginTop: 0 }}&gt;{title}&lt;/h3&gt;
+      {children}
+    &lt;/div&gt;
+  );
+}
+
+function App() {
+  return (
+    &lt;div&gt;
+      &lt;Card title="🍎 Apples"&gt;
+        &lt;p&gt;Crunchy and sweet.&lt;/p&gt;
+      &lt;/Card&gt;
+      &lt;Card title="🚀 Launch"&gt;
+        &lt;p&gt;Anything can go in here —&lt;/p&gt;
+        &lt;button&gt;even a button!&lt;/button&gt;
+      &lt;/Card&gt;
+    &lt;/div&gt;
+  );
+}
+
+render(&lt;App /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p><code>children</code> is just a normal prop with a special name — React fills it in automatically from the nested content. Combine <code>children</code> with a few regular props (like <code>title</code>) and you can build flexible, reusable layout components with almost no code.</p></div>
+        <div class="challenge">
+          <h4>🧪 Try it yourself</h4>
+          <p>Add a third <code>&lt;Card&gt;</code> with the title <code>"📝 Notes"</code> that contains a <code>&lt;ul&gt;</code> with two <code>&lt;li&gt;</code> items inside it. Notice you didn't have to change the <code>Card</code> component at all — that's the power of composition.</p>
+        </div>
+      </section>
+
+      <!-- STATE -->
+      <section id="state" class="section">
+        <h2>⑥ State — data that changes over time <span class="chip basic">Basic</span></h2>
+        <p>Props come from outside and don't change. <strong>State</strong> is a component's own private memory that <em>does</em> change over time — the typed text in a search box, whether a menu is open, the current count, the list of todos. When state changes, React automatically re-renders the component so the screen stays in sync with the data.</p>
+        <p>You create state with the <code>useState</code> <strong>hook</strong>. A "hook" is just a special function (its name always starts with <code>use</code>) that lets a component plug into React features like memory and lifecycle. <code>useState</code> is the one you'll use most.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 120" role="img" aria-label="useState returns value and setter">
+            <text x="360" y="50" text-anchor="middle" fill="#fff" font-size="17" font-family="monospace">const [count, setCount] = useState(0);</text>
+            <text x="150" y="95" text-anchor="middle" fill="#9ee493" font-size="12">current value</text>
+            <text x="370" y="95" text-anchor="middle" fill="#ff9dcb" font-size="12">function to update it</text>
+            <text x="610" y="95" text-anchor="middle" fill="#ffce5c" font-size="12">starting value</text>
+            <line x1="150" y1="60" x2="150" y2="82" stroke="#38d39f"/><line x1="300" y1="60" x2="370" y2="82" stroke="#ff7eb6"/><line x1="560" y1="60" x2="610" y2="82" stroke="#ffce5c"/>
+          </svg>
+          <figcaption><code>useState</code> gives you a value and a function to change it. Call the setter → React re-renders.</figcaption>
+        </figure>
+        <p>Here's the classic counter. Click the buttons — React updates the display every time:</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">counter.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    &lt;div style={{ textAlign: "center" }}&gt;
+      &lt;h1&gt;{count}&lt;/h1&gt;
+      &lt;button onClick={() =&gt; setCount(count - 1)}&gt;➖ Minus&lt;/button&gt;
+      {" "}
+      &lt;button onClick={() =&gt; setCount(count + 1)}&gt;➕ Plus&lt;/button&gt;
+      {" "}
+      &lt;button onClick={() =&gt; setCount(0)}&gt;Reset&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+render(&lt;Counter /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>Never change state directly</strong> (don't write <code>count = 5</code>). Always use the setter (<code>setCount(5)</code>) — that's what tells React to re-render. Assigning to the variable does nothing visible and just confuses React.</p></div>
+        <div class="callout info"><span class="ci">🧠</span><p><strong>State updates can be "batched" and are not instant.</strong> Right after calling <code>setCount(count + 1)</code>, the <code>count</code> variable still holds the old value until the next render. If your new value depends on the old one, use the <em>updater function</em> form: <code>setCount(c =&gt; c + 1)</code>. React hands you the latest value as <code>c</code> — this is the safe way to do "+1" reliably, even multiple times in a row.</p></div>
+        <div class="challenge">
+          <h4>🧪 Try it yourself</h4>
+          <p>Change the <code>+</code> button so it adds <code>5</code> at a time, and add a fourth button that <em>doubles</em> the count using the updater form: <code>onClick={() =&gt; setCount(c =&gt; c * 2)}</code>.</p>
+        </div>
+      </section>
+
+      <!-- EVENTS -->
+      <section id="events" class="section">
+        <h2>⑦ Events — responding to the user <span class="chip basic">Basic</span></h2>
+        <p>React events look like HTML attributes but use camelCase and take a <em>function</em>, not a string: <code>onClick</code>, <code>onChange</code>, <code>onSubmit</code>, <code>onMouseEnter</code>, and so on. The function runs when the event fires.</p>
+        <p>One subtle but important point: you pass the function, you don't <em>call</em> it. Write <code>onClick={handleClick}</code> (pass the function) — not <code>onClick={handleClick()}</code> (which calls it immediately during render and stores the <em>result</em>). When you need to pass arguments, wrap it in an arrow function: <code>onClick={() =&gt; setOn(!on)}</code>. That arrow is a tiny function React will call later, on click. Try this live toggle:</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">events.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">function LightSwitch() {
+  const [on, setOn] = useState(false);
+
+  return (
+    &lt;div style={{
+      textAlign: "center", padding: 30, borderRadius: 12,
+      background: on ? "#fff7cc" : "#222", color: on ? "#222" : "#888"
+    }}&gt;
+      &lt;h2&gt;{on ? "💡 Light ON" : "🌙 Light OFF"}&lt;/h2&gt;
+      &lt;button onClick={() =&gt; setOn(!on)}&gt;
+        Toggle
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+render(&lt;LightSwitch /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>Pass, don't call.</strong> <code>onClick={doThing}</code> ✅ vs <code>onClick={doThing()}</code> ❌. The second runs <code>doThing</code> on every render, often causing an infinite re-render loop if it sets state. When in doubt, wrap it: <code>onClick={() =&gt; doThing()}</code>.</p></div>
+      </section>
+
+      <!-- CONDITIONAL RENDERING -->
+      <section id="conditional" class="section">
+        <h2>⑧ Conditional rendering — showing things only sometimes <span class="chip inter">Intermediate</span></h2>
+        <p>Real UIs constantly show or hide things: a "Loading…" spinner, an error banner, a logged-in vs logged-out view, an empty-state message. Because JSX is just JavaScript, you render conditionally using ordinary JavaScript expressions. There are three patterns you'll use over and over:</p>
+        <ul>
+          <li><strong>Logical AND (<code>&amp;&amp;</code>)</strong> — "show this <em>only if</em> the condition is true." <code>{isOpen &amp;&amp; &lt;Menu /&gt;}</code>. If the left side is true, JSX renders the right side; if false, it renders nothing.</li>
+          <li><strong>Ternary (<code>? :</code>)</strong> — "show A if true, otherwise B." <code>{loggedIn ? &lt;Dashboard /&gt; : &lt;Login /&gt;}</code>.</li>
+          <li><strong>Early return</strong> — bail out of the whole component before the main markup: <code>if (loading) return &lt;p&gt;Loading…&lt;/p&gt;;</code>. Great for guard clauses.</li>
+        </ul>
+        <p>Click the buttons below to see all three in action:</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">conditional.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">function Account() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [showTip, setShowTip] = useState(true);
+
+  return (
+    &lt;div&gt;
+      {/* TERNARY: pick one of two views */}
+      {loggedIn
+        ? &lt;h3&gt;✅ Welcome back, friend!&lt;/h3&gt;
+        : &lt;h3&gt;🔒 Please log in.&lt;/h3&gt;}
+
+      &lt;button onClick={() =&gt; setLoggedIn(!loggedIn)}&gt;
+        {loggedIn ? "Log out" : "Log in"}
+      &lt;/button&gt;
+
+      {/* AND: show ONLY when showTip is true */}
+      {showTip &amp;&amp; (
+        &lt;p style={{ color: "#0a7" }}&gt;
+          💡 Tip: this paragraph shows only because showTip is true.
+        &lt;/p&gt;
+      )}
+
+      &lt;button onClick={() =&gt; setShowTip(!showTip)}&gt;
+        Toggle tip
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+render(&lt;Account /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>The <code>0</code> trap.</strong> With <code>{count &amp;&amp; &lt;Badge /&gt;}</code>, if <code>count</code> is <code>0</code>, React renders the number <code>0</code> on screen instead of nothing! That's because <code>0</code> is "falsy" but still renderable. Fix it by making the left side a real boolean: <code>{count &gt; 0 &amp;&amp; &lt;Badge /&gt;}</code>.</p></div>
+        <div class="callout info"><span class="ci">💡</span><p>Use early returns to keep components readable: handle <code>loading</code> and <code>error</code> states up top with <code>if (...) return ...;</code>, so your main JSX at the bottom only deals with the happy path. You'll lean on this in the data-fetching section.</p></div>
+      </section>
+
+      <!-- LISTS -->
+      <section id="lists" class="section">
+        <h2>⑨ Rendering lists with <code>.map()</code> <span class="chip inter">Intermediate</span></h2>
+        <p>Remember <code>.map()</code> from the JavaScript module? In React you use it to turn an array of <em>data</em> into an array of <em>elements</em>. This is the bridge between your data (which often comes from a server) and what the user sees on screen. Each item needs a unique <code>key</code> so React can track it across re-renders.</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">list.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">function TaskList() {
+  const tasks = [
+    { id: 1, title: "Learn JavaScript", done: true },
+    { id: 2, title: "Learn React", done: false },
+    { id: 3, title: "Build an app", done: false },
+  ];
+
+  return (
+    &lt;ul&gt;
+      {tasks.map((task) =&gt; (
+        &lt;li key={task.id}&gt;
+          {task.done ? "✅" : "⬜"} {task.title}
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}
+
+render(&lt;TaskList /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>The <code>key</code> prop (a stable, unique id) is how React keeps track of <em>which item is which</em> between renders. When the list changes, React compares keys to figure out what was added, removed, or reordered — so it can touch only the parts of the DOM that actually changed, instead of rebuilding the whole list.</p></div>
+        <h3>Why keys matter — and what breaks without them</h3>
+        <p>Imagine a numbered coat check. The <code>key</code> is the ticket number. If everyone has a stable ticket, the attendant instantly finds your coat no matter how the line shuffles. But if tickets are handed out by <em>position in line</em> (the array index), then when someone leaves the front, everyone's ticket number shifts — and the attendant hands you the wrong coat.</p>
+        <p>That's exactly the bug with <strong>index keys on a changing list</strong>. Because each item's key (its position) changes when items are inserted, removed, or reordered, React mismatches elements. The classic symptom: you delete one item from a list of inputs, and the <em>text you typed</em> jumps to the wrong row, or a checkbox stays checked on the wrong item. The data is correct, but the on-screen state is glued to the wrong element.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 760 230" role="img" aria-label="Stable id keys vs index keys when an item is removed">
+            <text x="20" y="28" fill="#9ee493" font-size="14" font-weight="700">✅ Stable id keys</text>
+            <rect x="20" y="40" width="150" height="34" rx="7" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="95" y="62" text-anchor="middle" fill="#fff" font-size="12">key=a · "Milk"</text>
+            <rect x="20" y="82" width="150" height="34" rx="7" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="95" y="104" text-anchor="middle" fill="#fff" font-size="12">key=b · "Eggs"</text>
+            <rect x="20" y="124" width="150" height="34" rx="7" fill="#2a1b22" stroke="#ff7eb6" stroke-width="2" stroke-dasharray="5 4"/>
+            <text x="95" y="146" text-anchor="middle" fill="#ff9dcb" font-size="12">key=c · (removed)</text>
+            <path d="M185,100 L255,100" stroke="#6c8cff" stroke-width="2.5" marker-end="url(#k1)"/>
+            <rect x="260" y="60" width="150" height="34" rx="7" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="335" y="82" text-anchor="middle" fill="#fff" font-size="12">key=a · "Milk" ✔</text>
+            <rect x="260" y="102" width="150" height="34" rx="7" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="335" y="124" text-anchor="middle" fill="#fff" font-size="12">key=b · "Eggs" ✔</text>
+            <text x="335" y="170" text-anchor="middle" fill="#9ee493" font-size="12">React removes only row c. Others stay put.</text>
+
+            <line x1="470" y1="20" x2="470" y2="210" stroke="#2c3447" stroke-width="1.5"/>
+            <text x="500" y="28" fill="#ff9dcb" font-size="14" font-weight="700">⚠️ Index keys (0,1,2)</text>
+            <rect x="500" y="60" width="160" height="34" rx="7" fill="#1b2030" stroke="#ffce5c" stroke-width="2"/>
+            <text x="580" y="82" text-anchor="middle" fill="#fff" font-size="12">key=0 · was "Milk"</text>
+            <rect x="500" y="102" width="160" height="34" rx="7" fill="#2a1b22" stroke="#ff7eb6" stroke-width="2"/>
+            <text x="580" y="124" text-anchor="middle" fill="#ff9dcb" font-size="12">key=1 · now "Eggs"?!</text>
+            <text x="580" y="170" text-anchor="middle" fill="#ff9dcb" font-size="12">Keys shifted → inputs/checkboxes</text>
+            <text x="580" y="188" text-anchor="middle" fill="#ff9dcb" font-size="12">attach to the wrong row.</text>
+            <defs>
+              <marker id="k1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6c8cff"/></marker>
+            </defs>
+          </svg>
+          <figcaption>Stable ids let React track items through changes; index keys silently glue UI state to the wrong row.</figcaption>
+        </figure>
+        <div class="callout tip"><span class="ci">⚡</span><p>Rule of thumb: use a real, stable <code>id</code> from your data as the key. Using the array index is only safe when the list never changes order and items are never inserted or removed (a static list). When in doubt, give your items real ids.</p></div>
+        <div class="quiz">
+          <div class="q">Why does React need a <code>key</code> on each list item?</div>
+          <div class="opt" data-correct="true">So it can match items across re-renders and update only what changed</div>
+          <div class="opt" data-correct="false">Because keys set the CSS order of the items</div>
+          <div class="opt" data-correct="false">Keys are optional decoration with no real effect</div>
+          <div class="explain">✅ Keys are React's identity tags for list items. With stable keys, React efficiently adds/removes/reorders the right elements instead of rebuilding the whole list.</div>
+        </div>
+      </section>
+
+      <!-- DERIVED VALUES -->
+      <section id="derived" class="section">
+        <h2>⑩ Derived values — don't store what you can compute <span class="chip inter">Intermediate</span></h2>
+        <p>A super common beginner habit is to create extra state for things that could simply be <em>calculated</em> from existing state. For example, storing both a <code>todos</code> array <em>and</em> a separate <code>completedCount</code> number. The problem: now you have two sources of truth that can drift out of sync — forget to update the count in one place, and your UI shows a wrong number.</p>
+        <p>The fix is the principle of <strong>derived (computed) values</strong>: keep the minimal state, and compute everything else during render. The count, the filtered list, whether a form is valid — these are all just expressions over your state. Because the component re-renders whenever state changes, your computed values are always fresh and correct, for free.</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">derived.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">function ShoppingList() {
+  // The ONLY state: the items themselves.
+  const [items, setItems] = useState([
+    { id: 1, name: "Milk", bought: true },
+    { id: 2, name: "Eggs", bought: false },
+    { id: 3, name: "Bread", bought: false },
+  ]);
+
+  // DERIVED — computed each render, never stored:
+  const boughtCount = items.filter((i) =&gt; i.bought).length;
+  const remaining = items.length - boughtCount;
+
+  function toggle(id) {
+    setItems(items.map((i) =&gt;
+      i.id === id ? { ...i, bought: !i.bought } : i
+    ));
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;&lt;strong&gt;{boughtCount}&lt;/strong&gt; bought · &lt;strong&gt;{remaining}&lt;/strong&gt; to go&lt;/p&gt;
+      &lt;ul&gt;
+        {items.map((i) =&gt; (
+          &lt;li key={i.id} onClick={() =&gt; toggle(i.id)}
+              style={{ cursor: "pointer",
+                       textDecoration: i.bought ? "line-through" : "none" }}&gt;
+            {i.bought ? "✅" : "⬜"} {i.name}
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  );
+}
+
+render(&lt;ShoppingList /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>Click an item — the counts update automatically because they're <em>derived</em> from <code>items</code>, not stored separately. Ask yourself before adding state: "Can I calculate this from data I already have?" If yes, compute it; don't store it.</p></div>
+      </section>
+
+      <!-- FORMS -->
+      <section id="forms" class="section">
+        <h2>⑪ Forms — capturing input <span class="chip inter">Intermediate</span></h2>
+        <p>Forms tie everything together: state holds the input value, <code>onChange</code> updates that state on every keystroke, and <code>onSubmit</code> handles the final result. An input wired this way — value from state, updates state on change — is called a <strong>controlled component</strong>, because React (not the browser) is the single source of truth for what's in the box. This is the heart of the capstone app. Type and add a few items:</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">todo.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">function MiniTodo() {
+  const [text, setText] = useState("");
+  const [items, setItems] = useState(["Buy milk"]);
+
+  function addItem(e) {
+    e.preventDefault();              // stop the page reloading
+    if (!text.trim()) return;        // ignore empty
+    setItems([...items, text]);      // spread + new item
+    setText("");                     // clear the box
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;form onSubmit={addItem}&gt;
+        &lt;input
+          value={text}
+          onChange={(e) =&gt; setText(e.target.value)}
+          placeholder="Add a task…"
+        /&gt;
+        &lt;button&gt;Add&lt;/button&gt;
+      &lt;/form&gt;
+      &lt;ul&gt;
+        {items.map((item, i) =&gt; &lt;li key={i}&gt;{item}&lt;/li&gt;)}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  );
+}
+
+render(&lt;MiniTodo /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout info"><span class="ci">💡</span><p>An input whose value comes from state and updates state on change is a <strong>controlled component</strong> — the React-recommended way to handle forms. The benefit: at any moment you can read, validate, transform, or reset the value just by looking at (or setting) state.</p></div>
+        <div class="challenge">
+          <h4>🧪 Try it yourself</h4>
+          <p>Add a "❌ Clear all" button next to the form that empties the list. (Hint: <code>onClick={() =&gt; setItems([])}</code>.)</p>
+        </div>
+
+        <h3>Many fields, one handler — a state object</h3>
+        <p>Most real forms have several fields (name, email, message…). You <em>could</em> create a separate <code>useState</code> for each, but that gets repetitive fast. A tidy pattern is to keep <strong>one state object</strong> and use a <strong>single change handler</strong> that updates the right field by its <code>name</code> attribute. The key technique is the spread operator from the JavaScript module: copy the old object, then overwrite one field — <code>{ ...form, [name]: value }</code> (a computed property name).</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">multi-field.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">function SignupForm() {
+  const [form, setForm] = useState({ name: "", email: "", city: "" });
+
+  // ONE handler for every field, keyed by the input's name
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });   // copy + overwrite one field
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;input name="name"  value={form.name}  onChange={handleChange} placeholder="Name" /&gt;{" "}
+      &lt;input name="email" value={form.email} onChange={handleChange} placeholder="Email" /&gt;{" "}
+      &lt;input name="city"  value={form.city}  onChange={handleChange} placeholder="City" /&gt;
+      &lt;pre style={{ background: "#f3f4f6", padding: 10, borderRadius: 8 }}&gt;
+        {JSON.stringify(form, null, 2)}
+      &lt;/pre&gt;
+    &lt;/div&gt;
+  );
+}
+
+render(&lt;SignupForm /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p>Notice we build a <em>new</em> object with <code>{ ...form, ... }</code> rather than mutating <code>form</code> directly (no <code>form.name = value</code>). React only re-renders when you hand the setter a brand-new value — mutating the old object in place would update the data but leave the screen stale. Immutability is a recurring theme; the pitfalls section drives it home.</p></div>
+      </section>
+
+      <!-- LIFTING STATE UP -->
+      <section id="lifting" class="section">
+        <h2>⑫ Lifting state up — sharing between siblings <span class="chip inter">Intermediate</span></h2>
+        <p>What happens when two components need to share the same data? Say a temperature slider and a "feels like" label both depend on one number. State is private to the component that owns it, so siblings can't reach into each other. The React answer: <strong>lift the state up</strong> to their nearest common parent, then pass it back down to each child as props.</p>
+        <p>The parent becomes the single source of truth. It holds the state and passes <em>two</em> things down: the current value (so children can display it) and a function to change it (so children can request updates). This "data down, events up" flow is the backbone of how React apps are wired together.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 700 240" role="img" aria-label="Lifting state up to a common parent">
+            <rect x="270" y="20" width="160" height="60" rx="10" fill="#1b2030" stroke="#61dafb" stroke-width="2"/>
+            <text x="350" y="44" text-anchor="middle" fill="#fff" font-size="14">Parent</text>
+            <text x="350" y="64" text-anchor="middle" fill="#61dafb" font-size="12">owns: temp = 22</text>
+            <rect x="60" y="160" width="200" height="56" rx="10" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="160" y="184" text-anchor="middle" fill="#fff" font-size="13">Slider child</text>
+            <text x="160" y="202" text-anchor="middle" fill="#9ee493" font-size="11">value + setter (props)</text>
+            <rect x="440" y="160" width="200" height="56" rx="10" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="540" y="184" text-anchor="middle" fill="#fff" font-size="13">Display child</text>
+            <text x="540" y="202" text-anchor="middle" fill="#9ee493" font-size="11">value (props)</text>
+            <path d="M300,80 C220,110 180,130 165,158" stroke="#6c8cff" stroke-width="2" fill="none" marker-end="url(#l1)"/>
+            <path d="M400,80 C480,110 520,130 535,158" stroke="#6c8cff" stroke-width="2" fill="none" marker-end="url(#l1)"/>
+            <path d="M160,158 C150,110 230,95 285,80" stroke="#ff7eb6" stroke-width="2" fill="none" marker-end="url(#l2)" stroke-dasharray="5 4"/>
+            <text x="120" y="120" fill="#9ee493" font-size="11">data down ↓</text>
+            <text x="120" y="100" fill="#ff9dcb" font-size="11">events up ↑</text>
+            <defs>
+              <marker id="l1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6c8cff"/></marker>
+              <marker id="l2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#ff7eb6"/></marker>
+            </defs>
+          </svg>
+          <figcaption>State lives in the common parent; children receive the value (down) and call a setter to request changes (up).</figcaption>
+        </figure>
+        <p>Here the parent owns <code>temp</code>. The slider changes it; the readout reflects it — instantly in sync, because they share <em>one</em> piece of state:</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">lifting.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">// Child 1: lets the user change the value
+function Slider({ temp, onChange }) {
+  return (
+    &lt;input type="range" min="0" max="40" value={temp}
+           onChange={(e) =&gt; onChange(Number(e.target.value))} /&gt;
+  );
+}
+
+// Child 2: only displays the value
+function Readout({ temp }) {
+  const mood = temp &gt; 28 ? "🥵 hot" : temp &lt; 10 ? "🥶 cold" : "🙂 comfy";
+  return &lt;h2&gt;{temp}°C — {mood}&lt;/h2&gt;;
+}
+
+// Parent: owns the shared state, passes it to both
+function Thermostat() {
+  const [temp, setTemp] = useState(22);
+  return (
+    &lt;div&gt;
+      &lt;Readout temp={temp} /&gt;
+      &lt;Slider temp={temp} onChange={setTemp} /&gt;
+    &lt;/div&gt;
+  );
+}
+
+render(&lt;Thermostat /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>The parent passed <code>setTemp</code> straight down as the <code>onChange</code> prop — so the child can update the parent's state without ever owning it. That's "events up": children don't change shared state themselves, they <em>call a function</em> the parent gave them.</p></div>
+        <div class="quiz">
+          <div class="q">Two sibling components need to share the same piece of data. Where should that state live?</div>
+          <div class="opt" data-correct="true">In their closest common parent, passed down as props</div>
+          <div class="opt" data-correct="false">Duplicated independently in each sibling</div>
+          <div class="opt" data-correct="false">In a global HTML attribute</div>
+          <div class="explain">✅ Lift the state to the nearest common parent and pass it down. Keeping one source of truth avoids the two copies drifting out of sync.</div>
+        </div>
+      </section>
+
+      <!-- USEEFFECT -->
+      <section id="effect" class="section">
+        <h2>⑬ useEffect — side effects &amp; cleanup <span class="chip adv">Advanced</span></h2>
+        <p>Rendering should be "pure" — given the same state, a component returns the same JSX and touches nothing outside itself. But real apps need to reach <em>outside</em> React sometimes: fetch data from a server, start a timer, subscribe to events, set the document title. These are called <strong>side effects</strong>, and the <code>useEffect</code> hook is where they belong. The function you give <code>useEffect</code> runs <em>after</em> React has painted the screen.</p>
+        <h3>The dependency array controls <em>when</em> it runs</h3>
+        <p>The second argument to <code>useEffect</code> — the array — is the most important and most misunderstood part. It tells React which values to "watch". After each render, React compares the array to last time; if anything changed, it runs your effect again. Three cases:</p>
+        <ul>
+          <li><code>useEffect(fn, [])</code> — <strong>empty array</strong>: run <em>once</em> after the first render (on "mount"). Perfect for fetching initial data.</li>
+          <li><code>useEffect(fn, [count])</code> — <strong>with dependencies</strong>: run on mount <em>and</em> every time <code>count</code> changes.</li>
+          <li><code>useEffect(fn)</code> — <strong>no array at all</strong>: run after <em>every</em> render. Rarely what you want, and a common cause of infinite loops.</li>
+        </ul>
+        <h3>Cleanup — the return function</h3>
+        <p>If your effect starts something that keeps running — a timer, a subscription, a WebSocket — you must <em>stop</em> it when the component goes away (or before the effect re-runs). Otherwise you get "zombie" timers stacking up, memory leaks, and updates fired at components that no longer exist. To clean up, <strong>return a function from your effect</strong>; React calls it on unmount and before each re-run. The interval below is created on mount and cleared on cleanup — toggle the clock off and the timer stops cleanly:</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">cleanup.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">function Clock() {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() =&gt; {
+    // start a timer when the component mounts
+    const id = setInterval(() =&gt; {
+      setSeconds((s) =&gt; s + 1);   // updater form = always fresh
+    }, 1000);
+
+    // CLEANUP: runs on unmount / before re-run
+    return () =&gt; clearInterval(id);
+  }, []);   // [] = set up the timer once
+
+  return &lt;h1&gt;⏱️ {seconds}s&lt;/h1&gt;;
+}
+
+function App() {
+  const [show, setShow] = useState(true);
+  return (
+    &lt;div&gt;
+      &lt;button onClick={() =&gt; setShow(!show)}&gt;
+        {show ? "Hide clock (cleanup runs)" : "Show clock"}
+      &lt;/button&gt;
+      {show &amp;&amp; &lt;Clock /&gt;}
+    &lt;/div&gt;
+  );
+}
+
+render(&lt;App /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout warn"><span class="ci">⚠️</span><p><strong>Without cleanup, that <code>setInterval</code> would keep ticking forever</strong>, even after the clock is hidden — and if you showed/hid it repeatedly you'd pile up multiple timers all fighting to update state. Returning <code>clearInterval(id)</code> tears it down. Same idea for <code>removeEventListener</code>, unsubscribing, and aborting fetches.</p></div>
+        <h3>Fetching data — the original use case</h3>
+        <p>The most common use of <code>useEffect</code> is loading data from a server after the component appears. The empty <code>[]</code> means "fetch once on load":</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">fetch-pattern.jsx</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import { useState, useEffect } from "react";
+
+function Users() {
+  const [users, setUsers] = useState([]);   // start empty
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // runs once, after first render
+    async function load() {
+      const res = await fetch("http://localhost:4000/api/users");
+      const data = await res.json();
+      setUsers(data);       // store it → triggers re-render
+      setLoading(false);
+    }
+    load();
+  }, []);                    // [] = run once
+
+  if (loading) return &lt;p&gt;Loading…&lt;/p&gt;;
+  return (
+    &lt;ul&gt;
+      {users.map((u) => &lt;li key={u.id}&gt;{u.name}&lt;/li&gt;)}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>This exact pattern — <code>useState</code> for the data + <code>useEffect</code> to fetch it on load — is how your React front-end will talk to the Node/Express REST API you build in Modules 3–5. You'll wire it up for real in the capstone. See the <a href="#fetching">data-fetching states</a> section below for the full loading/error/empty handling.</p></div>
+        <div class="quiz">
+          <div class="q">When does <code>useEffect(fn, [userId])</code> run its effect?</div>
+          <div class="opt" data-correct="true">After the first render, and again whenever <code>userId</code> changes</div>
+          <div class="opt" data-correct="false">Only once, ever — the dependency is ignored</div>
+          <div class="opt" data-correct="false">Before the component renders, blocking the paint</div>
+          <div class="explain">✅ React re-runs the effect whenever a value in the dependency array changes. So an effect that fetches a user should list <code>[userId]</code> to re-fetch when you switch users.</div>
+        </div>
+      </section>
+
+      <!-- USEREF -->
+      <section id="ref" class="section">
+        <h2>⑭ useRef — DOM access &amp; values that don't re-render <span class="chip adv">Advanced</span></h2>
+        <p>Sometimes you need to do something that state can't elegantly handle. The <code>useRef</code> hook gives you a small, persistent "box" — an object with a single <code>.current</code> property — that survives re-renders. It has two main jobs:</p>
+        <ul>
+          <li><strong>Grab a real DOM element</strong> — to focus an input, scroll to a spot, measure a size, or play a video. Attach a ref to a tag with <code>ref={myRef}</code>, then reach the element via <code>myRef.current</code>.</li>
+          <li><strong>Hold a mutable value that should NOT trigger a re-render</strong> — like a timer id or a "previous value". Changing <code>ref.current</code> never re-renders the component (unlike state).</li>
+        </ul>
+        <p>Below, a ref points at the input so the button can call <code>.focus()</code> on the actual DOM node:</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">useref.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">function FocusDemo() {
+  const inputRef = useRef(null);   // empty box
+
+  function focusIt() {
+    // inputRef.current is the real &lt;input&gt; DOM node
+    inputRef.current.focus();
+    inputRef.current.value = "👋 focused by useRef!";
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;input ref={inputRef} placeholder="Click the button →" /&gt;{" "}
+      &lt;button onClick={focusIt}&gt;Focus the input&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+render(&lt;FocusDemo /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout info"><span class="ci">💡</span><p><strong>State vs ref, in one line:</strong> use <em>state</em> for data that should appear on screen (changing it re-renders); use a <em>ref</em> for behind-the-scenes values or direct DOM access (changing it doesn't re-render). Reach for refs only when the declarative, state-driven approach genuinely can't do the job — they're the escape hatch, not the default.</p></div>
+      </section>
+
+      <!-- CUSTOM HOOKS -->
+      <section id="custom-hooks" class="section">
+        <h2>⑮ Custom hooks — reusing stateful logic <span class="chip adv">Advanced</span></h2>
+        <p>Once you've written a few components, you'll notice the same little bundles of state logic repeating — a toggle, a counter, a form field, a "fetch this URL" routine. You can't share that logic by copy-pasting JSX, but you <em>can</em> extract it into a <strong>custom hook</strong>: a plain function whose name starts with <code>use</code> and which calls other hooks inside it.</p>
+        <p>A custom hook isn't a new React feature — it's just a function that bundles up <code>useState</code>/<code>useEffect</code> calls so multiple components can share the behavior (not the data — each component that calls the hook gets its own independent state). Here's a tiny <code>useToggle</code> hook powering two independent switches:</p>
+        <div class="playground" data-playground>
+          <div class="pg-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span style="margin-left:6px;font-family:var(--mono);">use-toggle.jsx</span><span class="actions"><button class="reset">Reset</button><button class="run">▶ Run</button></span></div>
+          <textarea class="editor" spellcheck="false">// Custom hook: bundles the toggle logic.
+// Name MUST start with "use".
+function useToggle(initial = false) {
+  const [on, setOn] = useState(initial);
+  const toggle = () =&gt; setOn((v) =&gt; !v);
+  return [on, toggle];
+}
+
+function Panel({ label }) {
+  // Each call gets its OWN independent state:
+  const [open, toggle] = useToggle(false);
+  return (
+    &lt;div style={{ margin: "6px 0" }}&gt;
+      &lt;button onClick={toggle}&gt;
+        {open ? "▼" : "▶"} {label}
+      &lt;/button&gt;
+      {open &amp;&amp; &lt;p&gt;Hidden content for {label}!&lt;/p&gt;}
+    &lt;/div&gt;
+  );
+}
+
+function App() {
+  return (
+    &lt;div&gt;
+      &lt;Panel label="Section A" /&gt;
+      &lt;Panel label="Section B" /&gt;
+    &lt;/div&gt;
+  );
+}
+
+render(&lt;App /&gt;);</textarea>
+          <div class="pg-preview" data-preview></div>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>Both panels share the <em>logic</em> from <code>useToggle</code>, but each keeps its <em>own</em> open/closed state — they don't interfere. That's the whole point: write the behavior once, reuse it everywhere, keep components clean. In real projects you'll write hooks like <code>useFetch</code>, <code>useLocalStorage</code>, or <code>useForm</code>.</p></div>
+        <div class="challenge">
+          <h4>🧪 Try it yourself</h4>
+          <p>Write a <code>useCounter(start)</code> hook that returns <code>{ count, increment, reset }</code>, then use it in a component with two buttons. (Hint: return an object instead of an array, and read it with <code>const { count, increment, reset } = useCounter(0);</code>.)</p>
+        </div>
+      </section>
+
+      <!-- CONTEXT -->
+      <section id="context" class="section">
+        <h2>⑯ Context API — escaping prop-drilling <span class="chip adv">Advanced</span></h2>
+        <p>Passing props down one level is easy. But what if a deeply nested component needs data that lives way up at the top — the logged-in user, the color theme, the language? Threading that prop through every intermediate component that doesn't even use it is tedious and fragile. This pain has a name: <strong>prop-drilling</strong>.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 720 220" role="img" aria-label="Prop drilling versus Context">
+            <text x="20" y="24" fill="#ff9dcb" font-size="13" font-weight="700">😩 Prop-drilling</text>
+            <rect x="30" y="34" width="120" height="30" rx="6" fill="#1b2030" stroke="#2c3447"/><text x="90" y="54" text-anchor="middle" fill="#fff" font-size="11">App (theme)</text>
+            <rect x="30" y="84" width="120" height="30" rx="6" fill="#1b2030" stroke="#2c3447"/><text x="90" y="104" text-anchor="middle" fill="#aab2c5" font-size="11">Page →theme</text>
+            <rect x="30" y="134" width="120" height="30" rx="6" fill="#1b2030" stroke="#2c3447"/><text x="90" y="154" text-anchor="middle" fill="#aab2c5" font-size="11">Toolbar →theme</text>
+            <rect x="30" y="184" width="120" height="30" rx="6" fill="#1b2030" stroke="#38d39f"/><text x="90" y="204" text-anchor="middle" fill="#9ee493" font-size="11">Button uses it</text>
+            <path d="M90,64 L90,84 M90,114 L90,134 M90,164 L90,184" stroke="#ff7eb6" stroke-width="2" marker-end="url(#c1)"/>
+
+            <line x1="370" y1="20" x2="370" y2="210" stroke="#2c3447"/>
+            <text x="400" y="24" fill="#9ee493" font-size="13" font-weight="700">😊 Context</text>
+            <rect x="430" y="34" width="160" height="34" rx="6" fill="#1b2030" stroke="#61dafb" stroke-width="2"/><text x="510" y="56" text-anchor="middle" fill="#61dafb" font-size="11">Provider (theme)</text>
+            <rect x="470" y="184" width="160" height="34" rx="6" fill="#1b2030" stroke="#38d39f" stroke-width="2"/><text x="550" y="206" text-anchor="middle" fill="#9ee493" font-size="11">useContext() reads it</text>
+            <path d="M510,68 C520,120 540,150 550,182" stroke="#61dafb" stroke-width="2.5" fill="none" marker-end="url(#c2)"/>
+            <text x="560" y="130" fill="#61dafb" font-size="11">straight through,</text>
+            <text x="560" y="146" fill="#61dafb" font-size="11">no middle props</text>
+            <defs>
+              <marker id="c1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#ff7eb6"/></marker>
+              <marker id="c2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#61dafb"/></marker>
+            </defs>
+          </svg>
+          <figcaption>Context lets a Provider share a value with any descendant directly — skipping the intermediate components.</figcaption>
+        </figure>
+        <p>The <strong>Context API</strong> solves this. You <code>createContext</code> once, wrap part of your tree in a <code>&lt;Context.Provider value={...}&gt;</code>, and any component inside — no matter how deep — reads the value with <code>useContext</code>. No more passing props through the middle. (This needs real <code>import</code>s, so here's a static example rather than a playground.)</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">theme-context.jsx</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import { createContext, useContext, useState } from "react";
+
+// 1. Create the context (with a default)
+const ThemeContext = createContext("light");
+
+// 2. Provide a value high in the tree
+function App() {
+  const [theme, setTheme] = useState("dark");
+  return (
+    &lt;ThemeContext.Provider value={theme}&gt;
+      &lt;button onClick={() =&gt; setTheme(theme === "dark" ? "light" : "dark")}&gt;
+        Toggle theme
+      &lt;/button&gt;
+      &lt;Toolbar /&gt;          {/* doesn't need the theme prop */}
+    &lt;/ThemeContext.Provider&gt;
+  );
+}
+
+function Toolbar() {
+  return &lt;SaveButton /&gt;;   // also doesn't pass anything down
+}
+
+// 3. Consume it anywhere below, no prop-drilling
+function SaveButton() {
+  const theme = useContext(ThemeContext);   // reads "dark"
+  return &lt;button className={theme}&gt;Save ({theme})&lt;/button&gt;;
+}</code></pre>
+        </div>
+        <div class="callout tip"><span class="ci">⚡</span><p>Context is perfect for <em>global-ish</em> data that many components need: theme, current user, language, auth status. Don't overuse it for everything though — for most local data, plain props and lifting state up are simpler and clearer.</p></div>
+      </section>
+
+      <!-- DATA FETCHING STATES -->
+      <section id="fetching" class="section">
+        <h2>⑰ Data fetching: loading, error &amp; empty states <span class="chip adv">Advanced</span></h2>
+        <p>Fetching data isn't just "get the array and map it." Networks are slow and unreliable, so a polished component handles <strong>four</strong> distinct states: still loading, request failed, succeeded but empty, and succeeded with data. Skipping these is the difference between an amateur UI (blank screen, then a flash of content) and a professional one.</p>
+        <p>The recipe: keep three pieces of state — the <code>data</code>, a <code>loading</code> flag, and an <code>error</code> — then use early returns (from the conditional-rendering section) to render the right thing for each case. Because this needs a real server and <code>fetch</code>, it's a static block; you'll run it against the API from <a href="05-rest-apis.html">Module 5 (REST APIs)</a> in the <a href="07-capstone.html">capstone</a>.</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">UserList.jsx</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">import { useState, useEffect } from "react";
+
+function UserList() {
+  const [users, setUsers]     = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
+
+  useEffect(() =&gt; {
+    let active = true;                         // avoid setting state after unmount
+    async function load() {
+      try {
+        setLoading(true);
+        const res = await fetch("http://localhost:4000/api/users");
+        if (!res.ok) throw new Error("Server returned " + res.status);
+        const data = await res.json();
+        if (active) setUsers(data);
+      } catch (err) {
+        if (active) setError(err.message);     // network or server error
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+    load();
+    return () =&gt; { active = false; };           // cleanup guards against late updates
+  }, []);
+
+  // 1. LOADING state
+  if (loading) return &lt;p&gt;⏳ Loading users…&lt;/p&gt;;
+  // 2. ERROR state
+  if (error)   return &lt;p style={{ color: "crimson" }}&gt;⚠️ {error}&lt;/p&gt;;
+  // 3. EMPTY state
+  if (users.length === 0) return &lt;p&gt;No users yet — add one!&lt;/p&gt;;
+  // 4. SUCCESS state
+  return (
+    &lt;ul&gt;
+      {users.map((u) =&gt; &lt;li key={u.id}&gt;{u.name}&lt;/li&gt;)}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+        </div>
+        <div class="callout key"><span class="ci">🔑</span><p>Always handle all four states. The <code>try/catch/finally</code> guarantees <code>loading</code> turns off even if the request fails, and the <code>active</code> flag in the cleanup prevents the "can't update state on an unmounted component" warning when a user navigates away mid-request.</p></div>
+      </section>
+
+      <!-- THINKING IN REACT -->
+      <section id="thinking" class="section">
+        <h2>Thinking in React — breaking a UI into components <span class="chip inter">Intermediate</span></h2>
+        <p>Before you write a single line, it helps to <em>look</em> at a design and mentally chop it into a tree of components. The official React mindset is a few simple steps: draw boxes around every logical piece of the UI, nest them into a hierarchy, decide what's static (props) versus what changes (state), figure out the minimal state and where it should live, and wire the data flow.</p>
+        <p>Imagine a product page with a search box, a filter checkbox, and a list of products grouped by category. You might break it into: a <code>FilterableProductTable</code> wrapping a <code>SearchBar</code> and a <code>ProductTable</code>, where the table renders <code>ProductCategoryRow</code>s and <code>ProductRow</code>s. Each box is one component with one job.</p>
+        <figure class="diagram">
+          <svg viewBox="0 0 700 250" role="img" aria-label="Component tree for a product table UI">
+            <rect x="250" y="16" width="200" height="40" rx="8" fill="#1b2030" stroke="#61dafb" stroke-width="2"/>
+            <text x="350" y="40" text-anchor="middle" fill="#61dafb" font-size="12">FilterableProductTable</text>
+            <rect x="120" y="96" width="160" height="38" rx="8" fill="#1b2030" stroke="#6c8cff" stroke-width="2"/>
+            <text x="200" y="120" text-anchor="middle" fill="#fff" font-size="12">SearchBar</text>
+            <rect x="420" y="96" width="160" height="38" rx="8" fill="#1b2030" stroke="#6c8cff" stroke-width="2"/>
+            <text x="500" y="120" text-anchor="middle" fill="#fff" font-size="12">ProductTable</text>
+            <rect x="340" y="170" width="190" height="36" rx="8" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="435" y="193" text-anchor="middle" fill="#9ee493" font-size="11">ProductCategoryRow</text>
+            <rect x="430" y="216" width="160" height="30" rx="8" fill="#1b2030" stroke="#38d39f" stroke-width="2"/>
+            <text x="510" y="236" text-anchor="middle" fill="#9ee493" font-size="11">ProductRow ×N</text>
+            <path d="M320,56 L210,94 M380,56 L495,94" stroke="#6c8cff" stroke-width="2" fill="none" marker-end="url(#t1)"/>
+            <path d="M500,134 L440,168" stroke="#38d39f" stroke-width="2" fill="none" marker-end="url(#t2)"/>
+            <path d="M470,206 L505,214" stroke="#38d39f" stroke-width="2" fill="none" marker-end="url(#t2)"/>
+            <defs>
+              <marker id="t1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#6c8cff"/></marker>
+              <marker id="t2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#38d39f"/></marker>
+            </defs>
+          </svg>
+          <figcaption>One UI, broken into a tree of single-purpose components. State (search text, filter) lives in the top component and flows down.</figcaption>
+        </figure>
+        <div class="callout tip"><span class="ci">⚡</span><p>Two handy questions when sizing components: "Does this piece have one clear job?" (if it has several, split it) and "Is this exact markup repeated?" (if so, extract a reusable component with props). You'll do this for real when you build the capstone's task board.</p></div>
+      </section>
+
+      <!-- PITFALLS -->
+      <section id="pitfalls" class="section">
+        <h2>Common pitfalls &amp; the Rules of Hooks <span class="chip adv">Advanced</span></h2>
+        <p>Almost every React bug a beginner hits falls into a handful of categories. Learn to recognize these and you'll save hours:</p>
+        <div class="grid grid-2">
+          <div class="callout warn" style="margin:0;"><span class="ci">🚫</span><p><strong>Mutating state directly.</strong> <code>items.push(x)</code> or <code>form.name = "x"</code> changes the old object/array in place. React sees the same reference and skips re-rendering. Always make a <em>new</em> value: <code>setItems([...items, x])</code>, <code>setForm({ ...form, name: "x" })</code>.</p></div>
+          <div class="callout warn" style="margin:0;"><span class="ci">⏳</span><p><strong>Stale state.</strong> State variables hold the value from <em>this</em> render. <code>setCount(count + 1)</code> twice in a row only adds 1, because both read the same old <code>count</code>. Use the updater form: <code>setCount(c =&gt; c + 1)</code>.</p></div>
+          <div class="callout warn" style="margin:0;"><span class="ci">🔑</span><p><strong>Missing or index keys.</strong> No <code>key</code> triggers a warning and slow updates; index keys on a reorderable list cause UI state to stick to the wrong row. Use stable ids.</p></div>
+          <div class="callout warn" style="margin:0;"><span class="ci">🪝</span><p><strong>Breaking the Rules of Hooks.</strong> Call hooks only at the <em>top level</em> of a component — never inside <code>if</code>, loops, or nested functions — and only from React components or other hooks. The order of hook calls must be identical every render.</p></div>
+        </div>
+        <p>That last one trips people up, so here's the why: React tracks each hook by the <em>order</em> it's called. If a hook is hidden behind an <code>if</code>, the order changes between renders and React loses track of which state is which. The fix is always to put the condition <em>inside</em> the hook, not the hook inside the condition.</p>
+        <div class="grid grid-2">
+          <div class="code-wrap" style="margin:0;">
+            <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">❌ Wrong</span></div>
+<pre><code class="js">function Bad({ show }) {
+  if (show) {
+    // ❌ hook inside a condition
+    const [n, setN] = useState(0);
+  }
+  // ...
+}</code></pre>
+          </div>
+          <div class="code-wrap" style="margin:0;">
+            <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">✅ Right</span></div>
+<pre><code class="js">function Good({ show }) {
+  // ✅ hook always called, top level
+  const [n, setN] = useState(0);
+  if (!show) return null;   // condition AFTER hooks
+  // ...
+}</code></pre>
+          </div>
+        </div>
+        <div class="quiz">
+          <div class="q">Why must you never call a hook inside an <code>if</code> statement?</div>
+          <div class="opt" data-correct="true">React identifies hooks by call order, which must be the same every render</div>
+          <div class="opt" data-correct="false">Hooks are too slow to run conditionally</div>
+          <div class="opt" data-correct="false">It's only a style preference with no real consequence</div>
+          <div class="explain">✅ React relies on hooks being called in the same order each render to match up state. A conditional hook changes that order and corrupts the state mapping — hence the Rules of Hooks.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">Which line correctly adds an item to a state array <code>items</code> without mutating it?</div>
+          <div class="opt" data-correct="false"><code>items.push(newItem)</code></div>
+          <div class="opt" data-correct="true"><code>setItems([...items, newItem])</code></div>
+          <div class="opt" data-correct="false"><code>items = [...items, newItem]</code></div>
+          <div class="explain">✅ Spread the old array into a brand-new one and pass it to the setter. <code>push</code> mutates in place (no re-render); reassigning the variable does nothing useful in React.</div>
+        </div>
+      </section>
+
+      <!-- SETUP -->
+      <section id="setup" class="section">
+        <h2>Setting up a real React project</h2>
+        <p>The playgrounds above are great for learning, but real projects use a build tool. The modern, fast choice is <strong>Vite</strong>. Three commands and you're running:</p>
+        <div class="code-wrap">
+          <div class="code-head"><span class="dot" style="background:#ff5f56;"></span><span class="dot" style="background:#ffbd2e;"></span><span class="dot" style="background:#27c93f;"></span><span class="label">terminal</span><span class="actions"><button class="copy">Copy</button></span></div>
+<pre><code class="js">npm create vite@latest my-app -- --template react
+cd my-app
+npm install
+npm run dev      // → open the http://localhost:5173 link it prints</code></pre>
+        </div>
+        <p>Inside, the key files you'll touch:</p>
+        <table>
+          <thead><tr><th>File</th><th>What it's for</th></tr></thead>
+          <tbody>
+            <tr><td><code>src/App.jsx</code></td><td>Your main component — start editing here</td></tr>
+            <tr><td><code>src/main.jsx</code></td><td>Mounts <code>&lt;App /&gt;</code> into the page (you rarely touch it)</td></tr>
+            <tr><td><code>src/*.css</code></td><td>Your styles</td></tr>
+            <tr><td><code>package.json</code></td><td>Lists your dependencies &amp; scripts</td></tr>
+          </tbody>
+        </table>
+        <div class="callout tip"><span class="ci">⚡</span><p>Vite has <strong>hot reload</strong>: save a file and the browser updates instantly, keeping your app's state. It makes building feel magical.</p></div>
+      </section>
+
+      <!-- QUIZ -->
+      <section id="quiz" class="section">
+        <h2>Quiz</h2>
+        <div class="quiz">
+          <div class="q">1. What does <code>useState(0)</code> return?</div>
+          <div class="opt" data-correct="true">An array: the current value and a function to update it</div>
+          <div class="opt" data-correct="false">Just the number 0</div>
+          <div class="opt" data-correct="false">An HTML element</div>
+          <div class="explain">✅ <code>const [value, setValue] = useState(0)</code> — the current state and its setter. Calling the setter re-renders the component.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">2. How does a parent component pass data to a child?</div>
+          <div class="opt" data-correct="false">Through state</div>
+          <div class="opt" data-correct="true">Through props</div>
+          <div class="opt" data-correct="false">Through CSS</div>
+          <div class="explain">✅ Props flow down from parent to child, like <code>&lt;Greeting name="Ravi" /&gt;</code>. They're read-only inside the child.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">3. Which array method turns a list of data into a list of elements?</div>
+          <div class="opt" data-correct="false">.filter()</div>
+          <div class="opt" data-correct="true">.map()</div>
+          <div class="opt" data-correct="false">.push()</div>
+          <div class="explain">✅ <code>items.map(item =&gt; &lt;li key={item.id}&gt;{item.title}&lt;/li&gt;)</code> — and don't forget the unique <code>key</code>.</div>
+        </div>
+        <div class="quiz">
+          <div class="q">4. When does <code>useEffect(fn, [])</code> run?</div>
+          <div class="opt" data-correct="true">Once, after the component first renders</div>
+          <div class="opt" data-correct="false">On every single render</div>
+          <div class="opt" data-correct="false">Never</div>
+          <div class="explain">✅ An empty dependency array <code>[]</code> means "run once on mount" — perfect for fetching initial data.</div>
+        </div>
+      </section>
+
+      <section id="takeaways" class="section">
+        <h2>Key takeaways</h2>
+        <div class="card">
+          <ul>
+            <li><strong>Components</strong> are functions that return JSX — your reusable UI blocks. <strong>Fragments</strong> (<code>&lt;&gt;…&lt;/&gt;</code>) group siblings without an extra div.</li>
+            <li><strong>JSX</strong> is HTML inside JavaScript; embed values with <code>{ }</code>, use <code>className</code>. <code>null</code>/<code>false</code> render nothing — the basis of conditional UI.</li>
+            <li><strong>Props</strong> pass data down (read-only); the <code>children</code> prop enables <strong>composition</strong>. <strong>State</strong> (<code>useState</code>) is changeable memory that re-renders on change.</li>
+            <li><strong>Conditional rendering</strong> uses <code>&amp;&amp;</code>, ternaries, and early returns. Render lists with <strong>.map()</strong> + a stable <code>key</code> (not the index).</li>
+            <li>Prefer <strong>derived values</strong> over extra state. For shared data, <strong>lift state up</strong> to a common parent ("data down, events up").</li>
+            <li>Handle <strong>events</strong> by passing functions (not calling them). Build forms as <strong>controlled inputs</strong>, often with one state object + one handler.</li>
+            <li><strong>useEffect</strong> runs side effects; the <strong>dependency array</strong> controls when, and the returned <strong>cleanup</strong> function stops timers/subscriptions.</li>
+            <li><strong>useRef</strong> grabs DOM nodes / holds non-rendering values. <strong>Custom hooks</strong> (<code>useX</code>) reuse stateful logic; <strong>Context</strong> avoids prop-drilling.</li>
+            <li>Fetching needs <strong>loading / error / empty / success</strong> states. Avoid pitfalls: don't mutate state, beware stale state, and obey the <strong>Rules of Hooks</strong>.</li>
+            <li>Start real projects with <strong>Vite</strong> (<code>npm create vite@latest</code>).</li>
+          </ul>
+          <label class="complete-toggle"><input type="checkbox" data-module="react" /> Mark this module complete</label>
+        </div>
+      </section>
+
+      <div class="pager">
+        <a href="02-javascript.html" class="prev"><div class="dir">← Previous</div><div class="ttl">1 · JavaScript</div></a>
+        <a href="04-node.html" class="next"><div class="dir">Next →</div><div class="ttl">3 · Node.js</div></a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>DevLaunch Academy · Module 2 of 6</p>
+  <div class="signature" aria-label="Author signature">
+    <span class="sig-br">/**</span>
+    <span class="sig-line"><span class="sig-tag">* @author</span>&nbsp; Sumanth Reddy Pathi</span>
+    <span class="sig-line"><span class="sig-tag">* @role</span>&nbsp;&nbsp;&nbsp; Software Engineer · 7+ yrs — Web · AI &amp; MedTech</span>
+    <span class="sig-line"><span class="sig-tag">* @company</span> Compliance Group</span>
+    <span class="sig-br">*/<span class="sig-caret">&nbsp;▌</span></span>
+  </div>
+</footer>
+
+<!-- React + Babel for the live playgrounds -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  // Live React playground engine
+  (function () {
+    if (!window.React || !window.Babel) return;
+    const { useState, useEffect, useRef, useReducer } = React;
+
+    document.querySelectorAll("[data-playground]").forEach((pg) => {
+      const editor = pg.querySelector(".editor");
+      const preview = pg.querySelector("[data-preview]");
+      const runBtn = pg.querySelector("button.run");
+      const resetBtn = pg.querySelector("button.reset");
+      const original = editor.value;
+      let root = null;
+
+      function autosize() { editor.style.height = "auto"; editor.style.height = Math.max(240, editor.scrollHeight) + "px"; }
+      autosize();
+      editor.addEventListener("input", autosize);
+      editor.addEventListener("keydown", (e) => {
+        if (e.key === "Tab") { e.preventDefault(); const s = editor.selectionStart; editor.value = editor.value.slice(0, s) + "  " + editor.value.slice(editor.selectionEnd); editor.selectionStart = editor.selectionEnd = s + 2; }
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") run();
+      });
+
+      function run() {
+        // decode the HTML entities the textarea holds back into JSX source
+        const src = editor.value;
+        preview.innerHTML = "";
+        try {
+          const compiled = Babel.transform(src, { presets: ["react"] }).code;
+          if (!root) root = ReactDOM.createRoot(preview);
+          const render = (el) => root.render(el);
+          // eslint-disable-next-line no-new-func
+          const fn = new Function("React", "useState", "useEffect", "useRef", "useReducer", "render", compiled);
+          fn(React, useState, useEffect, useRef, useReducer, render);
+        } catch (err) {
+          preview.innerHTML = '<div class="pg-err">⚠️ ' + (err && err.message ? err.message : err) + "</div>";
+        }
+      }
+      runBtn.addEventListener("click", run);
+      resetBtn.addEventListener("click", () => { editor.value = original; autosize(); run(); });
+      run(); // render once on load
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 14: Multimodal AI — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="4">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch14-multimodal.html" class="current">Part 4: Generative AI</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Generative AI</a> / <span class="current">Multimodal AI</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 14 · Part 4 of 7 · Generative AI —</div>
+
+  <h1 class="page-title">Multimodal <em>AI</em></h1>
+  <p class="page-subtitle">Models that see, hear, and read all at once. Why one model handling everything is dramatically more powerful — and harder to build — than a stack of specialized ones.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#kid">Kid Translation: One Brain, Many Senses</a></li>
+      <li><a href="#why-multimodal">Why Multimodal Matters</a></li>
+      <li><a href="#how-it-works">How One Model Sees, Hears, and Reads</a></li>
+      <li><a href="#vision-models">Vision-Language Models</a></li>
+      <li><a href="#native-multimodal">Native Multimodal Models</a></li>
+      <li><a href="#what-it-unlocks">What Multimodal Unlocks</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="kid">Kid Translation: One Brain, Many Senses</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Until 2023, AI was like a person with only one sense at a time. You had a "reading AI" that knew text. A "seeing AI" that knew pictures. A "listening AI" that knew sound. None of them talked to each other.</p>
+    <p>Then someone went: what if we built a single AI that could do all three at once? Show it a picture and it can describe it. Read it a question and it can answer in writing. Play it music and it can transcribe the lyrics. <strong>One brain, many senses</strong> — same as us.</p>
+    <p>That's multimodal AI. The wild part: when one model learns multiple senses at once, it gets <em>better at each one</em>. Knowing what an apple looks like helps you understand the word "apple" more deeply. The senses reinforce each other.</p>
+  </div>
+
+  <h2 id="why-multimodal">Why Multimodal Matters</h2>
+
+  <p>Most real-world tasks aren't single-mode. A doctor reads charts (numbers), looks at scans (images), listens to symptoms (audio), and synthesizes everything together. Same for a teacher, a designer, a developer, a customer-service rep. Real intelligence is multimodal.</p>
+
+  <p>Beyond just "doing more tasks," multimodal models exhibit <strong>cross-modal grounding</strong>: they can connect concepts across senses. Show one a photo and ask "what would the people in this picture say next?" — it has to combine vision and language reasoning. Tell it "draw the second equation we discussed" — it has to recall conversation, formulate a visual, and generate.</p>
+
+  <h2 id="how-it-works">How One Model Sees, Hears, and Reads</h2>
+
+  <p>The trick is to convert <em>everything</em> into the same representation: a sequence of tokens (or something like tokens) that a transformer can process. Once images, audio, and text are all "tokens," one transformer can attend across them all.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr14a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+        </marker>
+      </defs>
+
+      <!-- Inputs row -->
+      <text x="80" y="30" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#6b6b6b" letter-spacing="1">TEXT</text>
+      <rect x="30" y="40" width="100" height="60" rx="4" fill="#fff8e1" stroke="#d4a017" stroke-width="1.5"/>
+      <text x="80" y="65" text-anchor="middle" font-family="Newsreader, serif" font-size="12">"What's in</text>
+      <text x="80" y="82" text-anchor="middle" font-family="Newsreader, serif" font-size="12">this image?"</text>
+
+      <text x="240" y="30" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#6b6b6b" letter-spacing="1">IMAGE</text>
+      <rect x="190" y="40" width="100" height="60" rx="4" fill="#fdf0e3" stroke="#b54a3b" stroke-width="1.5"/>
+      <circle cx="220" cy="65" r="11" fill="#dfc59a"/>
+      <rect x="240" y="55" width="40" height="35" fill="#7d9bbd"/>
+
+      <text x="400" y="30" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#6b6b6b" letter-spacing="1">AUDIO</text>
+      <rect x="350" y="40" width="100" height="60" rx="4" fill="#f0e8f7" stroke="#6b4a8b" stroke-width="1.5"/>
+      <g stroke="#5b3a8b" stroke-width="1.5" fill="none">
+        <path d="M 360 70 L 365 60 L 370 78 L 375 50 L 380 82 L 385 65 L 390 78 L 395 55 L 400 75 L 405 60 L 410 80 L 415 55 L 420 75 L 425 60 L 430 78 L 435 65 L 440 70"/>
+      </g>
+
+      <text x="560" y="30" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#6b6b6b" letter-spacing="1">VIDEO</text>
+      <rect x="510" y="40" width="100" height="60" rx="4" fill="#e0eff5" stroke="#1f6f8b" stroke-width="1.5"/>
+      <rect x="520" y="55" width="22" height="32" fill="#a4b3c4"/>
+      <rect x="548" y="55" width="22" height="32" fill="#7d9bbd"/>
+      <rect x="576" y="55" width="22" height="32" fill="#5a7a9b"/>
+
+      <!-- Down arrows -->
+      <line x1="80" y1="105" x2="80" y2="135" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr14a)"/>
+      <line x1="240" y1="105" x2="240" y2="135" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr14a)"/>
+      <line x1="400" y1="105" x2="400" y2="135" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr14a)"/>
+      <line x1="560" y1="105" x2="560" y2="135" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr14a)"/>
+
+      <!-- Encoder boxes -->
+      <rect x="30" y="138" width="100" height="34" rx="4" fill="#f5f3ed" stroke="#888"/>
+      <text x="80" y="159" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11">tokenizer</text>
+      <rect x="190" y="138" width="100" height="34" rx="4" fill="#f5f3ed" stroke="#888"/>
+      <text x="240" y="159" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11">vision enc.</text>
+      <rect x="350" y="138" width="100" height="34" rx="4" fill="#f5f3ed" stroke="#888"/>
+      <text x="400" y="159" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11">audio enc.</text>
+      <rect x="510" y="138" width="100" height="34" rx="4" fill="#f5f3ed" stroke="#888"/>
+      <text x="560" y="159" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11">video enc.</text>
+
+      <!-- Down arrows -->
+      <line x1="80" y1="172" x2="170" y2="195" stroke="#1a1a1a" stroke-width="1.5"/>
+      <line x1="240" y1="172" x2="260" y2="195" stroke="#1a1a1a" stroke-width="1.5"/>
+      <line x1="400" y1="172" x2="370" y2="195" stroke="#1a1a1a" stroke-width="1.5"/>
+      <line x1="560" y1="172" x2="470" y2="195" stroke="#1a1a1a" stroke-width="1.5"/>
+
+      <!-- Unified token sequence -->
+      <rect x="100" y="195" width="450" height="40" rx="6" fill="#1a1a1a" stroke="#000" stroke-width="2"/>
+      <text x="325" y="215" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#f3d77a">UNIFIED TOKEN SEQUENCE</text>
+      <text x="325" y="230" text-anchor="middle" font-family="Newsreader, serif" font-size="11" fill="#fff" font-style="italic">[text tokens] [image tokens] [audio tokens] [video tokens]</text>
+
+      <!-- Arrow to transformer -->
+      <line x1="325" y1="237" x2="325" y2="252" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#arr14a)"/>
+
+      <text x="325" y="270" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-weight="700" fill="#1f6f8b">→ Single transformer (attention across all modalities) →</text>
+    </svg>
+    <p class="diagram-caption">Multimodal architecture: each modality has its own encoder that converts to tokens. After that, one transformer handles everything together.</p>
+  </figure>
+
+  <p>Two main approaches to building these:</p>
+
+  <table class="compare-table">
+    <thead><tr><th>Approach</th><th>How it's built</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Bolted-on vision</strong></td><td>Take a pretrained LLM. Add a vision encoder (often CLIP). Train a small "adapter" to bridge them.</td><td>LLaVA, MiniGPT-4, early Claude/GPT-4 vision.</td></tr>
+      <tr><td><strong>Native multimodal</strong></td><td>Train one model from scratch with mixed-modality data, using shared tokenization.</td><td>GPT-4o, Gemini 1.5/2.0, Llama 4 multimodal.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Native multimodal models are the trajectory. Bolting modalities on works, but a model that learned all modalities together has richer cross-modal understanding — and lower latency in chains like "see → think → speak."</p>
+
+  <h2 id="vision-models">Vision-Language Models</h2>
+
+  <p>Vision-language models (VLMs) are the most common multimodal type. They take in text + images and output text. Modern frontier LLMs (Claude, GPT, Gemini) are essentially all VLMs by default.</p>
+
+  <p>Things they're good at:</p>
+
+  <ul>
+    <li>Describing photos in detail.</li>
+    <li>Reading charts, screenshots, diagrams, scientific figures.</li>
+    <li>OCR — reading text inside images, including handwriting.</li>
+    <li>Visual reasoning — counting, comparing, locating, identifying spatial relationships.</li>
+    <li>Document understanding — PDFs, receipts, forms, screenshots.</li>
+  </ul>
+
+  <p>Where they struggle:</p>
+
+  <ul>
+    <li>Fine-grained spatial reasoning (exactly which pixel is what).</li>
+    <li>Perceptual nuance (subtle visual differences, lighting, gloss).</li>
+    <li>Counting many objects.</li>
+    <li>Reading very small text or noisy images.</li>
+  </ul>
+
+  <h2 id="native-multimodal">Native Multimodal Models</h2>
+
+  <p>The biggest leap in 2024–2025 was native speech-and-vision integration. <strong>GPT-4o</strong> introduced low-latency voice conversations where the model directly processed audio in and produced audio out — no separate STT or TTS step. <strong>Gemini 2.0 / 2.5</strong> launched with deeply integrated vision, audio, and screen understanding (it can watch you use a computer and help in real time).</p>
+
+  <p>By 2026, native multimodal frontier models can:</p>
+
+  <ul>
+    <li>Have natural voice conversations with sub-second latency.</li>
+    <li>See your screen, click and type for you, fill out forms.</li>
+    <li>Watch a video and answer questions about specific moments.</li>
+    <li>Generate not just text but images, audio, and short videos as part of a response.</li>
+  </ul>
+
+  <h2 id="what-it-unlocks">What Multimodal Unlocks</h2>
+
+  <p>Some of the most useful AI applications only became possible with multimodal:</p>
+
+  <ul>
+    <li><strong>Visual coding assistants</strong> that look at design mockups and write the code (Cursor, Vercel v0).</li>
+    <li><strong>Document AI</strong> that understands invoices, contracts, and forms — including layout and tables, not just text.</li>
+    <li><strong>Accessibility</strong> — Be My Eyes uses GPT-4 vision to describe the world to blind users in real time.</li>
+    <li><strong>Real-time tutors</strong> that watch you work and help (Khan Academy's Khanmigo + Google's Astra-style assistants).</li>
+    <li><strong>Computer-use agents</strong> (Claude Computer Use, OpenAI Operator) that see your screen and operate apps for you.</li>
+    <li><strong>Customer service voice agents</strong> that can speak natively with users instead of routing through STT/TTS pipelines.</li>
+  </ul>
+
+  <div class="key-point">
+    Multimodal isn't a feature — it's the new default. By 2026 nearly every frontier model handles vision and audio natively, and the lines between "image AI," "speech AI," and "language AI" are mostly gone. There's just AI that handles whatever you throw at it.
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · How to sound fluent</div>
+    <p>"<strong>VLM</strong>" — vision-language model. "<strong>MLLM</strong>" — multimodal large language model.</p>
+    <p>"<strong>Cross-attention</strong>" — the mechanism that lets one modality attend to another. Text tokens attending to image patches, for instance.</p>
+    <p>"<strong>CLIP-style contrastive training</strong>" — train image and text encoders so that matched pairs end up close in embedding space, mismatched pairs far apart. The foundation under most VLMs.</p>
+    <p>"<strong>Image patches</strong>" — how vision transformers tokenize images. Split image into 14×14 or 16×16 patches, treat each as a token.</p>
+    <p>"<strong>Native multimodal</strong>" — built multimodal from scratch, vs. "<strong>adapter</strong>" or "<strong>bolted-on</strong>" approaches that wire vision onto an existing LLM.</p>
+    <p>"<strong>Streaming multimodal</strong>" — the model takes continuous input (live audio, video) and reacts in real time, rather than processing fixed clips.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself · Answer out loud</div>
+    <ol>
+      <li>What does "multimodal" mean for an AI model?
+        <details><summary>Answer</summary><p>The model can take in and/or produce more than one type of data — combinations of text, images, audio, video, sensor data. One model handling several modalities natively.</p></details>
+      </li>
+      <li>How does a multimodal transformer process images and text together?
+        <details><summary>Answer</summary><p>Each modality is converted to a sequence of tokens (text tokens, image patch tokens, audio tokens). The combined sequence is fed into a single transformer that uses attention to relate them all to each other.</p></details>
+      </li>
+      <li>What's the difference between bolted-on multimodal and native multimodal?
+        <details><summary>Answer</summary><p>Bolted-on: take a pretrained LLM and add modality encoders + adapters. Native: train one model with mixed-modality data from the start. Native models tend to have richer cross-modal understanding.</p></details>
+      </li>
+      <li>Why was GPT-4o's voice mode a bigger leap than just adding TTS to GPT-4?
+        <details><summary>Answer</summary><p>It processes audio directly — the model "hears" tone, emotion, prosody, and responds in audio without going through text intermediates. Lower latency, more natural delivery, can sing, can interrupt and be interrupted naturally.</p></details>
+      </li>
+      <li>Name three concrete applications that only became possible with multimodal AI.
+        <details><summary>Answer</summary><p>Many valid answers. Examples: visual coding from design mockups; computer-use agents that see and operate apps; real-time tutors watching your work; accessibility apps describing the world; document AI that handles layout-heavy formats like invoices and tables.</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <h3>Recommended next reading</h3>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"Learning Transferable Visual Models from Natural Language Supervision"</strong> by Radford et al. (2021) — the CLIP paper. Foundational for vision-language.</span>
+      </li>
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"Flamingo: A Visual Language Model for Few-Shot Learning"</strong> by Alayrac et al. (DeepMind, 2022) — major early VLM paper.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>OpenAI: "GPT-4o System Card"</strong> · openai.com · Free · Detailed write-up of the first major native multimodal frontier model.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Lilian Weng: "Vision-Language Models"</strong> · lilianweng.github.io · Free · Comprehensive technical reference on VLM architectures.</span>
+      </li>
+      <li>
+        <span class="ref-type tool">Tool</span>
+        <span class="ref-detail"><strong>Try Claude Computer Use, ChatGPT Vision, or Gemini Live</strong> · Web · Hands-on is the best way to feel the multimodal frontier.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch13-video-audio.html">← Previous: Video &amp; Audio</a>
+    <div class="nav-spacer"></div>
+    <a href="ch15-prompting.html">Next: Prompt Engineering →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 14 · Part 4 · Generative AI · Chapter 14 of 24</div>
+</footer>
+
+</body>
+</html>

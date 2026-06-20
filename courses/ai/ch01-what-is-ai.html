@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 1: What Is AI, Really? — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="1">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch01-what-is-ai.html" class="current">Part 1: Foundations</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">Foundations</a> / <span class="current">What Is AI?</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 01 · Part 1 of 7 · Foundations —</div>
+
+  <h1 class="page-title">What Is AI, <em>Really</em>?</h1>
+  <p class="page-subtitle">Stripping away the magic, the marketing, and the movies. Three honest definitions that fit together.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#story">A Story: Mira's Vending Machine</a></li>
+      <li><a href="#three-definitions">Three Honest Definitions of AI</a></li>
+      <li><a href="#rules-vs-learning">Rules vs Learning vs Intelligence</a></li>
+      <li><a href="#narrow-vs-general">Narrow AI vs General AI</a></li>
+      <li><a href="#what-ai-isnt">What AI Isn't (and Common Myths)</a></li>
+      <li><a href="#the-stack">The AI Stack You'll Meet in This Book</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="story">A Story: Mira's Vending Machine</h2>
+
+  <div class="story">
+    <div class="story-label">Story</div>
+    <p>Mira is 10. Her school just installed a snack vending machine. On day one, she puts in a coin, presses B4, and a chocolate bar drops. "Cool," she thinks. "It knew what I wanted."</p>
+    <p>But did it? Mira's older brother explains: "It didn't <em>know</em> anything. There's a list. B4 means chocolate bar. It's like a giant if-then sheet. If button = B4, then drop chocolate."</p>
+    <p>The next week, the school upgrades the machine. Now there's a camera. The machine looks at her face and says, "Hi Mira! Last time you got chocolate. Want the same?" That feels different. The machine seems to <em>recognize</em> her.</p>
+    <p>Then a year later, an even newer machine arrives. This one talks. Mira asks, "I'm feeling sad today, what should I get?" The machine pauses, then says, "Sometimes when I'm sad I want something warm. They have hot cocoa here. Want me to suggest that?"</p>
+    <p>Three machines. Three very different things happened. <em>All three</em> are sometimes called "AI."</p>
+  </div>
+
+  <p>This chapter is about untangling what people actually mean when they say "AI" — because it's at least three different things, and the confusion costs people a lot of headaches.</p>
+
+  <h2 id="three-definitions">Three Honest Definitions of AI</h2>
+
+  <p>When you hear someone say "AI," they're usually meaning one of these three things. They're related, but very different in what they can actually do.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+        </marker>
+      </defs>
+
+      <!-- Outer circle: Artificial Intelligence -->
+      <circle cx="350" cy="180" r="170" fill="#e8f0f7" stroke="#2d6a8e" stroke-width="2"/>
+      <text x="350" y="40" text-anchor="middle" font-family="Newsreader, serif" font-size="18" font-weight="700" fill="#2d6a8e">Artificial Intelligence (AI)</text>
+      <text x="350" y="58" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-style="italic" fill="#3a3a3a">The broad field: making machines act smart</text>
+
+      <!-- Middle circle: Machine Learning -->
+      <circle cx="350" cy="200" r="125" fill="#d4e3f0" stroke="#2d6a8e" stroke-width="2"/>
+      <text x="350" y="105" text-anchor="middle" font-family="Newsreader, serif" font-size="16" font-weight="700" fill="#1a4a68">Machine Learning (ML)</text>
+      <text x="350" y="122" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#3a3a3a">Machines that learn from data</text>
+
+      <!-- Inner circle: Deep Learning -->
+      <circle cx="350" cy="220" r="78" fill="#a8c4dc" stroke="#1a4a68" stroke-width="2"/>
+      <text x="350" y="200" text-anchor="middle" font-family="Newsreader, serif" font-size="15" font-weight="700" fill="#0d2a3d">Deep Learning</text>
+      <text x="350" y="218" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#0d2a3d">Multi-layer neural networks</text>
+
+      <!-- Innermost: GenAI -->
+      <ellipse cx="350" cy="245" rx="50" ry="22" fill="#5b3a8b" stroke="#3d2860" stroke-width="2"/>
+      <text x="350" y="250" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="white">GENERATIVE AI</text>
+
+      <!-- Labels with examples -->
+      <text x="20" y="180" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#2d6a8e">EXAMPLES</text>
+      <text x="20" y="200" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">AI: chess engines,</text>
+      <text x="20" y="215" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">spam filters, recommendation</text>
+      <text x="20" y="230" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">systems, autopilots</text>
+
+      <text x="540" y="180" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#5b3a8b">EXAMPLES</text>
+      <text x="540" y="200" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">GenAI: ChatGPT,</text>
+      <text x="540" y="215" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">Claude, Midjourney,</text>
+      <text x="540" y="230" font-family="Newsreader, serif" font-size="11" fill="#3a3a3a">Sora, ElevenLabs</text>
+    </svg>
+    <div class="diagram-caption">AI is the broad field. ML is a subset of AI. Deep Learning is a subset of ML. Generative AI is a recent sliver of Deep Learning. They're nested like Russian dolls.</div>
+  </div>
+
+  <h3>Definition 1: AI = "Machines doing tasks that seem to need intelligence"</h3>
+
+  <p>This is the original definition, from the 1950s. By this definition, your <strong>spam filter is AI</strong>. So is the GPS that finds the fastest route. So is the auto-focus on your phone camera. They're all "doing something that used to need a human brain."</p>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>If a machine does something that would impress your grandma — that's "AI." Your grandma would be impressed by GPS finding the fastest route. So GPS is AI. Even though it's just math under the hood.</p>
+  </div>
+
+  <h3>Definition 2: AI = "Machine Learning — systems that learn from examples"</h3>
+
+  <p>This is the more useful, modern definition. Instead of <em>writing rules</em> for a machine ("if email contains 'click here', mark as spam"), we <em>show it examples</em> ("here are 10,000 emails labeled spam or not — figure out the pattern yourself"). The machine builds its own rules from data.</p>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Imagine teaching a kid what a cat is. You don't say "a cat has 4 legs, fur, pointy ears, two eyes…" You show them 50 pictures of cats and 50 pictures of dogs and say "these are cats, these aren't." After a while, they can spot a cat they've never seen before. Machine learning is the same — but instead of a kid, it's a math equation.</p>
+  </div>
+
+  <h3>Definition 3: AI = "Generative AI — machines that create things"</h3>
+
+  <p>This is what most people mean in 2024–2025 when they casually say "AI." ChatGPT writes essays. Midjourney paints pictures. Sora makes videos. Claude debates philosophy. These systems don't just <em>classify</em> ("is this spam?") — they <em>create</em> ("write me a poem"). That's a fundamental shift.</p>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Old AI was like a really good <em>sorter</em>. New AI is like a really good <em>storyteller</em>. The sorter looks at things you give it and puts them in boxes. The storyteller makes <em>new things</em> that weren't there before — a poem, a picture, a video. Both are useful. Storytelling is newer and weirder.</p>
+  </div>
+
+  <div class="key-point">
+    When someone says "AI" today, ask yourself: do they mean the field, the technique (machine learning), or the thing that just generated their email? Almost always, they mean Generative AI without realizing it.
+  </div>
+
+  <h2 id="rules-vs-learning">Rules vs Learning vs Intelligence</h2>
+
+  <p>Mira's three vending machines correspond to three eras of AI. Understanding the difference is the foundation for everything else.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a1a1a"/>
+        </marker>
+      </defs>
+
+      <!-- Three columns: Rules, Learning, Intelligence -->
+      <!-- Column 1: Rule-based -->
+      <rect x="20" y="40" width="200" height="320" fill="#fff7ed" stroke="#c4651f" stroke-width="2" rx="6"/>
+      <text x="120" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#c4651f">ERA 1 · 1950s–2010s</text>
+      <text x="120" y="90" text-anchor="middle" font-family="Newsreader, serif" font-size="18" font-weight="700" fill="#1a1a1a">Rule-Based</text>
+      <text x="120" y="108" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#6b6b6b">"if-then" logic</text>
+
+      <text x="35" y="145" font-family="Newsreader, serif" font-size="13" fill="#3a3a3a">Humans write</text>
+      <text x="35" y="163" font-family="Newsreader, serif" font-size="13" fill="#3a3a3a">every rule by hand.</text>
+
+      <text x="35" y="195" font-family="Newsreader, serif" font-size="12" font-weight="700" fill="#1a1a1a">Examples:</text>
+      <text x="35" y="213" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">• Calculators</text>
+      <text x="35" y="231" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">• Vending machines</text>
+      <text x="35" y="249" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">• Chess (Deep Blue)</text>
+      <text x="35" y="267" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">• Tax software</text>
+
+      <text x="35" y="305" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#c4651f">Strength: predictable</text>
+      <text x="35" y="320" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#c4651f">Weakness: brittle</text>
+      <text x="35" y="335" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#c4651f">— breaks on edge cases</text>
+
+      <!-- Column 2: ML -->
+      <rect x="245" y="40" width="200" height="320" fill="#e8f0f7" stroke="#2d6a8e" stroke-width="2" rx="6"/>
+      <text x="345" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#2d6a8e">ERA 2 · 2010s–2017</text>
+      <text x="345" y="90" text-anchor="middle" font-family="Newsreader, serif" font-size="18" font-weight="700" fill="#1a1a1a">Learning</text>
+      <text x="345" y="108" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#6b6b6b">learn from data</text>
+
+      <text x="260" y="145" font-family="Newsreader, serif" font-size="13" fill="#3a3a3a">Machine builds</text>
+      <text x="260" y="163" font-family="Newsreader, serif" font-size="13" fill="#3a3a3a">its own rules.</text>
+
+      <text x="260" y="195" font-family="Newsreader, serif" font-size="12" font-weight="700" fill="#1a1a1a">Examples:</text>
+      <text x="260" y="213" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">• Spam filters</text>
+      <text x="260" y="231" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">• Face recognition</text>
+      <text x="260" y="249" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">• Recommendations</text>
+      <text x="260" y="267" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">• Self-driving (early)</text>
+
+      <text x="260" y="305" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#2d6a8e">Strength: pattern-finding</text>
+      <text x="260" y="320" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#2d6a8e">Weakness: needs labeled</text>
+      <text x="260" y="335" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#2d6a8e">data; no creativity</text>
+
+      <!-- Column 3: GenAI -->
+      <rect x="470" y="40" width="210" height="320" fill="#f0e8f7" stroke="#5b3a8b" stroke-width="2" rx="6"/>
+      <text x="575" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#5b3a8b">ERA 3 · 2017–NOW</text>
+      <text x="575" y="90" text-anchor="middle" font-family="Newsreader, serif" font-size="18" font-weight="700" fill="#1a1a1a">Generative</text>
+      <text x="575" y="108" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#6b6b6b">create new things</text>
+
+      <text x="485" y="145" font-family="Newsreader, serif" font-size="13" fill="#3a3a3a">Machine creates</text>
+      <text x="485" y="163" font-family="Newsreader, serif" font-size="13" fill="#3a3a3a">novel content.</text>
+
+      <text x="485" y="195" font-family="Newsreader, serif" font-size="12" font-weight="700" fill="#1a1a1a">Examples:</text>
+      <text x="485" y="213" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">• ChatGPT, Claude</text>
+      <text x="485" y="231" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">• Midjourney, DALL-E</text>
+      <text x="485" y="249" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">• Sora, ElevenLabs</text>
+      <text x="485" y="267" font-family="Newsreader, serif" font-size="12" fill="#3a3a3a">• AI agents</text>
+
+      <text x="485" y="305" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#5b3a8b">Strength: creative, flexible</text>
+      <text x="485" y="320" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#5b3a8b">Weakness: confidently</text>
+      <text x="485" y="335" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#5b3a8b">wrong; expensive</text>
+    </svg>
+    <div class="diagram-caption">Three eras of AI. Each builds on the last. The transition from Era 2 to Era 3 happened in 2017 with the Transformer paper — Chapter 8 covers this.</div>
+  </div>
+
+  <h3>How they handle "Is this picture a cat?"</h3>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Era</th>
+        <th>How it works</th>
+        <th>What it can &amp; can't do</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Rule-Based</strong></td>
+        <td>"Count fur pixels. If fur &gt; 30%, count whiskers. If whiskers &gt; 4 and ears are pointy, output 'cat'."</td>
+        <td>Works on simple cases. Breaks the moment the cat is partly hidden, looks weird, or you've never seen this breed.</td>
+      </tr>
+      <tr>
+        <td><strong>Machine Learning</strong></td>
+        <td>"Show me 100,000 images labeled cat/not-cat. I'll figure out which patterns matter."</td>
+        <td>Excellent at this exact task. Useless if you ask it to also detect dogs unless you retrain it.</td>
+      </tr>
+      <tr>
+        <td><strong>Generative AI</strong></td>
+        <td>"I learned how the world looks, broadly. I can spot a cat. I can also describe it, generate a new one, write a poem about it…"</td>
+        <td>Surprisingly versatile. Sometimes confidently wrong. Costs much more compute.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="example">
+    <div class="example-label">Real example: Email spam</div>
+    <p><strong>1990s spam filter:</strong> a list of suspicious words. If the email contains "Nigerian prince" or "click here now" — flag it.</p>
+    <p><strong>2010s spam filter (ML):</strong> trained on a billion emails labeled spam or not-spam. Learned to weigh thousands of subtle signals — sender reputation, unusual link patterns, formatting quirks.</p>
+    <p><strong>2024 spam filter (GenAI-augmented):</strong> can read the email's actual <em>meaning</em> and detect if a stranger is trying to manipulate the reader emotionally — even if no individual word is suspicious.</p>
+  </div>
+
+  <h2 id="narrow-vs-general">Narrow AI vs General AI</h2>
+
+  <p>Another important distinction. Almost every AI you've ever used is "narrow" — it's good at one specific task. The dream (and fear) of "General AI" is something else entirely.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg">
+      <!-- Narrow AI side -->
+      <rect x="30" y="30" width="290" height="270" fill="#f5f3ed" stroke="#1a1a1a" stroke-width="2" rx="6"/>
+      <text x="175" y="58" text-anchor="middle" font-family="Newsreader, serif" font-size="20" font-weight="700" fill="#1a1a1a">Narrow AI</text>
+      <text x="175" y="76" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-style="italic" fill="#6b6b6b">(also called "Weak AI")</text>
+
+      <text x="175" y="108" text-anchor="middle" font-family="Newsreader, serif" font-size="13" fill="#3a3a3a">Excellent at one thing.</text>
+      <text x="175" y="125" text-anchor="middle" font-family="Newsreader, serif" font-size="13" fill="#3a3a3a">Useless outside it.</text>
+
+      <!-- Icons/labels -->
+      <circle cx="80" cy="170" r="22" fill="#2d6a8e"/>
+      <text x="80" y="175" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="white">CHESS</text>
+      <text x="80" y="210" text-anchor="middle" font-family="Newsreader, serif" font-size="10" fill="#3a3a3a">Stockfish</text>
+
+      <circle cx="175" cy="170" r="22" fill="#5b3a8b"/>
+      <text x="175" y="175" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="white">PROTEIN</text>
+      <text x="175" y="210" text-anchor="middle" font-family="Newsreader, serif" font-size="10" fill="#3a3a3a">AlphaFold</text>
+
+      <circle cx="270" cy="170" r="22" fill="#c4651f"/>
+      <text x="270" y="175" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="white">DRIVE</text>
+      <text x="270" y="210" text-anchor="middle" font-family="Newsreader, serif" font-size="10" fill="#3a3a3a">Waymo</text>
+
+      <text x="175" y="252" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">"Stockfish can crush a world</text>
+      <text x="175" y="268" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">champion at chess. It cannot</text>
+      <text x="175" y="284" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">play tic-tac-toe."</text>
+
+      <!-- General AI side -->
+      <rect x="380" y="30" width="290" height="270" fill="#f0e8f7" stroke="#5b3a8b" stroke-width="2" rx="6"/>
+      <text x="525" y="58" text-anchor="middle" font-family="Newsreader, serif" font-size="20" font-weight="700" fill="#1a1a1a">AGI / Strong AI</text>
+      <text x="525" y="76" text-anchor="middle" font-family="Newsreader, serif" font-size="13" font-style="italic" fill="#6b6b6b">(Artificial General Intelligence)</text>
+
+      <text x="525" y="108" text-anchor="middle" font-family="Newsreader, serif" font-size="13" fill="#3a3a3a">Good at any cognitive task</text>
+      <text x="525" y="125" text-anchor="middle" font-family="Newsreader, serif" font-size="13" fill="#3a3a3a">a human can do.</text>
+
+      <text x="525" y="170" text-anchor="middle" font-family="Newsreader, serif" font-size="48">🧠</text>
+
+      <text x="525" y="220" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#5b3a8b">Doesn't exist yet.</text>
+      <text x="525" y="236" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#5b3a8b">Modern LLMs are</text>
+      <text x="525" y="252" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#5b3a8b">surprisingly close to</text>
+      <text x="525" y="268" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#5b3a8b">general — but still narrow</text>
+      <text x="525" y="284" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#5b3a8b">in important ways.</text>
+    </svg>
+    <div class="diagram-caption">Every AI system that exists today is technically "narrow." Modern LLMs blur the line — they're general across <em>language</em> tasks, but still not general intelligence.</div>
+  </div>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>A really good chess robot is like a kid who's amazing at chess but can't tie their shoes. They have one super-power and zero everything else. That's narrow AI.</p>
+    <p>A kid who can do school, sports, talk to friends, learn a new game, and figure out new things they've never seen — that's general intelligence. Computers can't really do that yet. But they're getting closer than they used to be.</p>
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · Use these in conversation</div>
+    <p><strong>ANI</strong> (Artificial Narrow Intelligence) — every AI shipping today. Sometimes just called <strong>"narrow AI"</strong> or <strong>"weak AI."</strong></p>
+    <p><strong>AGI</strong> (Artificial General Intelligence) — hypothetical AI that matches humans across all cognitive tasks. Sam Altman, Dario Amodei, and Demis Hassabis all talk about AGI as a goal — they just disagree on the timeline (2027? 2035? 2050?).</p>
+    <p><strong>ASI</strong> (Artificial Superintelligence) — hypothetical AI smarter than humans at everything. The thing Nick Bostrom and Eliezer Yudkowsky write about. Don't bring this up casually unless you're at a Bay Area dinner party.</p>
+    <p>When someone says "We need AGI to solve this," they're usually wrong — most problems need better narrow AI, not general intelligence. Knowing this distinction makes you sound informed.</p>
+  </div>
+
+  <h2 id="what-ai-isnt">What AI Isn't (and Common Myths)</h2>
+
+  <p>Movies have given everyone a pretty wrong mental model. Let's clean it up.</p>
+
+  <h3>Myth 1: "AI is conscious / has feelings"</h3>
+  <p>No current AI has feelings, awareness, or experience. ChatGPT saying "I'm happy to help!" is not happy. It's predicting that "I'm happy to help!" is the kind of thing that would be said in this context. Whether <em>future</em> AI could be conscious is a real philosophy question — but today's AIs are very, very fancy autocomplete.</p>
+
+  <h3>Myth 2: "AI is always learning from your conversations"</h3>
+  <p>By default, when you chat with ChatGPT or Claude, the AI does <em>not</em> update its weights from your conversation. The model is "frozen" at training time. Some companies use chat data to train <em>future</em> models — but the model you're talking to right now isn't getting smarter mid-chat.</p>
+
+  <h3>Myth 3: "AI is one big brain"</h3>
+  <p>There are hundreds of different AI models, made by different companies, trained differently, good at different things. ChatGPT, Claude, Gemini, Llama, Mistral, DeepSeek, Qwen — these are all separate models. They don't talk to each other. They don't share knowledge. Each one is its own self-contained system.</p>
+
+  <h3>Myth 4: "AI = robots"</h3>
+  <p>Almost no AI today is in a robot. Most AI is software running on servers. The robot in <em>Terminator</em> needed a body to be scary; ChatGPT just needs a web browser. The interesting AI stuff happens in data centers, not on legs.</p>
+
+  <h3>Myth 5: "AI understands what it's saying"</h3>
+  <p>This is the hardest one. AI <em>seems</em> to understand because its outputs are coherent. But "understanding" in the human sense — having a model of meaning, intent, truth — is a deep philosophical question, and most researchers think today's AI doesn't have it. (Some disagree. We'll come back to this in Chapter 11.)</p>
+
+  <div class="callout-warn">
+    <div class="callout-label">⚠ Important</div>
+    <p>The fact that an AI is good at <em>seeming</em> intelligent doesn't mean it <em>is</em> intelligent in the human sense. This is called the <strong>Eliza Effect</strong> — humans naturally project minds onto things that talk fluently. Knowing this protects you from over-trusting AI outputs.</p>
+  </div>
+
+  <h2 id="the-stack">The AI Stack You'll Meet in This Book</h2>
+
+  <p>Here's the layered system you'll learn, from bottom to top. Don't worry about understanding it all yet — this is a roadmap.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 700 460" xmlns="http://www.w3.org/2000/svg">
+      <!-- Layer 1: Hardware -->
+      <rect x="100" y="400" width="500" height="50" fill="#fafaf6" stroke="#1a1a1a" stroke-width="2" rx="4"/>
+      <text x="350" y="420" text-anchor="middle" font-family="Newsreader, serif" font-size="14" font-weight="700" fill="#1a1a1a">Layer 0: Hardware</text>
+      <text x="350" y="438" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#6b6b6b">GPUs · TPUs · CPUs · Memory</text>
+
+      <!-- Layer 2: Math -->
+      <rect x="100" y="340" width="500" height="50" fill="#fff7ed" stroke="#c4651f" stroke-width="2" rx="4"/>
+      <text x="350" y="360" text-anchor="middle" font-family="Newsreader, serif" font-size="14" font-weight="700" fill="#1a1a1a">Layer 1: Math &amp; Algorithms</text>
+      <text x="350" y="378" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#6b6b6b">Linear algebra · Probability · Backpropagation · Gradient descent</text>
+
+      <!-- Layer 3: Neural networks -->
+      <rect x="100" y="280" width="500" height="50" fill="#e8f0f7" stroke="#2d6a8e" stroke-width="2" rx="4"/>
+      <text x="350" y="300" text-anchor="middle" font-family="Newsreader, serif" font-size="14" font-weight="700" fill="#1a1a1a">Layer 2: Neural Networks</text>
+      <text x="350" y="318" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#6b6b6b">Neurons · Layers · Activations · CNNs · RNNs · Transformers</text>
+
+      <!-- Layer 4: Models -->
+      <rect x="100" y="220" width="500" height="50" fill="#f0e8f7" stroke="#5b3a8b" stroke-width="2" rx="4"/>
+      <text x="350" y="240" text-anchor="middle" font-family="Newsreader, serif" font-size="14" font-weight="700" fill="#1a1a1a">Layer 3: Foundation Models (LLMs &amp; Diffusion)</text>
+      <text x="350" y="258" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#6b6b6b">GPT-4 · Claude · Gemini · Llama · Stable Diffusion · Sora</text>
+
+      <!-- Layer 5: Capabilities -->
+      <rect x="100" y="160" width="500" height="50" fill="#f0fdf4" stroke="#2d8a5e" stroke-width="2" rx="4"/>
+      <text x="350" y="180" text-anchor="middle" font-family="Newsreader, serif" font-size="14" font-weight="700" fill="#1a1a1a">Layer 4: Capabilities &amp; Techniques</text>
+      <text x="350" y="198" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#6b6b6b">Prompting · RAG · Embeddings · Fine-tuning · Tool use · Reasoning</text>
+
+      <!-- Layer 6: Applications -->
+      <rect x="100" y="100" width="500" height="50" fill="#fef7e6" stroke="#d4a017" stroke-width="2" rx="4"/>
+      <text x="350" y="120" text-anchor="middle" font-family="Newsreader, serif" font-size="14" font-weight="700" fill="#1a1a1a">Layer 5: Agents &amp; Applications</text>
+      <text x="350" y="138" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#6b6b6b">ChatGPT · Cursor · Devin · Multi-agent systems · MCP</text>
+
+      <!-- Top: Society -->
+      <rect x="100" y="40" width="500" height="50" fill="#fee2e2" stroke="#8b2c2c" stroke-width="2" rx="4"/>
+      <text x="350" y="60" text-anchor="middle" font-family="Newsreader, serif" font-size="14" font-weight="700" fill="#1a1a1a">Layer 6: Society, Ethics &amp; Alignment</text>
+      <text x="350" y="78" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#6b6b6b">Safety · Bias · Regulation · The future of work · AGI risk</text>
+
+      <!-- Direction arrow -->
+      <text x="40" y="55" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b6b6b">⬆ ABSTRACT</text>
+      <text x="40" y="425" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b6b6b">⬇ CONCRETE</text>
+    </svg>
+    <div class="diagram-caption">The AI stack. Each layer builds on the one below it. We'll build up through this stack chapter by chapter.</div>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself — say the answers out loud</div>
+    <ol>
+      <li>What are the three modern definitions of "AI" that this chapter described?</li>
+      <li>Your aunt says "GPS isn't really AI." Is she right? Why or why not?</li>
+      <li>What's the difference between rule-based AI and machine learning?</li>
+      <li>What does ANI vs AGI vs ASI mean?</li>
+      <li>Why does the chapter warn you about the "Eliza Effect"?</li>
+    </ol>
+    <details>
+      <summary>Show answers</summary>
+      <ol>
+        <li>(1) AI as a broad field of "machines doing things that need intelligence"; (2) Machine Learning — systems that learn from data; (3) Generative AI — systems that create new content.</li>
+        <li>By the original 1950s definition, GPS <em>is</em> AI. By the modern colloquial definition (chatbots and image generators), it isn't. Both views are defensible — the word "AI" is ambiguous.</li>
+        <li>Rule-based: humans write the rules. ML: humans show examples and the machine builds its own rules from patterns.</li>
+        <li>ANI = narrow AI, good at one thing (everything today). AGI = general AI, matches humans on all cognitive tasks (doesn't exist yet). ASI = superintelligence, smarter than humans at everything (hypothetical).</li>
+        <li>Because humans naturally project minds onto things that talk fluently — we'll feel an AI "understands" us even when it doesn't, and that can lead us to over-trust its outputs.</li>
+      </ol>
+    </details>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <div class="references-label">📚 Books, videos, and articles to deepen this chapter</div>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type book">Book</span>
+        <span class="ref-detail"><strong>"AI: A Modern Approach"</strong> by Russell &amp; Norvig — the classic textbook. Read <em>Chapter 1 (pp. 1–34)</em> for the academic version of this chapter.</span>
+      </li>
+      <li>
+        <span class="ref-type book">Book</span>
+        <span class="ref-detail"><strong>"The Coming Wave"</strong> by Mustafa Suleyman — read <em>Part 1 (chs. 1–4, ~80 pages)</em>. Plain-English context on where AI fits in modern technology waves.</span>
+      </li>
+      <li>
+        <span class="ref-type video">Video</span>
+        <span class="ref-detail"><strong>"But what IS a neural network?"</strong> by 3Blue1Brown · YouTube · ~19 min · The single best visual introduction to the entire field. Watch this even before continuing.</span>
+      </li>
+      <li>
+        <span class="ref-type video">Video</span>
+        <span class="ref-detail"><strong>"The 70-year history of AI"</strong> by Computerphile · YouTube · ~15 min · Solid history overview that complements Chapter 6.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>"What is artificial intelligence?"</strong> by McKinsey · mckinsey.com · Free · A clean, business-friendly summary of the same concepts in this chapter.</span>
+      </li>
+      <li>
+        <span class="ref-type course">Course</span>
+        <span class="ref-detail"><strong>"AI for Everyone"</strong> by Andrew Ng on Coursera · Free to audit · ~6 hours · Skip if you finish this book; use as a parallel resource if you want video-based learning.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="index.html">← Home</a>
+    <div class="nav-spacer"></div>
+    <a href="ch02-how-machines-learn.html">Next: How Machines Learn →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Part 1 · Foundations · Chapter 1 of 24</div>
+</footer>
+
+</body>
+</html>

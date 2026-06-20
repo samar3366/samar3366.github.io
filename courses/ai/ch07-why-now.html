@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 7: Why AI Exploded — My AI Learning Journey</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-part="2">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a href="index.html" class="masthead-title"><em>My</em> AI Learning Journey</a>
+    <nav class="masthead-nav">
+      <a href="index.html">Home</a>
+      <a href="ch07-why-now.html" class="current">Part 2: History</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container-narrow">
+
+  <div class="crumbs">
+    <a href="index.html">Home</a> / <a href="index.html">History</a> / <span class="current">Why AI Exploded</span>
+  </div>
+
+  <div class="page-eyebrow">— Chapter 07 · Part 2 of 7 · History &amp; Why Now —</div>
+
+  <h1 class="page-title">Why AI Exploded in <em>2017–2024</em></h1>
+  <p class="page-subtitle">Three exponentials hit at once: scale, compute, and emergence. Understanding them tells you what's coming next.</p>
+
+  <div class="toc">
+    <div class="toc-label">On This Page</div>
+    <ol>
+      <li><a href="#kid">Kid Translation: Three Things Got Big At Once</a></li>
+      <li><a href="#scaling-laws">Scaling Laws: Bigger Is (Mostly) Better</a></li>
+      <li><a href="#emergence">Emergence: New Skills That Just Appear</a></li>
+      <li><a href="#compute-explosion">The Compute Explosion</a></li>
+      <li><a href="#data-explosion">The Data Explosion</a></li>
+      <li><a href="#what-comes-next">What This Tells Us About What's Next</a></li>
+      <li><a href="#self-check">Self-Check Questions</a></li>
+      <li><a href="#references">References &amp; Going Deeper</a></li>
+    </ol>
+  </div>
+
+  <h2 id="kid">Kid Translation: Three Things Got Big At Once</h2>
+
+  <div class="kid">
+    <div class="kid-label">🧒 Kid Translation</div>
+    <p>Imagine you wanted to bake the world's biggest cake. You'd need three things: <strong>ingredients</strong> (lots of flour and sugar), <strong>an oven</strong> (a giant one), and a <strong>recipe</strong> (one that actually works at huge scale).</p>
+    <p>For decades, AI had a great recipe (neural networks) but tiny ovens (slow computers) and tiny ingredients (small datasets). The recipe couldn't shine.</p>
+    <p>Around 2017, all three got big at once. The internet provided ingredients (trillions of words of text). Specialized chips (GPUs, TPUs) provided ovens. The transformer was the recipe that scaled. Bake.</p>
+    <p>Now imagine someone gives you a magic property: as you make the cake bigger, it doesn't just get larger — it spontaneously develops new flavors. Halfway through scaling up, suddenly it tastes like chocolate. Bigger still, suddenly vanilla appears. That's <strong>emergence</strong>, and it's the wildest part of modern AI.</p>
+  </div>
+
+  <h2 id="scaling-laws">Scaling Laws: Bigger Is (Mostly) Better</h2>
+
+  <p>In 2020, OpenAI published a paper called "Scaling Laws for Neural Language Models." They had trained dozens of language models of different sizes, on different amounts of data, with different compute budgets. The result was shocking: <strong>performance improved smoothly and predictably with scale</strong>, following neat mathematical laws.</p>
+
+  <p>This wasn't a small effect. Doubling the size, doubling the data, doubling the compute reliably gave you a better model. No diminishing returns visible. The implication: if you wanted a smarter model, you didn't need a smarter idea — you just needed bigger.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg">
+      <!-- Axes -->
+      <line x1="80" y1="200" x2="640" y2="200" stroke="#1a1a1a" stroke-width="2"/>
+      <line x1="80" y1="40" x2="80" y2="200" stroke="#1a1a1a" stroke-width="2"/>
+
+      <!-- Curve: smooth log-linear improvement -->
+      <path d="M 100 50 Q 200 70 300 95 Q 400 120 500 150 Q 580 180 620 195" fill="none" stroke="#1f6f8b" stroke-width="3"/>
+
+      <!-- Markers along the curve -->
+      <circle cx="120" cy="55" r="5" fill="#1f6f8b"/>
+      <text x="120" y="40" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#1a4a68">GPT-1</text>
+
+      <circle cx="220" cy="78" r="5" fill="#1f6f8b"/>
+      <text x="220" y="63" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#1a4a68">GPT-2</text>
+
+      <circle cx="340" cy="105" r="5" fill="#1f6f8b"/>
+      <text x="340" y="90" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#1a4a68">GPT-3</text>
+
+      <circle cx="460" cy="140" r="5" fill="#1f6f8b"/>
+      <text x="460" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#1a4a68">GPT-4</text>
+
+      <circle cx="580" cy="180" r="5" fill="#1f6f8b"/>
+      <text x="580" y="165" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#1a4a68">GPT-5+</text>
+
+      <!-- Labels -->
+      <text x="40" y="120" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#3a3a3a" transform="rotate(-90, 40, 120)">Loss (lower=better)</text>
+      <text x="360" y="225" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#3a3a3a">Compute · Data · Parameters (log scale)</text>
+    </svg>
+    <p class="diagram-caption">Scaling laws: model loss decreases predictably as you increase compute, data, or model size. Plotted on a log scale, it's almost a straight line. This is the chart that drove a $200B compute buildout.</p>
+  </figure>
+
+  <p>Scaling laws turned AI research into something more like physics or engineering — predictable. If you have $100M, you know what scale of model you can train, and roughly how good it'll be. This is why every big tech company built its own GPU cluster: scaling worked.</p>
+
+  <h2 id="emergence">Emergence: New Skills That Just Appear</h2>
+
+  <p>Here's where it gets weird. Scaling laws say models get <em>smoothly</em> better as you scale. But specific <strong>capabilities</strong> often appear suddenly — they don't exist at all in a small model, then they pop into existence past a certain size.</p>
+
+  <p>Examples documented across multiple research papers:</p>
+
+  <ul>
+    <li>Multi-step arithmetic — small models can't do it, large ones suddenly can.</li>
+    <li>Solving word problems — appears at a certain scale.</li>
+    <li>Following multi-step instructions reliably — emerges suddenly.</li>
+    <li>Translating between languages it was barely trained on — emerges.</li>
+    <li>Writing working code — improves continuously, but quality leaps appear.</li>
+  </ul>
+
+  <figure>
+    <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+      <line x1="60" y1="180" x2="640" y2="180" stroke="#1a1a1a" stroke-width="2"/>
+      <line x1="60" y1="40" x2="60" y2="180" stroke="#1a1a1a" stroke-width="2"/>
+
+      <!-- Flat at zero for a long time, then jumps -->
+      <path d="M 80 175 L 280 175 L 320 170 L 360 130 L 400 70 L 480 60 L 600 55" fill="none" stroke="#b54a3b" stroke-width="3"/>
+
+      <!-- Threshold line -->
+      <line x1="350" y1="40" x2="350" y2="180" stroke="#888" stroke-width="1" stroke-dasharray="3 3"/>
+      <text x="350" y="32" text-anchor="middle" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#6b6b6b">Capability threshold</text>
+
+      <!-- Annotations -->
+      <text x="170" y="160" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">"can't do it at all"</text>
+      <text x="500" y="50" font-family="Newsreader, serif" font-size="11" font-style="italic" fill="#3a3a3a">"can do it now"</text>
+
+      <text x="40" y="110" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#3a3a3a" transform="rotate(-90, 40, 110)">Performance</text>
+      <text x="350" y="205" text-anchor="middle" font-family="Newsreader, serif" font-size="12" font-style="italic" fill="#3a3a3a">Model scale →</text>
+    </svg>
+    <p class="diagram-caption">Emergent capabilities: the model is incompetent at the task, until past some scale threshold it suddenly isn't. Whether this is real or an artifact of how we measure is debated, but the effect is well-documented.</p>
+  </figure>
+
+  <p>Emergence is what makes modern AI feel magical and unpredictable. Nobody designed GPT-3 to do arithmetic. It just learned to. Nobody designed GPT-4 to pass the bar exam. It just did. Each scaling jump produced surprises.</p>
+
+  <h2 id="compute-explosion">The Compute Explosion</h2>
+
+  <p>The compute used to train top AI systems has roughly <strong>doubled every six months</strong> since 2010. That's wildly faster than Moore's Law. Total compute used for the largest models has grown by ~10⁸× since 2012.</p>
+
+  <p>What enabled this:</p>
+
+  <ol class="steps">
+    <li><strong>GPUs.</strong> NVIDIA's CUDA platform turned graphics chips into general parallel processors perfect for matrix math.</li>
+    <li><strong>TPUs &amp; AI accelerators.</strong> Google built custom chips just for tensor operations. Apple, AMD, Cerebras, Groq followed.</li>
+    <li><strong>Distributed training.</strong> Software (DeepSpeed, FSDP, Megatron) that could train one model across thousands of GPUs.</li>
+    <li><strong>Capital.</strong> Training GPT-4 reportedly cost over $100M. GPT-5-class models likely cost ~$1B. Only well-funded labs can play.</li>
+  </ol>
+
+  <h2 id="data-explosion">The Data Explosion</h2>
+
+  <p>LLMs are trained on datasets measured in trillions of tokens. Where does that come from?</p>
+
+  <ul>
+    <li><strong>Common Crawl</strong> — a massive snapshot of the public internet, refreshed monthly. ~250 billion pages.</li>
+    <li><strong>Wikipedia</strong> — heavily weighted because it's high quality.</li>
+    <li><strong>Books</strong> — millions of digitized texts.</li>
+    <li><strong>Code</strong> — GitHub, especially. Models that train on code think more rigorously.</li>
+    <li><strong>Scientific papers</strong> — arXiv, PubMed, etc.</li>
+    <li><strong>Curated, filtered, deduplicated</strong> — and increasingly, <strong>synthetic data</strong> generated by other models.</li>
+  </ul>
+
+  <div class="callout-warn">
+    <div class="callout-label">⚠ Caveat</div>
+    <p>We may be hitting a "data wall." Some researchers estimate the supply of high-quality public text is only enough for one or two more rounds of scaling. Future progress may depend more on better algorithms, synthetic data, and clever training than on simply finding more text. This is an active research front.</p>
+  </div>
+
+  <h2 id="what-comes-next">What This Tells Us About What's Next</h2>
+
+  <p>The simultaneous explosion of scaling laws + emergence + cheap compute + plentiful data created the modern AI moment. Understanding it lets you reason about the future:</p>
+
+  <table class="compare-table">
+    <thead>
+      <tr><th>Trend</th><th>What it means going forward</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Compute keeps growing</strong></td><td>Models will keep getting bigger. Costs will keep growing. Only a handful of labs (OpenAI, Anthropic, Google, Meta, xAI, DeepSeek, Mistral) can train frontier models.</td></tr>
+      <tr><td><strong>Data is hitting limits</strong></td><td>Pure scaling may slow. Algorithmic and architectural innovation matters more (e.g. mixture of experts, reasoning models).</td></tr>
+      <tr><td><strong>Inference compute matters too</strong></td><td>Reasoning models like o1/o3 use 100× more compute per query — different scaling axis.</td></tr>
+      <tr><td><strong>Emergence is unpredictable</strong></td><td>We can't reliably predict what new capabilities will pop up at the next scale. This is part of why AI safety is hard.</td></tr>
+      <tr><td><strong>Specialization vs. generality</strong></td><td>Expect both — frontier general models, plus specialized smaller models for specific domains.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    The reason AI feels different now isn't a single breakthrough. It's that scaling worked — and emergence keeps surprising us. Bet on continued surprise.
+  </div>
+
+  <div class="pro-talk">
+    <div class="pro-talk-label">💼 Pro Talk · How to sound fluent</div>
+    <p>"<strong>Compute</strong>" — the resource you're spending. Measured in FLOPs (floating-point operations) for training; in tokens for inference.</p>
+    <p>"<strong>Chinchilla scaling</strong>" — DeepMind's 2022 finding that data should grow with model size at a specific ratio. Made everyone realize earlier models were undertrained.</p>
+    <p>"<strong>Emergent capabilities</strong>" — abilities that appear suddenly past a scale threshold. Some researchers argue this is partly an artifact of evaluation metrics.</p>
+    <p>"<strong>Data wall</strong>" — the prediction that we'll exhaust high-quality training text before we can keep scaling.</p>
+    <p>"<strong>Test-time compute</strong>" or <strong>"inference-time scaling"</strong> — using more compute when answering, not training. The new scaling axis with reasoning models like o1, o3, Claude with extended thinking.</p>
+  </div>
+
+  <h2 id="self-check">Self-Check Questions</h2>
+
+  <div class="quiz">
+    <div class="quiz-label">🧠 Test yourself · Answer out loud</div>
+    <ol>
+      <li>What are scaling laws, in one sentence?
+        <details><summary>Answer</summary><p>Empirical mathematical relationships showing that model performance improves predictably as you increase model size, training data, and compute.</p></details>
+      </li>
+      <li>What's the difference between scaling and emergence?
+        <details><summary>Answer</summary><p>Scaling describes smooth, gradual improvement on a global metric (like loss). Emergence describes specific capabilities popping into existence — going from "can't do it" to "can do it" past a scale threshold.</p></details>
+      </li>
+      <li>Why did GPUs enable the deep learning revolution?
+        <details><summary>Answer</summary><p>GPUs do massive parallel matrix multiplications very fast — exactly the operation neural networks need most. CPUs are too sequential.</p></details>
+      </li>
+      <li>What's the "data wall" and why does it matter?
+        <details><summary>Answer</summary><p>The prediction that we're approaching the limits of available high-quality public training text. If true, simply scaling up won't keep working — we'll need better algorithms or synthetic data.</p></details>
+      </li>
+      <li>What's "test-time compute" and why is it interesting?
+        <details><summary>Answer</summary><p>It's compute spent when the model is answering a query, not when it's being trained. Reasoning models (o1, o3) use 10–100× more inference compute to "think longer." A new dimension to scale along, separate from training scale.</p></details>
+      </li>
+    </ol>
+  </div>
+
+  <h2 id="references">References &amp; Going Deeper</h2>
+
+  <div class="references">
+    <h3>Recommended next reading</h3>
+    <ul class="ref-list">
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"Scaling Laws for Neural Language Models"</strong> by Kaplan et al. (2020) — ~30 pages. The paper that justified the GPU spending. Read sections 1–3 carefully.</span>
+      </li>
+      <li>
+        <span class="ref-type paper">Paper</span>
+        <span class="ref-detail"><strong>"Emergent Abilities of Large Language Models"</strong> by Wei et al. (2022) — the canonical reference on emergence. Plus the response paper "Are Emergent Abilities a Mirage?" (Schaeffer et al., 2023).</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>"Compute Trends Across Three Eras of Machine Learning"</strong> · Epoch AI · Free · The definitive analysis of how compute use has grown. Updated regularly.</span>
+      </li>
+      <li>
+        <span class="ref-type book">Book</span>
+        <span class="ref-detail"><strong>The Coming Wave</strong> by Mustafa Suleyman — <em>Part 1 (chapters 1–4, ~120 pages)</em>. Big-picture context for why this technology is different.</span>
+      </li>
+      <li>
+        <span class="ref-type article">Article</span>
+        <span class="ref-detail"><strong>Dario Amodei: "Machines of Loving Grace"</strong> · darioamodei.com · Free · A serious take on what AI might do for humanity over the next decade.</span>
+      </li>
+    </ul>
+  </div>
+
+  <nav class="page-nav">
+    <a href="ch06-history.html">← Previous: Turing to Transformers</a>
+    <div class="nav-spacer"></div>
+    <a href="ch08-transformers.html">Next: The Transformer Revolution →</a>
+  </nav>
+
+</main>
+
+<footer class="colophon">
+  <div>Chapter 07 · Part 2 · History · Chapter 7 of 24</div>
+</footer>
+
+</body>
+</html>
